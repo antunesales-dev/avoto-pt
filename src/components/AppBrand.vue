@@ -26,31 +26,34 @@ defineProps({
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.65rem;
   text-decoration: none;
   color: inherit;
   min-width: 0;
 
   &--compact .brand__mark {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
 }
 
 .brand__mark {
   position: relative;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 2px;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 32, 91, 0.15);
+  border: 1px solid rgba(12, 27, 51, 0.12);
+  background: white;
 }
 
 .brand__flag {
   position: absolute;
-  inset: 0;
+  inset: 3px;
   display: flex;
+  border-radius: 1px;
+  overflow: hidden;
 }
 
 .brand__flag-green {
@@ -59,7 +62,7 @@ defineProps({
 }
 
 .brand__flag-gold {
-  width: 3px;
+  width: 2px;
   background: var(--pt-gold);
   flex-shrink: 0;
 }
@@ -77,33 +80,34 @@ defineProps({
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   letter-spacing: -0.02em;
+  z-index: 1;
 }
 
 .brand__text {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  line-height: 1.1;
+  line-height: 1.05;
 }
 
 .brand__name {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   color: var(--pt-navy);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .brand__slogan {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--pt-red);
-  margin-top: 0.15rem;
+  margin-top: 0.12rem;
 }
 </style>

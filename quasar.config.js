@@ -65,14 +65,14 @@ export default defineConfig((/* ctx */) => {
     framework: {
       config: {
         brand: {
-          primary: '#046a38',
-          secondary: '#da291c',
-          accent: '#f1bf00',
-          dark: '#00205b',
-          positive: '#0a8a4a',
-          negative: '#da291c',
+          primary: '#006633',
+          secondary: '#c8102e',
+          accent: '#e8b923',
+          dark: '#0c1b33',
+          positive: '#006633',
+          negative: '#c8102e',
           info: '#1d4ed8',
-          warning: '#f1bf00',
+          warning: '#e8b923',
         },
       },
 

@@ -50,11 +50,19 @@ const estadoClass = computed(() => {
   margin-bottom: 0.7rem;
 }
 
+.init-card {
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: #faf8f3;
+  }
+}
+
 .init-card__title {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.35;
   color: var(--pt-navy);
   margin: 0 0 0.35rem;
 }

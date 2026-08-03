@@ -1,24 +1,30 @@
-// Tipografia portuguesa — clássica + legível (pt-PT)
+// =============================================================================
+// A Voto — tema próprio (cívico / hemiciclo / jornal)
+// Menos “SaaS genérico”, mais Bancada Cidadã
+// =============================================================================
+
 :root {
-  --pt-green: #046a38;
-  --pt-green-dark: #024d28;
-  --pt-green-light: #0a8a4a;
-  --pt-red: #da291c;
-  --pt-red-dark: #b01f16;
-  --pt-gold: #f1bf00;
-  --pt-gold-dark: #c9a000;
-  --pt-navy: #00205b;
-  --pt-cream: #fbf8f3;
-  --pt-paper: #ffffff;
-  --pt-ink: #1c1917;
-  --pt-muted: #57534e;
-  --pt-border: #e7e5e4;
-  --pt-sidebar: 280px;
-  --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
-  --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  --pt-green: #006633;
+  --pt-green-dark: #004d27;
+  --pt-green-light: #0a7a3e;
+  --pt-red: #c8102e;
+  --pt-red-dark: #9e0c24;
+  --pt-gold: #e8b923;
+  --pt-navy: #0c1b33;
+  --pt-ink: #12141a;
+  --pt-muted: #4a4f59;
+  --pt-line: #c8c4bb;
+  --pt-paper: #fffcf7;
+  --pt-paper-2: #f3efe6;
+  --pt-cream: #f3efe6; /* alias */
+  --pt-border: #c8c4bb; /* alias → line */
+  --pt-white: #ffffff;
+  --font-display: 'Libre Baskerville', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  --shadow-soft: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px rgba(28, 25, 23, 0.06);
-  --radius: 14px;
+  --radius: 3px;
+  --rule: 1px solid var(--pt-line);
+  --shadow: none;
 }
 
 html,
@@ -27,13 +33,14 @@ body,
   min-height: 100%;
   font-family: var(--font-body);
   color: var(--pt-ink);
-  background: var(--pt-cream);
+  background: var(--pt-paper-2);
   -webkit-font-smoothing: antialiased;
 }
 
 body {
   font-size: 16px;
   line-height: 1.55;
+  letter-spacing: 0.01em;
 }
 
 h1,
@@ -42,25 +49,27 @@ h3,
 h4,
 .font-display {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--pt-navy);
+  line-height: 1.2;
 }
 
 a {
   color: var(--pt-green-dark);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 
   &:hover {
     color: var(--pt-red);
   }
 }
 
-// Faixa da bandeira (verde | vermelho)
+// ---------------------------------------------------------------------------
+// Faixa bandeira — fina, editorial
+// ---------------------------------------------------------------------------
 .flag-stripe {
   display: flex;
-  height: 4px;
+  height: 3px;
   width: 100%;
   flex-shrink: 0;
 
@@ -75,165 +84,166 @@ a {
   }
 }
 
-.flag-bar-vertical {
-  width: 6px;
-  flex-shrink: 0;
-  background: linear-gradient(
-    180deg,
-    var(--pt-green) 0%,
-    var(--pt-green) 40%,
-    var(--pt-gold) 40%,
-    var(--pt-gold) 42%,
-    var(--pt-red) 42%,
-    var(--pt-red) 100%
-  );
-  border-radius: 99px;
-}
-
-// Página content
+// ---------------------------------------------------------------------------
+// Layout de página
+// ---------------------------------------------------------------------------
 .page-shell {
-  max-width: 1120px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 3rem;
+  padding: 1.5rem 1.1rem 3.5rem;
 
   @media (min-width: 1024px) {
-    padding: 1.75rem 1.75rem 3.5rem;
+    padding: 2rem 1.5rem 4rem;
   }
 }
 
 .page-title {
   font-family: var(--font-display);
-  font-size: clamp(1.85rem, 3vw, 2.45rem);
+  font-size: clamp(1.65rem, 3.2vw, 2.15rem);
   font-weight: 700;
-  line-height: 1.15;
   color: var(--pt-navy);
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.4rem;
+  border-bottom: 2px solid var(--pt-navy);
+  padding-bottom: 0.55rem;
+  display: inline-block;
+  width: 100%;
 }
 
 .page-subtitle {
   color: var(--pt-muted);
-  font-size: 1.05rem;
-  margin: 0 0 1.5rem;
-  max-width: 52rem;
+  font-size: 1rem;
+  margin: 0.75rem 0 1.5rem;
+  max-width: 40rem;
+  line-height: 1.55;
 }
 
 .section-title {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--pt-navy);
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.9rem;
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.65rem;
+  text-transform: none;
+  letter-spacing: 0;
 
   &::before {
     content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    background: linear-gradient(135deg, var(--pt-green) 50%, var(--pt-red) 50%);
-    box-shadow: 0 0 0 2px rgba(241, 191, 0, 0.35);
+    width: 4px;
+    height: 1.1em;
+    background: var(--pt-red);
+    flex-shrink: 0;
   }
 }
 
-// Cards
+// ---------------------------------------------------------------------------
+// Cards — papel, borda, sem “glass”
+// ---------------------------------------------------------------------------
 .av-card {
-  background: var(--pt-paper);
-  border: 1px solid var(--pt-border);
+  background: var(--pt-white);
+  border: var(--rule);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
   overflow: hidden;
 }
 
 .av-card-pad {
-  padding: 1.15rem 1.2rem;
+  padding: 1.1rem 1.15rem;
 }
 
-// Badges de estado
+// ---------------------------------------------------------------------------
+// Badges — rectangulares, tipográficos
+// ---------------------------------------------------------------------------
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.75rem;
+  gap: 0.25rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 0.28rem 0.6rem;
-  border-radius: 999px;
-  line-height: 1;
+  padding: 0.22rem 0.45rem;
+  border-radius: 2px;
+  line-height: 1.2;
+  border: 1px solid transparent;
 
   &--green {
-    background: rgba(4, 106, 56, 0.12);
+    background: #e8f5ee;
     color: var(--pt-green-dark);
+    border-color: #b7dcc8;
   }
 
   &--red {
-    background: rgba(218, 41, 28, 0.12);
+    background: #fdeceb;
     color: var(--pt-red-dark);
+    border-color: #f0c4c8;
   }
 
   &--gold {
-    background: rgba(241, 191, 0, 0.2);
-    color: #7a5f00;
+    background: #fbf3d5;
+    color: #6b5500;
+    border-color: #e8d48a;
   }
 
   &--navy {
-    background: rgba(0, 32, 91, 0.1);
+    background: #eef1f6;
     color: var(--pt-navy);
+    border-color: #c5cedd;
   }
 
   &--muted {
-    background: #f5f5f4;
+    background: #f0eeea;
     color: var(--pt-muted);
+    border-color: var(--pt-line);
   }
 }
 
-// Barra de voto (cidadãos)
+// ---------------------------------------------------------------------------
+// Votos
+// ---------------------------------------------------------------------------
 .vote-track {
   display: flex;
-  height: 12px;
-  border-radius: 99px;
+  height: 10px;
+  border-radius: 0;
   overflow: hidden;
-  background: #f5f5f4;
-  border: 1px solid var(--pt-border);
+  background: var(--pt-paper-2);
+  border: 1px solid var(--pt-line);
 }
 
 .vote-seg {
   height: 100%;
   min-width: 2px;
-  transition: width 0.35s ease;
 
   &--favor {
     background: var(--pt-green);
   }
-
   &--contra {
     background: var(--pt-red);
   }
-
   &--abstencao {
-    background: #a8a29e;
+    background: #8a8680;
   }
 }
 
-// ID de cidadão
 .cid-chip {
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  background: rgba(0, 32, 91, 0.06);
+  background: var(--pt-paper-2);
   color: var(--pt-navy);
-  border: 1px solid rgba(0, 32, 91, 0.12);
-  padding: 0.2rem 0.55rem;
-  border-radius: 6px;
+  border: 1px solid var(--pt-line);
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
 }
 
-// Grid de métricas
 .stats-grid {
   display: grid;
-  gap: 0.9rem;
+  gap: 0;
   grid-template-columns: 1fr;
+  border: var(--rule);
+  background: var(--pt-white);
 
   @media (min-width: 600px) {
     grid-template-columns: repeat(2, 1fr);
@@ -242,9 +252,13 @@ a {
   @media (min-width: 1024px) {
     grid-template-columns: repeat(4, 1fr);
   }
+
+  > * {
+    border-right: var(--rule);
+    border-bottom: var(--rule);
+  }
 }
 
-// Layout helpers
 .stack {
   display: flex;
   flex-direction: column;
@@ -254,7 +268,7 @@ a {
 .stack-lg {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .row-between {
@@ -265,10 +279,9 @@ a {
   flex-wrap: wrap;
 }
 
-// Prose for static pages
 .prose {
   color: var(--pt-ink);
-  max-width: 48rem;
+  max-width: 42rem;
 
   p {
     margin: 0 0 1rem;
@@ -277,11 +290,11 @@ a {
   ul,
   ol {
     margin: 0 0 1rem;
-    padding-left: 1.25rem;
+    padding-left: 1.2rem;
   }
 
   li {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
   }
 
   strong {
@@ -289,63 +302,61 @@ a {
   }
 
   h3 {
-    font-size: 1.25rem;
-    margin: 1.5rem 0 0.6rem;
+    font-size: 1.1rem;
+    margin: 1.4rem 0 0.5rem;
   }
 }
 
-// Empty / notice boxes
 .notice {
-  border-left: 4px solid var(--pt-gold);
-  background: rgba(241, 191, 0, 0.08);
-  padding: 0.9rem 1rem;
-  border-radius: 0 10px 10px 0;
+  border-left: 3px solid var(--pt-gold);
+  background: #fbf6e6;
+  padding: 0.85rem 1rem;
+  border-radius: 0;
   color: var(--pt-ink);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 .notice-info {
   border-left-color: var(--pt-green);
-  background: rgba(4, 106, 56, 0.06);
+  background: #eef7f1;
 }
 
-// Party color dots
 .party-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-// Tables
 .av-table-wrap {
   overflow-x: auto;
-  border-radius: var(--radius);
-  border: 1px solid var(--pt-border);
-  background: var(--pt-paper);
+  border: var(--rule);
+  background: var(--pt-white);
+  border-radius: 0;
 }
 
 .av-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 
   th,
   td {
-    padding: 0.75rem 1rem;
+    padding: 0.7rem 0.9rem;
     text-align: left;
-    border-bottom: 1px solid var(--pt-border);
+    border-bottom: var(--rule);
     white-space: nowrap;
   }
 
   th {
-    background: rgba(0, 32, 91, 0.04);
+    background: var(--pt-paper-2);
     font-weight: 700;
     color: var(--pt-navy);
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
   }
 
   tr:last-child td {
@@ -353,129 +364,141 @@ a {
   }
 
   tbody tr:hover {
-    background: rgba(4, 106, 56, 0.03);
+    background: #faf8f3;
   }
 }
 
-// Filter chips row
 .filter-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
   margin-bottom: 1rem;
 }
 
 .chip-btn {
   appearance: none;
-  border: 1px solid var(--pt-border);
-  background: var(--pt-paper);
+  border: 1px solid var(--pt-line);
+  background: var(--pt-white);
   color: var(--pt-muted);
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  border-radius: 2px;
   cursor: pointer;
-  transition: 0.15s ease;
 
   &:hover {
-    border-color: var(--pt-green);
-    color: var(--pt-green-dark);
+    border-color: var(--pt-navy);
+    color: var(--pt-navy);
   }
 
   &.is-active {
-    background: var(--pt-green);
-    border-color: var(--pt-green);
+    background: var(--pt-navy);
+    border-color: var(--pt-navy);
     color: white;
   }
 }
 
-// Hero on home
+// ---------------------------------------------------------------------------
+// Hero — masthead, não “gradient blob”
+// ---------------------------------------------------------------------------
 .hero {
   position: relative;
-  border-radius: calc(var(--radius) + 4px);
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse 80% 80% at 100% 0%, rgba(218, 41, 28, 0.12), transparent 55%),
-    radial-gradient(ellipse 70% 70% at 0% 100%, rgba(4, 106, 56, 0.14), transparent 50%),
-    linear-gradient(145deg, #fff 0%, #f7f4ee 100%);
-  border: 1px solid var(--pt-border);
-  box-shadow: var(--shadow-soft);
-  padding: 1.5rem 1.35rem 1.6rem;
+  border: var(--rule);
+  background: var(--pt-white);
+  padding: 1.75rem 1.35rem 1.85rem;
+  border-radius: 0;
 
   @media (min-width: 768px) {
-    padding: 2rem 2.1rem 2.15rem;
+    padding: 2.25rem 2rem 2.1rem;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--pt-green) 40%, var(--pt-red) 40%);
   }
 
   &__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.78rem;
+    display: inline-block;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--pt-red);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid var(--pt-red);
+    padding-bottom: 0.2rem;
   }
 
   &__title {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 4.5vw, 3.1rem);
+    font-size: clamp(1.85rem, 4.2vw, 2.75rem);
     font-weight: 700;
-    line-height: 1.08;
+    line-height: 1.12;
     color: var(--pt-navy);
-    margin: 0 0 0.75rem;
-    max-width: 16ch;
+    margin: 0 0 0.85rem;
+    max-width: 14ch;
   }
 
   &__lead {
-    font-size: 1.08rem;
+    font-size: 1.02rem;
     color: var(--pt-muted);
-    max-width: 40rem;
-    margin: 0 0 1.35rem;
+    max-width: 38rem;
+    margin: 0 0 1.4rem;
+    line-height: 1.6;
   }
 
   &__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.65rem;
+    gap: 0.55rem;
   }
 }
 
-// Buttons (custom, beyond Quasar)
+// ---------------------------------------------------------------------------
+// Botões — rectos, tipográficos
+// ---------------------------------------------------------------------------
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 0.95rem;
-  padding: 0.65rem 1.15rem;
-  border-radius: 10px;
-  border: 2px solid transparent;
+  font-size: 0.9rem;
+  padding: 0.6rem 1.05rem;
+  border-radius: 2px;
+  border: 1.5px solid transparent;
   cursor: pointer;
   text-decoration: none;
-  transition: 0.15s ease;
   line-height: 1.2;
+  letter-spacing: 0.02em;
 
   &--primary {
     background: var(--pt-green);
+    border-color: var(--pt-green);
     color: white;
 
     &:hover {
       background: var(--pt-green-dark);
+      border-color: var(--pt-green-dark);
       color: white;
     }
   }
 
   &--secondary {
     background: var(--pt-red);
+    border-color: var(--pt-red);
     color: white;
 
     &:hover {
       background: var(--pt-red-dark);
+      border-color: var(--pt-red-dark);
       color: white;
     }
   }
@@ -492,61 +515,53 @@ a {
   }
 
   &--ghost {
-    background: rgba(4, 106, 56, 0.08);
-    color: var(--pt-green-dark);
+    background: transparent;
+    border-color: var(--pt-line);
+    color: var(--pt-navy);
 
     &:hover {
-      background: rgba(4, 106, 56, 0.14);
+      border-color: var(--pt-green);
       color: var(--pt-green-dark);
     }
   }
 
   &--sm {
-    font-size: 0.85rem;
-    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
   }
 }
 
-// Link card
 .link-card {
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(28, 25, 23, 0.1);
-
     .link-card__title {
-      color: var(--pt-green-dark);
+      color: var(--pt-red);
     }
   }
 }
 
-// Scrollbar subtle
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
-  border-radius: 99px;
-  border: 2px solid transparent;
-  background-clip: content-box;
+  background: #c4c0b6;
+  border-radius: 0;
 }
 
-// Quasar overrides for Portuguese brand
 .q-drawer {
-  background: var(--pt-paper) !important;
+  background: var(--pt-white) !important;
 }
 
 .q-header {
-  background: var(--pt-paper) !important;
+  background: var(--pt-white) !important;
   color: var(--pt-ink) !important;
 }
 
 .q-page-container {
-  background: var(--pt-cream);
+  background: var(--pt-paper-2);
 }

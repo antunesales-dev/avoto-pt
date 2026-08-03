@@ -116,10 +116,11 @@
 
 ```
 [x] 1.1–1.7  Supabase cloud
+[x] 2.1–2.5  Cloudflare Pages (https://avoto-pt.pages.dev)
+[x] 2.7      Auth site URL → pages.dev
 [ ] 5.1–5.4  Licença (rápido, qualquer altura)
-[ ] 2.1–2.5  Cloudflare Pages (*.pages.dev)
-[ ] 4.1–4.6  Auth produção (com URL Pages)
-[ ] 2.6–2.7  Domínio avoto.pt + redirects finais
+[ ] 4.1–4.6  Auth produção (confirm email + reset UI)
+[ ] 2.6      Domínio avoto.pt
 [ ] 3.1–3.7  Import AR
 ```
 

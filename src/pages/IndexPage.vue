@@ -1,10 +1,7 @@
 <template>
   <div class="page-shell stack-lg">
     <section class="hero">
-      <div class="hero__eyebrow">
-        <span class="party-dot" style="background: var(--pt-green)" />
-        Independente · Open source · Cidadania
-      </div>
+      <div class="hero__eyebrow">Independente · Open source · Cidadania</div>
       <h1 class="hero__title">A Voto — Bancada Cidadã</h1>
       <p class="hero__lead">
         Plataforma cívica independente (não governamental), neutra e open source: vê, lado a lado,
@@ -80,10 +77,20 @@ const recentes = computed(() => data.iniciativas.slice(0, 4))
 <style scoped lang="scss">
 .init-grid {
   display: grid;
-  gap: 1rem;
+  gap: 0;
   grid-template-columns: 1fr;
+  border-top: 1px solid var(--pt-line);
+  border-left: 1px solid var(--pt-line);
+
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  :deep(.init-card) {
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid var(--pt-line);
+    border-bottom: 1px solid var(--pt-line);
   }
 }
 </style>

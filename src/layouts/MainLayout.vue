@@ -175,45 +175,45 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 <style scoped lang="scss">
 .av-layout {
   min-height: 100vh;
-  background: var(--pt-cream);
+  background: var(--pt-paper-2);
 }
 
 .av-header {
-  background: var(--pt-paper) !important;
+  background: var(--pt-white) !important;
   color: var(--pt-ink) !important;
   box-shadow: none !important;
-  border-bottom: 1px solid var(--pt-border);
+  border-bottom: 2px solid var(--pt-navy);
 }
 
 .app-bar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.55rem 0.85rem;
-  min-height: 56px;
-  max-width: 1200px;
+  padding: 0.65rem 1rem;
+  min-height: 58px;
+  max-width: 1080px;
   margin: 0 auto;
   width: 100%;
 
   @media (min-width: 1024px) {
-    padding: 0.55rem 1.25rem;
-    gap: 1rem;
+    padding: 0.7rem 1.5rem;
   }
 }
 
 .app-bar__nav {
   display: flex;
   align-items: center;
-  gap: 0.1rem;
+  gap: 0;
   flex: 1;
-  margin-left: 0.35rem;
+  margin-left: 0.75rem;
+  height: 100%;
 }
 
 .app-bar__actions {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   position: relative;
   flex-shrink: 0;
 }
@@ -223,12 +223,14 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   border: none;
   background: transparent;
   font-family: var(--font-body);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--pt-muted);
   text-decoration: none;
-  padding: 0.45rem 0.7rem;
-  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -237,12 +239,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
   &:hover {
     color: var(--pt-navy);
-    background: rgba(0, 32, 91, 0.05);
   }
 
   &.is-active {
-    color: var(--pt-green-dark);
-    background: rgba(4, 106, 56, 0.1);
+    color: var(--pt-navy);
+    border-bottom-color: var(--pt-red);
   }
 }
 
@@ -252,36 +253,36 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 .mais__menu {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   right: 0;
   min-width: 200px;
-  background: var(--pt-paper);
-  border: 1px solid var(--pt-border);
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(28, 25, 23, 0.12);
-  padding: 0.35rem;
+  background: var(--pt-white);
+  border: 1px solid var(--pt-line);
+  border-radius: 0;
+  box-shadow: 2px 4px 0 rgba(12, 27, 51, 0.08);
+  padding: 0.25rem 0;
   z-index: 1000;
 }
 
 .mais__item {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
+  gap: 0.55rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0;
   text-decoration: none;
   color: var(--pt-ink);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 
   &:hover {
-    background: rgba(4, 106, 56, 0.07);
-    color: var(--pt-green-dark);
+    background: var(--pt-paper-2);
+    color: var(--pt-navy);
   }
 
   &.is-active {
-    background: rgba(4, 106, 56, 0.1);
-    color: var(--pt-green-dark);
+    background: var(--pt-paper-2);
+    color: var(--pt-red);
   }
 }
 
@@ -297,10 +298,10 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   background: transparent;
   color: var(--pt-navy);
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  border-radius: 2px;
   cursor: pointer;
   white-space: nowrap;
   line-height: 1.2;
@@ -317,11 +318,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   align-items: center;
   gap: 0.3rem;
   text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 0.4rem 0.7rem;
-  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.65rem;
+  border-radius: 2px;
   background: var(--pt-green);
   color: white;
   border: 1.5px solid var(--pt-green);
@@ -333,62 +334,59 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
     border-color: var(--pt-green-dark);
     color: white;
   }
-
-  &.is-active {
-    box-shadow: 0 0 0 2px rgba(4, 106, 56, 0.25);
-  }
 }
 
 .icon-btn {
   appearance: none;
-  border: 1px solid var(--pt-border);
-  background: var(--pt-cream);
+  border: 1px solid var(--pt-line);
+  background: var(--pt-white);
   color: var(--pt-navy);
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 
   &:hover {
-    border-color: var(--pt-green);
-    color: var(--pt-green-dark);
+    border-color: var(--pt-navy);
   }
 }
 
 .mobile-menu {
   display: flex;
   flex-direction: column;
-  padding: 0.35rem 0.65rem 0.75rem;
-  border-top: 1px solid var(--pt-border);
-  background: var(--pt-paper);
+  padding: 0.25rem 0 0.5rem;
+  border-top: 1px solid var(--pt-line);
+  background: var(--pt-white);
 }
 
 .mobile-menu__link {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.7rem 0.75rem;
-  border-radius: 8px;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0;
   text-decoration: none;
   color: var(--pt-ink);
   font-weight: 600;
   font-size: 0.95rem;
+  border-left: 3px solid transparent;
 
   &:hover {
-    background: rgba(4, 106, 56, 0.07);
+    background: var(--pt-paper-2);
   }
 
   &.is-active {
-    background: rgba(4, 106, 56, 0.12);
-    color: var(--pt-green-dark);
+    background: var(--pt-paper-2);
+    border-left-color: var(--pt-red);
+    color: var(--pt-navy);
   }
 }
 
 .av-page {
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 62px);
 }
 
 .boot-state {
