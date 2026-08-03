@@ -15,21 +15,31 @@
 
 ## O que fazer (ordem)
 
-### 1. OVH — esperar o domínio
+### 1. OVH — nameservers (passo a passo na UI)
 
-No ecrã OVH, quando **Status do domínio** e **Estado técnico** deixarem de estar “Em criação” e passarem a **Activo**:
+**Só depois** de Status / Estado técnico **não** estarem “Em criação” (estarem **Activo**).
 
-1. Abrir **avoto.pt** → **Servidores DNS** → **Configurar**
-2. Trocar de **OVHcloud default** para **nameservers externos**:
+1. [manager.ovh.com](https://www.ovh.com/manager/) → **Web Cloud** → **Domínios e DNS**  
+2. Lista à esquerda: clica **avoto.pt**  
+3. Separador superior: **Servidores DNS**  
+4. Botão **Configificar** (à direita de “Servidores DNS” / “OVHcloud default”)  
+5. Opção tipo **Modificar os servidores DNS** / **Personalizar os servidores DNS**  
+6. Remove os 2–4 servidores OVH (`dns*.ovh.net`, etc.)  
+7. Adiciona **só estes dois** (um por linha):
 
 ```
 edna.ns.cloudflare.com
 quinton.ns.cloudflare.com
 ```
 
-3. Guardar. Propagação: minutos a ~24–48 h (muitas vezes &lt; 1 h).
+8. **Validar** / **Aplicar** / **Confirmar**  
+9. A OVH pode mostrar “modificação em curso” — normal  
 
-> Enquanto o domínio estiver “Em criação”, a OVH bloqueia várias acções — é normal. Não configures registos DNS na OVH se fores usar Cloudflare como DNS (Full).
+**Não** uses o botão “Zona DNS → Gerir” na OVH para o site de produção se os NS forem Cloudflare: a zona que manda passa a ser a do Cloudflare.
+
+Propagação: frequentemente &lt; 1 h; pior caso 24–48 h.
+
+> Enquanto o domínio estiver “Em criação”, a OVH bloqueia várias acções — espera.
 
 ### 2. Cloudflare — activar a zona
 

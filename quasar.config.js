@@ -37,6 +37,9 @@ export default defineConfig((/* ctx */) => {
       // filenameBasedRouting: true,
 
       vueRouterMode: 'history', // available values: 'hash', 'history'
+      // GitHub Pages (dev): PUBLIC_PATH=/avoto-pt/  |  Cloudflare prod: /
+      publicPath: process.env.PUBLIC_PATH || '/',
+      vueRouterBase: process.env.PUBLIC_PATH || '/',
       // vueRouterBase,
 
       // publicPath: '/',
