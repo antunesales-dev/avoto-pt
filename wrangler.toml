@@ -1,0 +1,4 @@
+# Cloudflare Pages — A Voto
+name = "avoto-pt"
+compatibility_date = "2026-01-15"
+pages_build_output_dir = "dist/spa"

@@ -1,2 +1,17 @@
-# Cloudflare Pages — SPA history mode (Vue Router)
-/*    /index.html   200
+# SPA: rotas da app → index.html
+# NÃO fazer catch-all em /assets/* — ficheiros em falta devem dar 404,
+# senão o browser tenta executar HTML como JS (Failed to fetch module).
+#
+# Rotas sem extensão (Vue Router history):
+/*/   /index.html   200
+/comparacao  /index.html  200
+/iniciativas  /index.html  200
+/iniciativas/*  /index.html  200
+/metricas  /index.html  200
+/como-funciona  /index.html  200
+/dados  /index.html  200
+/sobre  /index.html  200
+/privacidade  /index.html  200
+/perfil  /index.html  200
+/entrar  /index.html  200
+/registo  /index.html  200
