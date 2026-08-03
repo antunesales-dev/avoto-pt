@@ -4,7 +4,8 @@ import { supabase } from '@/lib/supabase'
 import { loginSchema, registoSchema } from '@/lib/schemas'
 
 /**
- * Auth real via Supabase — sem sessão fictícia.
+ * Auth real via Supabase.
+ * PII e votos: encriptados na BD (Vault + pgcrypto); acesso só via RPC.
  */
 export const useAuthStore = defineStore('auth', () => {
   const session = ref(null)
@@ -16,18 +17,27 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => session.value?.user != null)
   const user = computed(() => session.value?.user ?? null)
   const cid = computed(() => profile.value?.cid ?? null)
-  const email = computed(() => profile.value?.email ?? user.value?.email ?? null)
+  const email = computed(() => user.value?.email ?? null)
 
-  async function fetchProfile(userId) {
-    const { data, error: err } = await supabase
-      .from('profiles')
-      .select('id, cid, email, partido_preferencia, created_at')
-      .eq('id', userId)
-      .maybeSingle()
-
+  async function fetchProfile() {
+    if (!user.value) {
+      profile.value = null
+      return null
+    }
+    const { data, error: err } = await supabase.rpc('get_my_profile')
     if (err) throw err
-    profile.value = data
-    return data
+    // rpc returns setof → array
+    const row = Array.isArray(data) ? data[0] : data
+    profile.value = row
+      ? {
+          id: row.id,
+          cid: row.cid,
+          partido_preferencia: row.partido_preferencia ?? null,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+        }
+      : null
+    return profile.value
   }
 
   async function init() {
@@ -38,7 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (err) throw err
       session.value = data.session
       if (data.session?.user) {
-        await fetchProfile(data.session.user.id)
+        await fetchProfile()
       } else {
         profile.value = null
       }
@@ -47,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
         session.value = next
         if (next?.user) {
           try {
-            await fetchProfile(next.user.id)
+            await fetchProfile()
           } catch (e) {
             console.error(e)
             profile.value = null
@@ -74,8 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
       partidoPreferencia: partidoPreferencia || '',
     })
     if (!parsed.success) {
-      const msg = parsed.error.issues[0]?.message || 'Dados inválidos.'
-      throw new Error(msg)
+      throw new Error(parsed.error.issues[0]?.message || 'Dados inválidos.')
     }
 
     loading.value = true
@@ -87,12 +96,16 @@ export const useAuthStore = defineStore('auth', () => {
       })
       if (err) throw err
       if (!data.session && data.user) {
-        // email confirmation required (remoto); local tem confirmations=false
         return { needsEmailConfirmation: true, user: data.user }
       }
       session.value = data.session
       if (data.user) {
-        await fetchProfile(data.user.id)
+        // perfil criado pelo trigger; pequeno retry se CID ainda não existir
+        for (let i = 0; i < 5; i++) {
+          await fetchProfile()
+          if (profile.value?.cid) break
+          await new Promise((r) => setTimeout(r, 150))
+        }
         if (parsed.data.partidoPreferencia) {
           await updatePartido(parsed.data.partidoPreferencia)
         }
@@ -120,7 +133,7 @@ export const useAuthStore = defineStore('auth', () => {
       })
       if (err) throw err
       session.value = data.session
-      if (data.user) await fetchProfile(data.user.id)
+      if (data.user) await fetchProfile()
       return data
     } catch (e) {
       error.value = e.message || String(e)
@@ -148,44 +161,39 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function updatePartido(partido) {
     if (!user.value) throw new Error('AUTH_REQUIRED')
-    const { data, error: err } = await supabase
-      .from('profiles')
-      .update({ partido_preferencia: partido || null, updated_at: new Date().toISOString() })
-      .eq('id', user.value.id)
-      .select()
-      .single()
+    const { data, error: err } = await supabase.rpc('update_my_partido', {
+      p_partido: partido || '',
+    })
     if (err) throw err
-    profile.value = data
-    return data
+    const row = Array.isArray(data) ? data[0] : data
+    profile.value = row
+      ? {
+          id: row.id,
+          cid: row.cid,
+          partido_preferencia: row.partido_preferencia ?? null,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+        }
+      : profile.value
+    return profile.value
   }
 
-  /** Voto do utilizador numa iniciativa (ou null) */
   async function getVoto(iniciativaId) {
     if (!user.value) return null
-    const { data, error: err } = await supabase
-      .from('votos_cidadaos')
-      .select('voto, created_at')
-      .eq('iniciativa_id', iniciativaId)
-      .eq('user_id', user.value.id)
-      .maybeSingle()
+    const { data, error: err } = await supabase.rpc('get_my_voto', {
+      p_iniciativa_id: iniciativaId,
+    })
     if (err) throw err
-    return data?.voto ?? null
+    return data ?? null
   }
 
   async function listMeusVotos() {
     if (!user.value) return []
-    const { data, error: err } = await supabase
-      .from('votos_cidadaos')
-      .select('iniciativa_id, voto, created_at')
-      .eq('user_id', user.value.id)
-      .order('created_at', { ascending: false })
+    const { data, error: err } = await supabase.rpc('list_my_votos')
     if (err) throw err
     return data || []
   }
 
-  /**
-   * Voto imutável via RPC. Falha com ALREADY_VOTED se já existir.
-   */
   async function castVoto(iniciativaId, voto) {
     if (!user.value) {
       const e = new Error('AUTH_REQUIRED')

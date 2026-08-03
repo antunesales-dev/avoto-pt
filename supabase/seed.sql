@@ -142,3 +142,8 @@ insert into public.iniciativas (
   '[{"label":"Texto na AR","url":"https://www.parlamento.pt"}]'::jsonb,
   '{"ps":"contra","psd":"favor","chega":"favor","il":"favor","be":"contra","pcp":"contra","livre":"abstencao","pan":"abstencao","cds":"favor"}'::jsonb
 );
+
+-- contadores públicos a zero (votos de cidadãos só via cast_voto encriptado)
+insert into public.iniciativa_voto_counts (iniciativa_id)
+select id from public.iniciativas
+on conflict (iniciativa_id) do nothing;

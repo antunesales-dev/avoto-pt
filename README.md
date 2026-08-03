@@ -77,6 +77,13 @@ Seed de desenvolvimento: `supabase/seed.sql` (iniciativas de exemplo). Em produ�
 
 ---
 
+## Encriptação de dados de utilizador
+
+- Votos e preferência partidária: **AES-256 na coluna** (pgcrypto + chave no Vault)
+- Sem email em claro em `profiles` (email só no Auth)
+- Acesso a PII/votos: **só RPC** com `auth.uid()` — sem select directo nas tabelas
+- Detalhe: [`docs/ENCRYPTION.md`](./docs/ENCRYPTION.md)
+
 ## Segurança do repositório
 
 Código público. Escrita e secrets só do dono. Ver [`SECURITY.md`](./SECURITY.md).

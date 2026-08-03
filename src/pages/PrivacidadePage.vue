@@ -37,8 +37,9 @@
         </p>
 
         <div class="notice notice-info">
-          Com conta: email e votos associados ao ID de cidadão, guardados no Supabase com RLS.
-          Agregados públicos não revelam o voto individual.
+          Com conta: email no Auth (Supabase); votos e preferência partidária
+          <strong>encriptados na base</strong> (AES + Vault), legíveis só por si via API autenticada.
+          Agregados públicos são contagens — não revelam o voto individual.
         </div>
       </div>
     </section>
