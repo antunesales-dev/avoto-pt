@@ -157,6 +157,71 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * Login / registo sem palavra-passe: magic link + código OTP por email.
+   * shouldCreateUser: true → primeira vez cria conta.
+   */
+  async function enviarMagicLink(email) {
+    const parsed = emailSchema.safeParse(email)
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0]?.message || 'Email inválido.')
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { error: err } = await supabase.auth.signInWithOtp({
+        email: parsed.data,
+        options: {
+          emailRedirectTo: `${appBaseUrl()}/entrar`,
+          shouldCreateUser: true,
+        },
+      })
+      if (err) throw err
+      return { email: parsed.data }
+    } catch (e) {
+      error.value = e.message || String(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /** Confirma o código de 6–8 dígitos do email */
+  async function verificarOtp(email, token) {
+    const parsedEmail = emailSchema.safeParse(email)
+    if (!parsedEmail.success) {
+      throw new Error(parsedEmail.success === false ? parsedEmail.error.issues[0]?.message : 'Email inválido.')
+    }
+    const code = String(token || '').trim()
+    if (code.length < 6) {
+      throw new Error('Indique o código completo do email.')
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { data, error: err } = await supabase.auth.verifyOtp({
+        email: parsedEmail.data,
+        token: code,
+        type: 'email',
+      })
+      if (err) throw err
+      session.value = data.session
+      if (data.user) {
+        for (let i = 0; i < 5; i++) {
+          await fetchProfile()
+          if (profile.value?.cid) break
+          await new Promise((r) => setTimeout(r, 150))
+        }
+      }
+      return data
+    } catch (e) {
+      error.value = e.message || String(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function sair() {
     loading.value = true
     error.value = null
@@ -360,6 +425,8 @@ export const useAuthStore = defineStore('auth', () => {
     init,
     registar,
     entrar,
+    enviarMagicLink,
+    verificarOtp,
     sair,
     pedirRecuperacao,
     atualizarPassword,

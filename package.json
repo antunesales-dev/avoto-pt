@@ -9,9 +9,11 @@
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "dev": "quasar dev",
-    "build": "quasar build",
+    "dev:pwa": "quasar dev -m pwa",
+    "build": "quasar build -m pwa",
+    "build:spa": "quasar build",
     "postinstall": "quasar prepare --silent",
-    "deploy": "pnpm build && wrangler pages deploy dist/spa --project-name=avoto-pt --branch=main",
+    "deploy": "pnpm build && wrangler pages deploy dist/pwa --project-name=avoto-pt --branch=main",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",

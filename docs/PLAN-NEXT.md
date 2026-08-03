@@ -102,16 +102,27 @@
 |----|------|--------|
 | **5.1–5.3** | AGPL-3.0 + LICENSE + README | ✅ |
 
-## Epic 4 — Auth de produção — ✅ UI + redirects
+## Epic 4 — Auth de produção — ✅ UI + passwordless
 
 | ID | Task | Estado |
 |----|------|--------|
 | **4.1** | Redirect URLs (pages.dev, gh pages, avoto.pt, localhost) | ✅ API |
 | **4.4–4.5** | UI recuperar / actualizar password / confirmar email | ✅ |
-| **4.2–4.3** | Templates email Supabase pt-PT | ⏳ dashboard (manual) |
+| **4.8** | Magic link + OTP (login principal sem password) | ✅ |
+| **4.2–4.3** | Templates email Supabase pt-PT (incl. magic link) | ⏳ dashboard (manual) |
 | **4.6** | E2E com email real | ⏳ precisa mailbox |
 
-**Dependências:** Epic 2 (URL estável). Pode usar `*.pages.dev` antes de avoto.pt (4.1 com URL Pages).
+Ver `docs/AUTH-PWA.md`.
+
+## Epic 6 — PWA + notificações cívicas — ✅ base
+
+| ID | Task | Estado |
+|----|------|--------|
+| **6.1** | Quasar PWA (manifest, icons, SW InjectManifest) | ✅ |
+| **6.2** | Preferências `notification_prefs` + RLS | ✅ migration |
+| **6.3** | UI Perfil (permissão browser + toggles) | ✅ |
+| **6.4** | Realtime → notificação local (digest, leis, investimentos) | ✅ |
+| **6.5** | Web Push VAPID (app fechada) | ⏳ chaves + edge |
 
 ---
 
@@ -122,17 +133,19 @@
 [x] 2.1–2.5  Cloudflare Pages (https://avoto-pt.pages.dev)
 [x] 2.7      Auth site URL → pages.dev
 [x] 5.x      Licença AGPL-3.0
-[x] 4.x      Auth UI (recuperar / confirmar) + allow list
+[x] 4.x      Auth UI + magic link/OTP + allow list
+[x] 6.1–6.4  PWA instalável + notificações (tab/PWA aberta)
 [ ] 4.2–4.3  Templates email no dashboard Supabase
+[ ] 6.5      Web Push VAPID
 [ ] 2.6      Domínio avoto.pt (OVH NS)
 [ ] 3.1–3.7  Import AR
 ```
 
 ### Critério de “MVP produção”
 
-- Utilizador qualquer regista-se, confirma email, vota uma vez, vê agregados.  
+- Utilizador entra com email (link/código), vota uma vez, vê agregados.  
 - Dados de iniciativas: seed **ou** primeira sync AR.  
-- HTTPS público.  
+- HTTPS público + PWA instalável.  
 - LICENSE no repo.  
 - Sem secrets no git.
 
@@ -140,7 +153,7 @@
 
 ## O que **não** entra neste plano
 
-- App nativa / PWA obrigatória  
+- App nativa (iOS/Android stores) — PWA basta  
 - Verificação de identidade real (NIF/CC) — fora de âmbito  
 - Monetização / ads  
 - Fontes não oficiais  
@@ -149,8 +162,6 @@
 
 ## Próxima acção concreta (agora)
 
-1. Tu: criar projecto Supabase EU e enviar (ou meter em `.env`) **URL + anon key** (nunca service_role no chat se preferires).  
-2. Agente/dev: **1.2–1.6** + **2.1–2.5**.  
-3. Em paralelo se quiseres: **5.x** com AGPL-3.0.
-
-Actualizar este ficheiro marcando tasks `[x]` à medida que fecham.
+1. `supabase db push` (notifications) se ainda não aplicado.  
+2. Templates magic link/OTP em pt-PT no dashboard Supabase.  
+3. Import AR (Epic 3) + domínio avoto.pt.

@@ -2,63 +2,151 @@
   <div class="page-shell auth-page">
     <h1 class="page-title">Entrar</h1>
     <p class="page-subtitle">
-      Conta obrigatória para votar. Um ID de cidadão por pessoa; um voto por iniciativa.
+      Sem palavra-passe: enviamos um <strong>link</strong> e um <strong>código</strong> para o seu
+      email. Mais simples e evita reutilizar passwords. Um ID de cidadão por pessoa.
     </p>
 
-    <form class="av-card av-card-pad auth-form" @submit.prevent="onSubmit">
+    <!-- Passo 1: pedir email -->
+    <form
+      v-if="step === 'email'"
+      class="av-card av-card-pad auth-form"
+      @submit.prevent="onEnviarCodigo"
+    >
       <label class="field">
         <span>Email</span>
-        <input v-model="email" type="email" autocomplete="username" required />
+        <input v-model="email" type="email" autocomplete="email" required />
       </label>
-      <label class="field">
-        <span>Palavra-passe</span>
-        <input v-model="password" type="password" autocomplete="current-password" required />
-      </label>
-
       <p v-if="formError" class="form-error">{{ formError }}</p>
-
       <button type="submit" class="btn btn--primary" :disabled="auth.loading">
-        {{ auth.loading ? 'A entrar…' : 'Entrar' }}
+        {{ auth.loading ? 'A enviar…' : 'Receber link / código' }}
       </button>
 
+      <button type="button" class="btn btn--ghost btn--sm" @click="showPassword = !showPassword">
+        {{ showPassword ? 'Esconder palavra-passe' : 'Entrar com palavra-passe (opcional)' }}
+      </button>
+
+      <template v-if="showPassword">
+        <label class="field">
+          <span>Palavra-passe</span>
+          <input v-model="password" type="password" autocomplete="current-password" />
+        </label>
+        <button type="button" class="btn btn--outline" :disabled="auth.loading" @click="onPassword">
+          Entrar com palavra-passe
+        </button>
+      </template>
+
       <div class="auth-links">
-        <router-link to="/recuperar-password">Esqueci a palavra-passe</router-link>
+        <router-link to="/recuperar-password">Recuperar palavra-passe</router-link>
         <router-link to="/confirmar-email">Reenviar confirmação</router-link>
       </div>
-
       <p class="auth-switch">
-        Ainda não tem conta?
-        <router-link to="/registo">Criar conta</router-link>
+        Primeira vez? Use o mesmo formulário — a conta é criada no primeiro acesso.
       </p>
+    </form>
+
+    <!-- Passo 2: código OTP -->
+    <form v-else class="av-card av-card-pad auth-form" @submit.prevent="onVerificarCodigo">
+      <p class="form-info">
+        Enviámos um email para <strong>{{ email }}</strong>. Pode clicar no link ou introduzir o
+        código aqui.
+      </p>
+      <label class="field">
+        <span>Código do email</span>
+        <input
+          v-model="otp"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          required
+          minlength="6"
+          maxlength="10"
+          placeholder="123456"
+        />
+      </label>
+      <p v-if="formError" class="form-error">{{ formError }}</p>
+      <button type="submit" class="btn btn--primary" :disabled="auth.loading">
+        {{ auth.loading ? 'A verificar…' : 'Confirmar código' }}
+      </button>
+      <button type="button" class="btn btn--ghost btn--sm" :disabled="auth.loading" @click="onEnviarCodigo">
+        Reenviar
+      </button>
+      <button type="button" class="btn btn--ghost btn--sm" @click="step = 'email'">
+        Mudar email
+      </button>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
 import '@/css/auth.scss'
 
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+const $q = useQuasar()
 
 const email = ref('')
 const password = ref('')
+const otp = ref('')
+const step = ref('email')
+const showPassword = ref(false)
 const formError = ref('')
 
-async function onSubmit() {
+onMounted(async () => {
+  // Magic link devolve aqui com sessão já estabelecida
+  if (auth.isLoggedIn) {
+    goAfterLogin()
+  }
+})
+
+function goAfterLogin() {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/perfil'
+  router.replace(redirect)
+}
+
+async function onEnviarCodigo() {
+  formError.value = ''
+  try {
+    await auth.enviarMagicLink(email.value)
+    step.value = 'otp'
+    $q.notify({
+      type: 'positive',
+      message: 'Email enviado. Use o link ou o código.',
+      position: 'top',
+    })
+  } catch (e) {
+    formError.value = e.message || 'Não foi possível enviar o email.'
+  }
+}
+
+async function onVerificarCodigo() {
+  formError.value = ''
+  try {
+    await auth.verificarOtp(email.value, otp.value)
+    $q.notify({
+      type: 'positive',
+      message: auth.cid ? `Sessão iniciada · ${auth.cid}` : 'Sessão iniciada.',
+      position: 'top',
+    })
+    goAfterLogin()
+  } catch (e) {
+    formError.value = e.message || 'Código inválido ou expirado.'
+  }
+}
+
+async function onPassword() {
   formError.value = ''
   try {
     await auth.entrar({ email: email.value, password: password.value })
-    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/perfil'
-    router.replace(redirect)
+    goAfterLogin()
   } catch (e) {
     const msg = e.message || 'Não foi possível entrar.'
     if (/confirm|verif|email/i.test(msg)) {
-      formError.value =
-        'Confirme o email antes de entrar. Use «Reenviar confirmação» se não recebeu o link.'
+      formError.value = 'Confirme o email antes de entrar com palavra-passe.'
     } else {
       formError.value = msg
     }

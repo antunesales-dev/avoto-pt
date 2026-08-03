@@ -42,12 +42,16 @@ jobs:
 
       # SPA history mode no GitHub Pages: 404.html = index.html
       - name: SPA 404 fallback
-        run: cp dist/spa/index.html dist/spa/404.html
+        run: |
+          OUT=dist/pwa
+          if [ ! -d "$OUT" ]; then OUT=dist/spa; fi
+          cp "$OUT/index.html" "$OUT/404.html"
+          echo "out=$OUT" >> "$GITHUB_ENV"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/spa
+          path: ${{ env.out || 'dist/pwa' }}
 
   deploy:
     needs: build

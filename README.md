@@ -5,7 +5,8 @@ Plataforma cívica **independente** (não governamental), **open source**, neutr
 | | |
 |---|---|
 | **Domínio** | [avoto.pt](https://avoto.pt) |
-| **Stack** | Vue 3 · Quasar · Pinia · Zod · Supabase · Cloudflare (deploy) |
+| **Stack** | Vue 3 · Quasar · Pinia · Zod · Supabase · Cloudflare (deploy) · **PWA** |
+| **Auth** | Magic link / código email (sem password) · password opcional |
 | **Locale** | pt-PT |
 | **Repo** | https://github.com/antunesales-dev/avoto-pt |
 
@@ -52,8 +53,9 @@ pnpm dev
 
 | Comando | Função |
 |---------|--------|
-| `pnpm dev` | App (Quasar) |
-| `pnpm build` | Build produção |
+| `pnpm dev` | App SPA local |
+| `pnpm dev:pwa` | App em modo PWA |
+| `pnpm build` | Build PWA produção (`dist/pwa`) |
 | `pnpm db:start` | Supabase local |
 | `pnpm db:stop` | Parar Supabase |
 | `pnpm db:reset` | Migrations + seed (local) |
@@ -61,13 +63,14 @@ pnpm dev
 
 ### Fluxo real
 
-1. **Criar conta** (`/registo`) → perfil com `CID-XXXXXX`  
-2. **Entrar** (`/entrar`)  
+1. **Entrar** (`/entrar`) com **email** → recebe **link + código** (sem palavra-passe)  
+2. Primeiro acesso cria conta e `CID-XXXXXX` automaticamente  
 3. **Votar** numa iniciativa → diálogo de confirmação → RPC `cast_voto`  
 4. Segundo voto na mesma iniciativa → **rejeitado** (constraint + RPC)  
-5. **Perfil** → histórico, preferência partidária opcional, sair  
+5. **Perfil** → histórico, preferência partidária, **notificações** (digest / leis / investimentos)  
 
-Sem sessão: só leitura. Com sessão: perfil + voto.
+Sem sessão: só leitura. Com sessão: perfil + voto.  
+Auth + PWA: [`docs/AUTH-PWA.md`](./docs/AUTH-PWA.md).
 
 ---
 

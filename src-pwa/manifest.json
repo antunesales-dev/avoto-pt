@@ -1,0 +1,45 @@
+{
+  "name": "A Voto — Bancada Cidadã",
+  "short_name": "A Voto",
+  "description": "Compare o voto dos cidadãos com o dos partidos. Despesa e investimentos públicos.",
+  "orientation": "any",
+  "background_color": "#f3efe6",
+  "theme_color": "#006633",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "pt-PT",
+  "categories": ["news", "government", "politics"],
+  "icons": [
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

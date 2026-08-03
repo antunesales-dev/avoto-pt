@@ -41,6 +41,52 @@
 
       <section class="av-card">
         <div class="av-card-pad">
+          <h2 class="section-title">Notificações</h2>
+          <p class="muted" style="margin-bottom: 0.75rem">
+            Avisos sobre digests, novas leis/votações e investimentos. Instale a app (PWA) no
+            telemóvel ou desktop para um atalho e melhor experiência.
+          </p>
+
+          <div class="notif-permission">
+            <span class="notif-status">Browser: <strong>{{ permLabel }}</strong></span>
+            <button
+              v-if="permission !== 'granted'"
+              type="button"
+              class="btn btn--primary btn--sm"
+              :disabled="!canRequest || savingNotif"
+              @click="onEnableNotif"
+            >
+              Activar notificações
+            </button>
+          </div>
+
+          <div class="toggle-list">
+            <label class="toggle">
+              <input v-model="prefs.notify_digest" type="checkbox" @change="onSavePrefs" />
+              <span>Digest diário (resumo da actividade)</span>
+            </label>
+            <label class="toggle">
+              <input v-model="prefs.notify_iniciativas" type="checkbox" @change="onSavePrefs" />
+              <span>Novas leis / propostas a votar</span>
+            </label>
+            <label class="toggle">
+              <input v-model="prefs.notify_investimentos" type="checkbox" @change="onSavePrefs" />
+              <span>Novos investimentos públicos</span>
+            </label>
+            <label class="toggle">
+              <input v-model="prefs.notify_despesa" type="checkbox" @change="onSavePrefs" />
+              <span>Actualizações de despesa pública</span>
+            </label>
+          </div>
+          <p class="muted" style="margin-top: 0.75rem; font-size: 0.82rem">
+            Com a app aberta ou instalada, as notificações chegam em tempo quase real. Push com a
+            app totalmente fechada (Web Push / VAPID) activa-se numa fase seguinte.
+          </p>
+        </div>
+      </section>
+
+      <section class="av-card">
+        <div class="av-card-pad">
           <h2 class="section-title">Histórico de votos</h2>
           <p v-if="!historico.length" class="muted">Ainda não votou em nenhuma iniciativa.</p>
           <div v-else class="av-table-wrap" style="border: none">
@@ -74,12 +120,19 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { formatDate, votoLabel } from '@/data/partidos'
 import { useAuthStore } from '@/stores/auth'
 import { useDataStore } from '@/stores/data'
+import {
+  fetchNotificationPrefs,
+  notificationPermission,
+  notificationSupport,
+  requestNotificationPermission,
+  saveNotificationPrefs,
+} from '@/lib/notifications'
 
 const auth = useAuthStore()
 const data = useDataStore()
@@ -88,8 +141,25 @@ const $q = useQuasar()
 
 const historico = ref([])
 const partido = ref(auth.profile?.partido_preferencia || '')
+const savingNotif = ref(false)
+const permission = ref(notificationPermission())
+const prefs = reactive({
+  notify_digest: true,
+  notify_iniciativas: true,
+  notify_investimentos: true,
+  notify_despesa: false,
+})
 
 const initial = computed(() => (auth.email || 'A').charAt(0).toUpperCase())
+const canRequest = computed(
+  () => notificationSupport() && permission.value !== 'denied' && permission.value !== 'unsupported',
+)
+const permLabel = computed(() => {
+  if (permission.value === 'unsupported') return 'não suportado'
+  if (permission.value === 'granted') return 'activas'
+  if (permission.value === 'denied') return 'bloqueadas no browser'
+  return 'ainda não pedidas'
+})
 
 function tituloDe(id) {
   return data.getIniciativa(id)?.titulo || id
@@ -115,9 +185,56 @@ async function savePartido() {
   }
 }
 
+async function onEnableNotif() {
+  savingNotif.value = true
+  try {
+    const result = await requestNotificationPermission()
+    permission.value = result
+    if (result === 'granted') {
+      $q.notify({
+        type: 'positive',
+        message: 'Notificações activadas neste dispositivo.',
+        position: 'top',
+      })
+    } else if (result === 'denied') {
+      $q.notify({
+        type: 'warning',
+        message: 'Permissão recusada. Pode activar nas definições do browser.',
+        position: 'top',
+      })
+    }
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro.', position: 'top' })
+  } finally {
+    savingNotif.value = false
+  }
+}
+
+async function onSavePrefs() {
+  if (!auth.user?.id) return
+  savingNotif.value = true
+  try {
+    await saveNotificationPrefs(auth.user.id, prefs)
+    $q.notify({ type: 'positive', message: 'Preferências de notificação guardadas.', position: 'top' })
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro ao guardar.', position: 'top' })
+  } finally {
+    savingNotif.value = false
+  }
+}
+
 onMounted(async () => {
   partido.value = auth.profile?.partido_preferencia || ''
   historico.value = await auth.listMeusVotos()
+  permission.value = notificationPermission()
+  if (auth.user?.id) {
+    try {
+      const p = await fetchNotificationPrefs(auth.user.id)
+      Object.assign(prefs, p)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 })
 </script>
 
@@ -128,6 +245,35 @@ onMounted(async () => {
   @media (min-width: 900px) {
     grid-template-columns: 1fr 1.2fr;
     align-items: start;
+  }
+}
+.notif-permission {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+.notif-status {
+  font-size: 0.9rem;
+  color: var(--pt-navy);
+}
+.toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--pt-ink);
+  cursor: pointer;
+  input {
+    margin-top: 0.2rem;
+    accent-color: var(--pt-green);
   }
 }
 .profile-head {
