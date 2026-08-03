@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#046a38">
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:;<% if (ctx.dev) { %> connect-src 'self' ws://localhost:* http://localhost:*; worker-src 'self' blob:;<% } %>"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co<% if (ctx.dev) { %> ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*<% } %>; worker-src 'self' blob:;"
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
