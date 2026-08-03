@@ -1,17 +1,7 @@
-# SPA: rotas da app → index.html
-# NÃO fazer catch-all em /assets/* — ficheiros em falta devem dar 404,
-# senão o browser tenta executar HTML como JS (Failed to fetch module).
-#
-# Rotas sem extensão (Vue Router history):
-/*/   /index.html   200
-/comparacao  /index.html  200
-/iniciativas  /index.html  200
-/iniciativas/*  /index.html  200
-/metricas  /index.html  200
-/como-funciona  /index.html  200
-/dados  /index.html  200
-/sobre  /index.html  200
-/privacidade  /index.html  200
-/perfil  /index.html  200
-/entrar  /index.html  200
-/registo  /index.html  200
+# 1) Assets: reescrever para o mesmo path.
+#    Se o ficheiro não existir → 404 (não index.html).
+#    Evita "Failed to fetch dynamically imported module" após deploys.
+/assets/*  /assets/:splat  200
+
+# 2) SPA (Vue Router history): resto das rotas → index.html
+/*  /index.html  200
