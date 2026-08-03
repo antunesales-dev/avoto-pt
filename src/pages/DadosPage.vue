@@ -68,13 +68,13 @@
       <div class="av-card-pad">
         <h2 class="section-title">Estado dos dados</h2>
         <p class="page-subtitle" style="margin-bottom: 0.75rem">
-          Votos de cidadãos na plataforma são reais (contas Supabase). Iniciativas, despesa e
-          investimentos com <code>source=seed</code> são estrutura de demonstração até os jobs
-          oficiais (<code>ar-sync</code>, <code>despesa-sync</code>) preencherem a base.
+          Em produção só há dados com origem oficial: Dados Abertos da AR (<code>ar-sync</code>),
+          Portal Base / dados.gov (<code>despesa-sync</code>). Votos de cidadãos são da própria
+          plataforma (contas Supabase). Não usamos dados de demonstração (“seed”).
         </p>
         <div class="notice">
-          Cada registo deve indicar a fonte. Lacunas dos dados oficiais são declaradas — nunca
-          preenchidas com notícias ou wikis.
+          Cada registo indica a fonte. Lacunas oficiais são declaradas — nunca preenchidas com
+          notícias ou wikis.
         </div>
       </div>
     </section>

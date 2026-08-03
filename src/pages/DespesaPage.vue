@@ -7,9 +7,9 @@
       Voto não interpreta nem recomenda — mostra montantes e ligações oficiais.
     </p>
 
-    <div class="notice" style="margin-bottom: 1.25rem">
-      <strong>Seed / demo:</strong> alguns registos são estruturais até o sync oficial
-      (<code>despesa-sync</code>) estar ligado. Sempre rotulados com <code>source</code>.
+    <div class="notice notice-info" style="margin-bottom: 1.25rem">
+      Dados sincronizados de fontes oficiais (<code>despesa-sync</code>). Cada linha indica a
+      origem.
     </div>
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
@@ -59,8 +59,8 @@
             <td>{{ formatMoney(d.montante_eur) }}</td>
             <td>{{ formatDate(d.data_publicacao) }}</td>
             <td>
-              <span class="badge" :class="d.source === 'seed' ? 'badge--gold' : 'badge--green'">
-                {{ d.source }}
+              <span class="badge" :class="sourceBadgeClass(d.source)">
+                {{ sourceLabel(d.source) }}
               </span>
             </td>
           </tr>
@@ -82,6 +82,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { formatDate, formatNumber } from '@/data/partidos'
+import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()

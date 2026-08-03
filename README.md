@@ -58,7 +58,7 @@ pnpm dev
 | `pnpm build` | Build PWA produção (`dist/pwa`) |
 | `pnpm db:start` | Supabase local |
 | `pnpm db:stop` | Parar Supabase |
-| `pnpm db:reset` | Migrations + seed (local) |
+| `pnpm db:reset` | Migrations (local; seed vazio — usa `pnpm sync:ar`) |
 | `pnpm db:status` | URL e keys locais |
 
 ### Fluxo real

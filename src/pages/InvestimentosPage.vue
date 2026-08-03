@@ -25,8 +25,8 @@
             <span class="badge" :class="decisaoClass(inv.decisao_oficial)">
               Oficial: {{ decisaoLabel(inv.decisao_oficial) }}
             </span>
-            <span class="badge" :class="inv.source === 'seed' ? 'badge--gold' : 'badge--green'">
-              {{ inv.source }}
+            <span class="badge" :class="sourceBadgeClass(inv.source)">
+              {{ sourceLabel(inv.source) }}
             </span>
           </div>
           <h2 class="inv-card__title link-card__title">{{ inv.titulo }}</h2>
@@ -43,6 +43,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import VoteBar from '@/components/VoteBar.vue'
+import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()

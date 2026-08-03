@@ -144,7 +144,7 @@ Ver `docs/AUTH-PWA.md`.
 ### Critério de “MVP produção”
 
 - Utilizador entra com email (link/código), vota uma vez, vê agregados.  
-- Dados de iniciativas: seed **ou** primeira sync AR.  
+- Dados de iniciativas: sync AR real (sem seed em produção).  
 - HTTPS público + PWA instalável.  
 - LICENSE no repo.  
 - Sem secrets no git.
