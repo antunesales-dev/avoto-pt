@@ -92,9 +92,13 @@
         <div class="av-card">
           <div class="av-card-pad">
             <h2 class="section-title">Voto dos partidos na AR</h2>
-            <div class="party-list">
+            <p v-if="!hasPartidos" class="hint">
+              O registo oficial desta iniciativa ainda não tem detalhe de voto por grupo
+              parlamentar (ou a votação não ocorreu). Sem inventar dados.
+            </p>
+            <div v-else class="party-list">
               <PartyVoteBadge
-                v-for="p in partidos"
+                v-for="p in partidosComVoto"
                 :key="p.id"
                 :partido="p"
                 :voto="item.resultadoPartidos[p.id]"
@@ -200,9 +204,21 @@ const estadoClass = computed(() => {
   return map[item.value?.estado] || 'badge--muted'
 })
 
-const alinhamentos = computed(() => {
+const hasPartidos = computed(() => {
+  const m = item.value?.resultadoPartidos
+  if (!m) return false
+  return Object.values(m).some((v) => v && v !== 'nao_participou')
+})
+
+const partidosComVoto = computed(() => {
   if (!item.value) return []
-  return partidos
+  const m = item.value.resultadoPartidos || {}
+  return partidos.filter((p) => m[p.id] && m[p.id] !== 'nao_participou')
+})
+
+const alinhamentos = computed(() => {
+  if (!item.value || !hasPartidos.value) return []
+  return partidosComVoto.value
     .map((p) => ({
       id: p.id,
       sigla: p.sigla,

@@ -13,14 +13,29 @@ export const partidos = [
 
 export const temas = [
   'Todos',
-  'Instituições',
-  'Economia',
-  'Habitação',
-  'Ambiente',
-  'Educação',
   'Saúde',
+  'Educação',
+  'Habitação',
   'Trabalho',
+  'Ambiente',
+  'Economia',
+  'Justiça',
+  'Imigração',
+  'Defesa',
+  'Agricultura',
+  'Transportes',
+  'Cultura',
+  'Direitos sociais',
+  'Autarquias',
+  'Instituições',
+  'Outros',
 ]
+
+/** true se há pelo menos um sentido de voto de partido */
+export function hasPartyVotes(resultadoPartidos) {
+  if (!resultadoPartidos || typeof resultadoPartidos !== 'object') return false
+  return Object.values(resultadoPartidos).some((v) => v && v !== 'nao_participou')
+}
 
 export const estadosLabel = {
   aprovado: 'Aprovado',

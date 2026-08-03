@@ -2,8 +2,8 @@
   <div class="page-shell">
     <h1 class="page-title">Iniciativas</h1>
     <p class="page-subtitle">
-      Iniciativas no Parlamento. Compare o voto agregado dos cidadãos com cada partido. Login
-      obrigatório para votar.
+      Iniciativas da AR com tema e, quando existir no registo oficial, o
+      <strong>voto de cada partido</strong>. Login para votar como cidadão.
     </p>
 
     <div class="toolbar av-card av-card-pad">
@@ -16,6 +16,18 @@
           aria-label="Pesquisar iniciativas"
         />
       </label>
+      <div class="filter-row" style="margin: 0">
+        <button
+          v-for="d in detalheOpts"
+          :key="d.id"
+          type="button"
+          class="chip-btn"
+          :class="{ 'is-active': detalhe === d.id }"
+          @click="detalhe = d.id"
+        >
+          {{ d.label }}
+        </button>
+      </div>
       <div class="filter-row" style="margin: 0">
         <button
           v-for="t in temas"
@@ -59,13 +71,21 @@
 <script setup>
 import { computed, ref } from 'vue'
 import InitiativeCard from '@/components/InitiativeCard.vue'
-import { temas } from '@/data/partidos'
+import { hasPartyVotes, temas } from '@/data/partidos'
 import { useDataStore } from '@/stores/data'
 
 const data = useDataStore()
 const query = ref('')
 const tema = ref('Todos')
 const estado = ref('todos')
+/** Por defeito: só as que têm votos de partidos (o resto é ruído sem detalhe) */
+const detalhe = ref('com_partidos')
+
+const detalheOpts = [
+  { id: 'com_partidos', label: 'Com voto dos partidos' },
+  { id: 'com_votacao', label: 'Com data de votação AR' },
+  { id: 'todas', label: 'Todas' },
+]
 
 const estados = [
   { id: 'todos', label: 'Todos os estados' },
@@ -77,6 +97,8 @@ const estados = [
 const filtradas = computed(() => {
   const q = query.value.trim().toLowerCase()
   return data.iniciativas.filter((i) => {
+    if (detalhe.value === 'com_partidos' && !hasPartyVotes(i.resultadoPartidos)) return false
+    if (detalhe.value === 'com_votacao' && !i.dataVotacao) return false
     if (tema.value !== 'Todos' && i.tema !== tema.value) return false
     if (estado.value !== 'todos' && i.estado !== estado.value) return false
     if (!q) return true

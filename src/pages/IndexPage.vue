@@ -106,7 +106,13 @@ const auth = useAuthStore()
 const data = useDataStore()
 
 const m = computed(() => data.metricas)
-const recentes = computed(() => data.iniciativas.slice(0, 4))
+const recentes = computed(() => {
+  const withParties = data.iniciativas.filter(
+    (i) => i.resultadoPartidos && Object.keys(i.resultadoPartidos).length > 0,
+  )
+  const list = withParties.length ? withParties : data.iniciativas
+  return list.slice(0, 4)
+})
 </script>
 
 <style scoped lang="scss">

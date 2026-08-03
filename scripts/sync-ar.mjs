@@ -20,11 +20,42 @@ const SIGLA_TO_ID = {
   IL: 'il',
   BE: 'be',
   PCP: 'pcp',
+  PEV: 'pcp',
   L: 'livre',
   LIVRE: 'livre',
   PAN: 'pan',
   'CDS-PP': 'cds',
   CDS: 'cds',
+  // JPP e outros: ignorados se não temos cor/UI
+}
+
+/** Partidos com UI na A Voto — para unânimes */
+const PARTIDOS_UI = ['ps', 'psd', 'chega', 'il', 'be', 'pcp', 'livre', 'pan', 'cds']
+
+const TEMA_RULES = [
+  [/sa[uú]de|hospital|sns|medicament|m[eé]dic/i, 'Saúde'],
+  [/educa|escol|universid|ensino|aluno|professor/i, 'Educação'],
+  [/habita|renda|arrendamento|casa|im[oó]vel|fogos/i, 'Habitação'],
+  [/trabalh|sal[aá]rio|desemprego|greve|contrato de trabalho|ss\b|segurança social/i, 'Trabalho'],
+  [/ambient|clima|energia|res[ií]duo|floresta|água|ocean|biodivers/i, 'Ambiente'],
+  [/or[cç]ament|imposto|irc|irs|iva|d[eé]ficit|finan[cç]|banc[aá]|econom/i, 'Economia'],
+  [/justi[cç]a|tribunal|c[oó]digo penal|crime|pris/i, 'Justiça'],
+  [/imigra|estrangeir|asilo|fronteira/i, 'Imigração'],
+  [/defesa|for[cç]as armadas|militar|nato/i, 'Defesa'],
+  [/agricult|pescas|rural|florest/i, 'Agricultura'],
+  [/transport|infraestrut|estrada|ferrovi|metro|aeroporto/i, 'Transportes'],
+  [/cultura|patrim[oó]nio|museu|desporto|media|imprensa/i, 'Cultura'],
+  [/fam[ií]lia|crian[cç]a|igualdade|g[eé]nero|discrimina/i, 'Direitos sociais'],
+  [/autarqu|munic[ií]p|regi[aã]o aut[oó]nom|descentral/i, 'Autarquias'],
+  [/constitui|eleitor|assembleia|parlament|regimento|partid/i, 'Instituições'],
+]
+
+function inferTema(titulo, tipoDesc = '') {
+  const text = `${titulo} ${tipoDesc}`
+  for (const [re, tema] of TEMA_RULES) {
+    if (re.test(text)) return tema
+  }
+  return 'Outros'
 }
 
 function parseArgs() {
@@ -32,7 +63,6 @@ function parseArgs() {
   for (const a of process.argv.slice(2)) {
     if (a.startsWith('--limit=')) {
       const n = Number(a.split('=')[1])
-      // 0 ou "all" → sem tecto prático
       if (a.endsWith('=all') || n === 0) limit = 100_000
       else limit = Math.min(100_000, n || 200)
     }
@@ -45,23 +75,34 @@ function parseDetalhePartidos(detalhe) {
   if (!detalhe) return out
   const text = String(detalhe)
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/?i>/gi, '')
-  for (const [key, voto] of [
-    ['a favor', 'favor'],
-    ['contra', 'contra'],
-    ['absten', 'abstencao'],
-  ]) {
-    const m = text.match(new RegExp(`${key}[^:]*:\\s*([^\\n]+)`, 'i'))
+    .replace(/<\/?i>/gi, ' ')
+    .replace(/&nbsp;/gi, ' ')
+  // secções: A Favor / Contra / Abstenção (com ou sem acento)
+  const sections = [
+    { re: /a\s*favor\s*:?\s*([^\n]+)/i, voto: 'favor' },
+    { re: /contra\s*:?\s*([^\n]+)/i, voto: 'contra' },
+    { re: /absten[cç][aã]o\s*:?\s*([^\n]+)/i, voto: 'abstencao' },
+  ]
+  for (const { re, voto } of sections) {
+    const m = text.match(re)
     if (!m) continue
-    for (const raw of m[1].split(/[,;]/)) {
-      const sigla = raw.replace(/<[^>]+>/g, '').trim().toUpperCase()
-      const id = SIGLA_TO_ID[sigla]
+    // siglas: PSD, CH, CDS-PP, L, …
+    const chunk = m[1]
+    for (const tok of chunk.split(/[,;|/]/)) {
+      const sigla = tok.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().toUpperCase()
+      if (!sigla) continue
+      // token pode ser "CH" ou " PSD "
+      const id = SIGLA_TO_ID[sigla] || SIGLA_TO_ID[sigla.replace(/\s/g, '')]
       if (id) out[id] = voto
     }
   }
   return out
 }
 
+/**
+ * Escolhe a melhor votação: prioriza fases finais E detalhe com partidos.
+ * Unânimes sem detalhe → todos os partidos UI no mesmo sentido.
+ */
 function pickMainVotacao(eventos) {
   if (!Array.isArray(eventos)) return null
   const priority = [
@@ -69,32 +110,61 @@ function pickMainVotacao(eventos) {
     'votação final',
     'votação global',
     'votação na generalidade',
+    'votação deliberação',
     'votação na especialidade',
+    'votação',
   ]
-  let best = null
+  const cands = []
   for (const e of eventos) {
     if (!e?.Votacao) continue
     const list = Array.isArray(e.Votacao) ? e.Votacao : [e.Votacao]
     const faseL = String(e.Fase || '').toLowerCase()
-    let score = 1
+    let phaseScore = 1
     for (let i = 0; i < priority.length; i++) {
       if (faseL.includes(priority[i])) {
-        score = 100 - i
+        phaseScore = 100 - i
         break
       }
     }
     for (const vo of list) {
-      const cand = {
-        score,
-        data: vo?.data ? String(vo.data).slice(0, 10) : e.DataFase ? String(e.DataFase).slice(0, 10) : null,
-        resultado: vo?.resultado ? String(vo.resultado) : null,
-        detalhe: vo?.detalhe ? String(vo.detalhe) : null,
-        descricao: vo?.descricao ? String(vo.descricao) : null,
-      }
-      if (!best || cand.score > best.score) best = cand
+      if (!vo || typeof vo !== 'object') continue
+      const detalhe = vo.detalhe ? String(vo.detalhe) : null
+      const parties = parseDetalhePartidos(detalhe)
+      const unanime = Boolean(vo.unanime)
+      cands.push({
+        score: phaseScore + (Object.keys(parties).length ? 40 : 0) + (detalhe ? 10 : 0),
+        data: vo.data ? String(vo.data).slice(0, 10) : e.DataFase ? String(e.DataFase).slice(0, 10) : null,
+        resultado: vo.resultado ? String(vo.resultado) : null,
+        detalhe,
+        descricao: vo.descricao ? String(vo.descricao) : null,
+        parties,
+        unanime,
+        fase: e.Fase || '',
+      })
     }
   }
-  return best
+  if (!cands.length) return null
+  cands.sort((a, b) => b.score - a.score)
+  const best = cands[0]
+  let parties = { ...best.parties }
+  if (!Object.keys(parties).length) {
+    // unânime ou detalhe vazio: inferir do resultado
+    const res = (best.resultado || '').toLowerCase()
+    let voto = null
+    if (res.includes('aprov') || res.includes('adopt') || res.includes('adot')) voto = 'favor'
+    else if (res.includes('rejeit')) voto = 'contra'
+    if (voto && (best.unanime || !best.detalhe)) {
+      for (const id of PARTIDOS_UI) parties[id] = voto
+    }
+  }
+  return {
+    data: best.data,
+    resultado: best.resultado,
+    detalhe: best.detalhe,
+    descricao: best.descricao,
+    parties,
+    fase: best.fase,
+  }
 }
 
 function mapAr(raw) {
@@ -116,7 +186,10 @@ function mapAr(raw) {
   let estado = 'em_discussao'
   const r = (main?.resultado || '').toLowerCase()
   if (r.includes('rejeit')) estado = 'rejeitado'
-  else if (r.includes('aprov')) estado = 'aprovado'
+  else if (r.includes('aprov') || r.includes('adopt') || r.includes('adot')) estado = 'aprovado'
+  // arquivado por fase
+  const fases = eventos.map((e) => String(e?.Fase || '').toLowerCase()).join(' ')
+  if (fases.includes('arquiv')) estado = 'arquivado'
 
   const autores = []
   const outros = raw.IniAutorOutros
@@ -136,11 +209,26 @@ function mapAr(raw) {
   const links = []
   if (raw.IniLinkTexto) links.push({ label: 'Texto na AR', url: String(raw.IniLinkTexto) })
   links.push({ label: 'Dados Abertos AR', url: DA })
-  const descricao = (main?.descricao || raw.IniObs || titulo)
+
+  const descParts = []
+  if (main?.descricao) descParts.push(main.descricao)
+  if (raw.IniObs) descParts.push(String(raw.IniObs))
+  if (raw.IniEpigrafe) descParts.push(String(raw.IniEpigrafe))
+  const descricao = (descParts.join(' — ') || titulo)
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 4000)
+
+  const parties = main?.parties || {}
+  let explicacao = ''
+  if (main?.fase && Object.keys(parties).length) {
+    explicacao = `Votação AR (${main.fase})${main.resultado ? `: ${main.resultado}` : ''}. Sentido de voto por partido a partir do registo oficial.`
+  } else if (main?.resultado) {
+    explicacao = `Resultado AR: ${main.resultado}. Sem detalhe nominal de grupos parlamentares no registo desta votação.`
+  } else {
+    explicacao = 'Ainda sem votação nominal de grupos parlamentares nos Dados Abertos para esta iniciativa.'
+  }
 
   return {
     id,
@@ -153,11 +241,11 @@ function mapAr(raw) {
     data_entrada: dataEntrada,
     data_votacao: main?.data || null,
     estado,
-    tema: 'Instituições',
+    tema: inferTema(titulo, tipoDesc),
     descricao_oficial: descricao,
-    explicacao: '',
+    explicacao,
     links,
-    resultado_partidos: parseDetalhePartidos(main?.detalhe),
+    resultado_partidos: parties,
   }
 }
 
@@ -209,8 +297,11 @@ async function main() {
     console.log('Raw iniciativas:', list.length)
 
     const mapped = list.map(mapAr).filter(Boolean)
-    // Preferir com votação AR; depois data mais recente
+    // Preferir: tem partidos → tem data votação → mais recente
     mapped.sort((a, b) => {
+      const pa = Object.keys(a.resultado_partidos || {}).length ? 1 : 0
+      const pb = Object.keys(b.resultado_partidos || {}).length ? 1 : 0
+      if (pb !== pa) return pb - pa
       const hasA = a.data_votacao ? 1 : 0
       const hasB = b.data_votacao ? 1 : 0
       if (hasB !== hasA) return hasB - hasA
