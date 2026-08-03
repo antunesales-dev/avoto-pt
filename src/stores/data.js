@@ -12,8 +12,24 @@ export const useDataStore = defineStore('data', () => {
     cidadaos_registados: 0,
     votos_emitidos: 0,
     iniciativas_disponiveis: 0,
+    digests: 0,
+    despesas: 0,
+    investimentos: 0,
     taxa_participacao_media: 0,
   })
+
+  function applyMetricas(row) {
+    if (!row) return
+    metricas.value = {
+      cidadaos_registados: Number(row.cidadaos_registados || 0),
+      votos_emitidos: Number(row.votos_emitidos || 0),
+      iniciativas_disponiveis: Number(row.iniciativas_disponiveis || 0),
+      digests: Number(row.digests || 0),
+      despesas: Number(row.despesas || 0),
+      investimentos: Number(row.investimentos || 0),
+      taxa_participacao_media: Number(row.taxa_participacao_media || 0),
+    }
+  }
   const loading = ref(false)
   const error = ref(null)
   let realtimeChannel = null
@@ -59,14 +75,7 @@ export const useDataStore = defineStore('data', () => {
       const aggMap = Object.fromEntries((aggRes.data || []).map((a) => [a.iniciativa_id, a]))
       iniciativas.value = (iniRes.data || []).map((row) => mapIniciativa(row, aggMap[row.id]))
 
-      if (metRes.data) {
-        metricas.value = {
-          cidadaos_registados: Number(metRes.data.cidadaos_registados || 0),
-          votos_emitidos: Number(metRes.data.votos_emitidos || 0),
-          iniciativas_disponiveis: Number(metRes.data.iniciativas_disponiveis || 0),
-          taxa_participacao_media: Number(metRes.data.taxa_participacao_media || 0),
-        }
-      }
+      applyMetricas(metRes.data)
     } catch (e) {
       error.value = e.message || String(e)
       throw e
@@ -99,14 +108,7 @@ export const useDataStore = defineStore('data', () => {
       }
     }
     const met = await supabase.from('metricas_globais').select('*').maybeSingle()
-    if (!met.error && met.data) {
-      metricas.value = {
-        cidadaos_registados: Number(met.data.cidadaos_registados || 0),
-        votos_emitidos: Number(met.data.votos_emitidos || 0),
-        iniciativas_disponiveis: Number(met.data.iniciativas_disponiveis || 0),
-        taxa_participacao_media: Number(met.data.taxa_participacao_media || 0),
-      }
-    }
+    if (!met.error) applyMetricas(met.data)
   }
 
   function applyCountRow(row) {
@@ -144,14 +146,7 @@ export const useDataStore = defineStore('data', () => {
             .select('*')
             .maybeSingle()
             .then(({ data }) => {
-              if (data) {
-                metricas.value = {
-                  cidadaos_registados: Number(data.cidadaos_registados || 0),
-                  votos_emitidos: Number(data.votos_emitidos || 0),
-                  iniciativas_disponiveis: Number(data.iniciativas_disponiveis || 0),
-                  taxa_participacao_media: Number(data.taxa_participacao_media || 0),
-                }
-              }
+              if (data) applyMetricas(data)
             })
         },
       )

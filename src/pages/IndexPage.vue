@@ -18,34 +18,67 @@
     </section>
 
     <section>
-      <h2 class="section-title">Números da plataforma</h2>
+      <h2 class="section-title">Dados oficiais na plataforma</h2>
+      <p class="section-hint">
+        Conteúdo sincronizado de fontes do Estado / AR — não é contagem de utilizadores.
+      </p>
       <div class="stats-grid">
         <StatCard
-          label="Cidadãos registados"
-          :value="formatNumber(m.cidadaos_registados)"
-          icon="groups"
-        />
-        <StatCard
-          label="Votos emitidos"
-          :value="formatNumber(m.votos_emitidos)"
-          icon="how_to_vote"
-          accent="var(--pt-red)"
-          tint="rgba(218, 41, 28, 0.1)"
-        />
-        <StatCard
-          label="Iniciativas"
+          label="Iniciativas (AR)"
           :value="formatNumber(m.iniciativas_disponiveis)"
           icon="gavel"
+        />
+        <StatCard
+          label="Digests diários"
+          :value="formatNumber(m.digests)"
+          icon="today"
           accent="var(--pt-navy)"
           tint="rgba(0, 32, 91, 0.08)"
         />
         <StatCard
-          label="Participação média"
-          :value="m.taxa_participacao_media + '%'"
-          icon="trending_up"
+          label="Despesas / contratos"
+          :value="formatNumber(m.despesas)"
+          icon="account_balance"
+          accent="var(--pt-red)"
+          tint="rgba(218, 41, 28, 0.1)"
+        />
+        <StatCard
+          label="Investimentos"
+          :value="formatNumber(m.investimentos)"
+          icon="savings"
           accent="#7a5f00"
           tint="rgba(241, 191, 0, 0.18)"
         />
+      </div>
+
+      <div class="part-box av-card av-card-pad">
+        <h3 class="part-box__title">Participação cidadã</h3>
+        <template v-if="m.votos_emitidos > 0">
+          <p class="part-box__nums">
+            <strong>{{ formatNumber(m.votos_emitidos) }}</strong> voto(s) ·
+            <strong>{{ formatNumber(m.cidadaos_registados) }}</strong> conta(s)
+            <template v-if="m.taxa_participacao_media > 0">
+              · taxa média {{ m.taxa_participacao_media }}%
+            </template>
+          </p>
+        </template>
+        <template v-else>
+          <p class="part-box__empty">
+            Ainda <strong>não há votos de cidadãos</strong> na plataforma. Os números de
+            iniciativas e despesa vêm dos portais oficiais; a comparação com a vontade dos
+            registados começa quando alguém entra e vota.
+          </p>
+          <router-link
+            v-if="!auth.isLoggedIn"
+            class="btn btn--primary btn--sm"
+            to="/entrar"
+          >
+            Entrar para votar
+          </router-link>
+          <router-link v-else class="btn btn--primary btn--sm" to="/iniciativas">
+            Ver iniciativas e votar
+          </router-link>
+        </template>
       </div>
     </section>
 
@@ -81,13 +114,39 @@ const recentes = computed(() => data.iniciativas.slice(0, 4))
   gap: 1.5rem;
 }
 
+.section-hint {
+  margin: -0.35rem 0 0.85rem;
+  font-size: 0.9rem;
+  color: var(--pt-muted);
+}
+
+.part-box {
+  margin-top: 1rem;
+}
+.part-box__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--pt-navy);
+}
+.part-box__nums {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--pt-ink);
+}
+.part-box__empty {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--pt-muted);
+}
+
 .recent-section__head {
   margin-bottom: 0.85rem;
   gap: 0.75rem;
   align-items: center;
 }
 
-/* Mesmo espaçamento que /iniciativas */
 .init-grid {
   display: grid;
   gap: 1rem;
