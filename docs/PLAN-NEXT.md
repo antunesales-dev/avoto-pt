@@ -29,21 +29,24 @@
 
 ---
 
-## Epic 2 — Deploy Cloudflare Pages
+## Epic 2 — Deploy Cloudflare Pages — ✅ base em produção
 
 **Done when:** URL pública HTTPS serve o build; env vars de produção configuradas; SPA history mode funciona.
 
+**URL:** https://avoto-pt.pages.dev · ver `docs/DEPLOY.md`
+
 ### Tasks
 
-| ID | Task | Detalhe | Done when |
-|----|------|---------|-----------|
-| **2.1** | Conta Cloudflare + Pages | Projecto Pages ligado ao GitHub `antunesales-dev/avoto-pt` | Repo ligado; build trigger em push a `main` |
-| **2.2** | Build config | Build command: `pnpm install && pnpm build` · Output: `dist/spa` · Node compatível (22+) | Build verde no dashboard |
-| **2.3** | Env de produção | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (valores do Epic 1) | App em produção fala com Supabase cloud |
-| **2.4** | SPA fallback | `_redirects` ou regra Pages: `/* /index.html 200` (history mode) | Refresh em `/iniciativas` não dá 404 |
-| **2.5** | Smoke test produção | Registo · login · voto · perfil · métricas | Fluxo completo no URL `*.pages.dev` |
-| **2.6** | Domínio `avoto.pt` | DNS + custom domain no Pages (quando o domínio existir) | HTTPS em avoto.pt |
-| **2.7** | CORS / Auth URLs | Supabase → Authentication → URL configuration: site URL + redirect URLs do domínio Pages/avoto.pt | Login/registo sem erro de redirect |
+| ID | Task | Estado |
+|----|------|--------|
+| **2.1** | Projecto Cloudflare Pages `avoto-pt` | ✅ |
+| **2.2** | Build `pnpm build` → `dist/spa` | ✅ |
+| **2.3** | Env build com Supabase cloud | ✅ |
+| **2.4** | SPA `_redirects` + headers | ✅ `/iniciativas` → 200 |
+| **2.5** | Smoke HTML + API iniciativas | ✅ |
+| **2.5b** | CI deploy (GitHub Actions + secrets) | ✅ |
+| **2.6** | Domínio `avoto.pt` | ⏳ quando DNS existir |
+| **2.7** | Auth site URL Pages | ✅ `https://avoto-pt.pages.dev` |
 
 **Dependências:** 1.1–1.6 (keys reais).  
 **Paralelo:** 2.1–2.2 podem preparar-se com keys placeholder, mas smoke real precisa de 1.x.

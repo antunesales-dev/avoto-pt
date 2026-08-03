@@ -11,6 +11,7 @@
     "dev": "quasar dev",
     "build": "quasar build",
     "postinstall": "quasar prepare --silent",
+    "deploy": "pnpm build && wrangler pages deploy dist/spa --project-name=avoto-pt --branch=main",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
@@ -28,7 +29,8 @@
   "devDependencies": {
     "@quasar/app-vite": "^3.3.0",
     "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8"
+    "postcss": "^8.5.8",
+    "wrangler": "^4.118.0"
   },
   "keywords": [
     "quasar",
