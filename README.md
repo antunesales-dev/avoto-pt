@@ -89,7 +89,7 @@ Migrations em `supabase/migrations/`.
 
 RLS: perfil só do próprio; iniciativas públicas; votos só os próprios; insert de votos **só** via RPC.
 
-Seed de desenvolvimento: `supabase/seed.sql` (iniciativas de exemplo). Em produção: importador dos Dados Abertos da AR.
+Dados de conteúdo: **só fontes oficiais** (`pnpm sync:ar`, `despesa-sync`). `seed.sql` está vazio de propósito.
 
 ---
 
