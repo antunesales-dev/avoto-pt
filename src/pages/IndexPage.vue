@@ -10,9 +10,9 @@
       </p>
       <div class="hero__actions">
         <router-link to="/iniciativas" class="btn btn--primary">Iniciativas</router-link>
-        <router-link to="/despesa" class="btn btn--outline">Despesa pública</router-link>
+        <router-link to="/digest" class="btn btn--outline">Digest</router-link>
+        <router-link to="/despesa" class="btn btn--outline">Despesa</router-link>
         <router-link to="/investimentos" class="btn btn--outline">Investimentos</router-link>
-        <router-link to="/digest" class="btn btn--ghost">Digest diário</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/registo" class="btn btn--ghost">Criar conta</router-link>
       </div>
     </section>

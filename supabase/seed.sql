@@ -230,5 +230,12 @@ insert into public.investimento_voto_counts (investimento_id)
 select id from public.investimentos
 on conflict (investimento_id) do nothing;
 
--- Digest de exemplo (data de uma iniciativa seed)
-select public.generate_daily_digest('2026-03-18'::date);
+-- Digests de exemplo (datas de votação das iniciativas seed)
+select public.generate_daily_digest(d::date)
+from (
+  values
+    ('2026-03-18'),
+    ('2026-04-09'),
+    ('2026-05-14'),
+    ('2026-06-04')
+) as t(d);

@@ -36,3 +36,11 @@ Cron: Cloudflare Worker ou scheduler com `x-avoto-cron-secret`.
 - Não pretende ser amostra representativa da população.
 - Não recomenda partidos nem “vencedores”.
 - Despesa e investimentos: **transparência e comparação**, não “controlo do governo”.
+
+## Digest (agora vs depois)
+
+| Agora | Depois (opcional) |
+|-------|-------------------|
+| `generate_daily_digest` monta **todos os dados** por item (oficial + partidos + cidadãos) | AI só para **rephrasing** informal por item |
+| Título/summary = **templates** pt-PT | Factos continuam a mandar; AI não inventa |
+| UI `/digest` mostra cartões completos | Mesma estrutura de items |

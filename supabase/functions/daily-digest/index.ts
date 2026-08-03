@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
     ok: true,
     digest_id: data,
     digest,
-    note: 'Digest factual a partir da BD. Conteúdo AR real depende do ar-sync oficial.',
+    note:
+      'Digest factual completo (título, estado, partidos, cidadãos, links). Sem AI. Conteúdo AR real depende do ar-sync oficial.',
   })
 })
