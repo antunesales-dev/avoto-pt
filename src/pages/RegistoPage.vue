@@ -50,6 +50,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useAuthStore } from '@/stores/auth'
+import '@/css/auth.scss'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -73,8 +74,10 @@ async function onSubmit() {
       partidoPreferencia: partido.value,
     })
     if (result.needsEmailConfirmation) {
-      info.value =
-        'Conta criada. Confirme o email (se a verificação estiver activa) e depois entre.'
+      router.replace({
+        name: 'confirmar-email',
+        query: { email: email.value },
+      })
       return
     }
     $q.notify({
@@ -88,64 +91,3 @@ async function onSubmit() {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.auth-page {
-  max-width: 28rem;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--pt-navy);
-
-  input {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--pt-border);
-    border-radius: 10px;
-    background: var(--pt-cream);
-    color: var(--pt-ink);
-
-    &:focus {
-      outline: 2px solid rgba(4, 106, 56, 0.35);
-      border-color: var(--pt-green);
-    }
-  }
-}
-
-.form-error {
-  margin: 0;
-  color: var(--pt-red-dark);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.form-info {
-  margin: 0;
-  color: var(--pt-green-dark);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.auth-switch {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--pt-muted);
-
-  a {
-    font-weight: 700;
-  }
-}
-</style>

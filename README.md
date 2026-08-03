@@ -113,8 +113,14 @@ Plano de tasks com critérios de done: **[`docs/PLAN-NEXT.md`](./docs/PLAN-NEXT.
 2. Deploy Cloudflare Pages  
 3. Import Dados Abertos da AR  
 4. Auth de produção (email confirm + reset)  
-5. Licença open source (recomendado: AGPL-3.0)  
+5. ~~Licença~~ → **AGPL-3.0** (`LICENSE`)
+6. Import Dados Abertos da AR  
+7. Domínio `avoto.pt` (DNS OVH → Cloudflare)
 
 ---
+
+## Licença
+
+[AGPL-3.0](./LICENSE) — código aberto; modificações de versões em rede devem ser partilhadas.
 
 **A Voto** — Bancada Cidadã · projecto cívico independente

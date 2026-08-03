@@ -94,21 +94,24 @@
 
 ---
 
-## Epic 5 — Licença open source
+## Epic 5 — Licença open source — ✅ AGPL-3.0
 
 **Done when:** ficheiro `LICENSE` no root; README e GitHub alinhados.
 
-### Tasks
+| ID | Task | Estado |
+|----|------|--------|
+| **5.1–5.3** | AGPL-3.0 + LICENSE + README | ✅ |
 
-| ID | Task | Detalhe | Done when |
-|----|------|---------|-----------|
-| **5.1** | Escolher licença | **Decisão de produto:** **AGPL-3.0** (recomendado: serviço na rede obriga a partilhar modificações) **ou** MIT (mais permissiva) | Escolha registada |
-| **5.2** | Adicionar `LICENSE` | Texto oficial da licença | Ficheiro no root |
-| **5.3** | Actualizar README + GitHub | Badge/secção licença · `gh repo edit --license …` se aplicável | UI GitHub mostra licença |
-| **5.4** | NOTICE / copyright | Ano + “A Voto” / maintainer | Consistente no footer legal se existir |
+## Epic 4 — Auth de produção — ✅ UI + redirects
 
-**Dependências:** nenhuma (pode ser o mais cedo).  
-**Recomendação técnica/civic:** **AGPL-3.0** — alinha com “open source total” e evita fork fechado do backend hospedado.
+| ID | Task | Estado |
+|----|------|--------|
+| **4.1** | Redirect URLs (pages.dev, gh pages, avoto.pt, localhost) | ✅ API |
+| **4.4–4.5** | UI recuperar / actualizar password / confirmar email | ✅ |
+| **4.2–4.3** | Templates email Supabase pt-PT | ⏳ dashboard (manual) |
+| **4.6** | E2E com email real | ⏳ precisa mailbox |
+
+**Dependências:** Epic 2 (URL estável). Pode usar `*.pages.dev` antes de avoto.pt (4.1 com URL Pages).
 
 ---
 

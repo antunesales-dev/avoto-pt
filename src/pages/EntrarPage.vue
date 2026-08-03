@@ -21,6 +21,11 @@
         {{ auth.loading ? 'A entrar…' : 'Entrar' }}
       </button>
 
+      <div class="auth-links">
+        <router-link to="/recuperar-password">Esqueci a palavra-passe</router-link>
+        <router-link to="/confirmar-email">Reenviar confirmação</router-link>
+      </div>
+
       <p class="auth-switch">
         Ainda não tem conta?
         <router-link to="/registo">Criar conta</router-link>
@@ -33,6 +38,7 @@
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import '@/css/auth.scss'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -49,61 +55,13 @@ async function onSubmit() {
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/perfil'
     router.replace(redirect)
   } catch (e) {
-    formError.value = e.message || 'Não foi possível entrar.'
-  }
-}
-</script>
-
-<style scoped lang="scss">
-.auth-page {
-  max-width: 28rem;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--pt-navy);
-
-  input {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--pt-border);
-    border-radius: 10px;
-    background: var(--pt-cream);
-    color: var(--pt-ink);
-
-    &:focus {
-      outline: 2px solid rgba(4, 106, 56, 0.35);
-      border-color: var(--pt-green);
+    const msg = e.message || 'Não foi possível entrar.'
+    if (/confirm|verif|email/i.test(msg)) {
+      formError.value =
+        'Confirme o email antes de entrar. Use «Reenviar confirmação» se não recebeu o link.'
+    } else {
+      formError.value = msg
     }
   }
 }
-
-.form-error {
-  margin: 0;
-  color: var(--pt-red-dark);
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.auth-switch {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--pt-muted);
-
-  a {
-    font-weight: 700;
-  }
-}
-</style>
+</script>

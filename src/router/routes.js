@@ -81,6 +81,24 @@ const routes = [
         component: () => import('@/pages/RegistoPage.vue'),
         meta: { title: 'Criar conta', guestOnly: true },
       },
+      {
+        path: 'recuperar-password',
+        name: 'recuperar-password',
+        component: () => import('@/pages/RecuperarPasswordPage.vue'),
+        meta: { title: 'Recuperar palavra-passe', guestOnly: true },
+      },
+      {
+        path: 'atualizar-password',
+        name: 'atualizar-password',
+        component: () => import('@/pages/AtualizarPasswordPage.vue'),
+        meta: { title: 'Nova palavra-passe' },
+      },
+      {
+        path: 'confirmar-email',
+        name: 'confirmar-email',
+        component: () => import('@/pages/ConfirmarEmailPage.vue'),
+        meta: { title: 'Confirmar email', guestOnly: true },
+      },
     ],
   },
   {

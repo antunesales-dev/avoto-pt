@@ -1,18 +1,26 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { computed, ref } from 'vue'
 import { supabase } from '@/lib/supabase'
-import { loginSchema, registoSchema } from '@/lib/schemas'
+import { emailSchema, loginSchema, passwordSchema, registoSchema } from '@/lib/schemas'
 
 /**
  * Auth real via Supabase.
  * PII e votos: encriptados na BD (Vault + pgcrypto); acesso só via RPC.
  */
+function appBaseUrl() {
+  if (typeof window === 'undefined') return ''
+  const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+  return `${window.location.origin}${base}`
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const session = ref(null)
   const profile = ref(null)
   const ready = ref(false)
   const loading = ref(false)
   const error = ref(null)
+  /** true quando o link de email abriu uma sessão de recuperação */
+  const passwordRecovery = ref(false)
 
   const isLoggedIn = computed(() => session.value?.user != null)
   const user = computed(() => session.value?.user ?? null)
@@ -53,7 +61,10 @@ export const useAuthStore = defineStore('auth', () => {
         profile.value = null
       }
 
-      supabase.auth.onAuthStateChange(async (_event, next) => {
+      supabase.auth.onAuthStateChange(async (event, next) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          passwordRecovery.value = true
+        }
         session.value = next
         if (next?.user) {
           try {
@@ -93,10 +104,13 @@ export const useAuthStore = defineStore('auth', () => {
       const { data, error: err } = await supabase.auth.signUp({
         email: parsed.data.email,
         password: parsed.data.password,
+        options: {
+          emailRedirectTo: `${appBaseUrl()}/entrar`,
+        },
       })
       if (err) throw err
       if (!data.session && data.user) {
-        return { needsEmailConfirmation: true, user: data.user }
+        return { needsEmailConfirmation: true, user: data.user, email: parsed.data.email }
       }
       session.value = data.session
       if (data.user) {
@@ -151,6 +165,76 @@ export const useAuthStore = defineStore('auth', () => {
       if (err) throw err
       session.value = null
       profile.value = null
+      passwordRecovery.value = false
+    } catch (e) {
+      error.value = e.message || String(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /** Envia email com link para repor a palavra-passe */
+  async function pedirRecuperacao(email) {
+    const parsed = emailSchema.safeParse(email)
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0]?.message || 'Email inválido.')
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { error: err } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+        redirectTo: `${appBaseUrl()}/atualizar-password`,
+      })
+      if (err) throw err
+      return true
+    } catch (e) {
+      error.value = e.message || String(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /** Define nova palavra-passe (após link de recuperação) */
+  async function atualizarPassword(password, passwordConfirm) {
+    if (password !== passwordConfirm) {
+      throw new Error('As palavras-passe não coincidem.')
+    }
+    const parsed = passwordSchema.safeParse(password)
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0]?.message || 'Palavra-passe inválida.')
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { error: err } = await supabase.auth.updateUser({ password: parsed.data })
+      if (err) throw err
+      passwordRecovery.value = false
+      return true
+    } catch (e) {
+      error.value = e.message || String(e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function reenviarConfirmacao(email) {
+    const parsed = emailSchema.safeParse(email)
+    if (!parsed.success) {
+      throw new Error(parsed.error.issues[0]?.message || 'Email inválido.')
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { error: err } = await supabase.auth.resend({
+        type: 'signup',
+        email: parsed.data,
+        options: { emailRedirectTo: `${appBaseUrl()}/entrar` },
+      })
+      if (err) throw err
+      return true
     } catch (e) {
       error.value = e.message || String(e)
       throw e
@@ -227,6 +311,7 @@ export const useAuthStore = defineStore('auth', () => {
     ready,
     loading,
     error,
+    passwordRecovery,
     isLoggedIn,
     user,
     cid,
@@ -235,6 +320,9 @@ export const useAuthStore = defineStore('auth', () => {
     registar,
     entrar,
     sair,
+    pedirRecuperacao,
+    atualizarPassword,
+    reenviarConfirmacao,
     updatePartido,
     fetchProfile,
     getVoto,
