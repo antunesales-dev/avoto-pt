@@ -94,10 +94,13 @@ Nunca commitar `.env`, service role key, tokens Cloudflare.
 
 ## O que falta (próximas fatias completas)
 
-1. Ligar projecto Supabase **remoto** (produção) + deploy Cloudflare Pages  
-2. Importador automático Dados Abertos da AR  
-3. Email de verificação / recuperação em produção  
-4. Licença MIT ou AGPL-3.0 no repo  
+Plano de tasks com critérios de done: **[`docs/PLAN-NEXT.md`](./docs/PLAN-NEXT.md)**
+
+1. Supabase remoto (produção)  
+2. Deploy Cloudflare Pages  
+3. Import Dados Abertos da AR  
+4. Auth de produção (email confirm + reset)  
+5. Licença open source (recomendado: AGPL-3.0)  
 
 ---
 
