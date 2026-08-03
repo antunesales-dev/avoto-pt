@@ -28,6 +28,11 @@
           havia uma forma simples, contínua e neutra de comparar vontade cidadã com voto real dos
           partidos.
         </p>
+        <p>
+          A origem pessoal deste projecto está em
+          <router-link to="/porque">O porquê</router-link> — a história de Tiago Sales e o que o
+          levou a criar a A Voto.
+        </p>
         <h3>Princípios não negociáveis</h3>
         <ul>
           <li>Open source total desde o primeiro dia</li>

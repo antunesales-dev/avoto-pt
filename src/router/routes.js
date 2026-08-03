@@ -46,6 +46,12 @@ const routes = [
         meta: { title: 'Fontes de dados' },
       },
       {
+        path: 'porque',
+        name: 'porque',
+        component: () => import('@/pages/PorquePage.vue'),
+        meta: { title: 'O porquê' },
+      },
+      {
         path: 'sobre',
         name: 'sobre',
         component: () => import('@/pages/SobrePage.vue'),

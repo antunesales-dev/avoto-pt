@@ -9,6 +9,7 @@ export const navPrincipal = [
 /** Menu Mais */
 export const navMais = [
   { to: '/como-funciona', label: 'Como funciona', icon: 'help_outline' },
+  { to: '/porque', label: 'O porquê', icon: 'menu_book' },
   { to: '/dados', label: 'Fontes de dados', icon: 'storage' },
   { to: '/sobre', label: 'Sobre', icon: 'info_outline' },
   { to: '/privacidade', label: 'Privacidade', icon: 'privacy_tip' },
