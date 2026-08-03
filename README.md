@@ -103,8 +103,16 @@ src/
 
 ---
 
+## Segurança do repositório
+
+Código **público** para auditoria. Escrita e secrets **só do dono**.
+
+- Ver [`SECURITY.md`](./SECURITY.md)
+- Não commitar `.env` (usar [`.env.example`](./.env.example))
+- Contribuições externas: **fork → PR** (sem write no repo principal)
+
 ## Licença
 
 A definir (MIT ou AGPL-3.0). Código público e auditável desde o primeiro dia.
 
-**A Voto** — Bancada Cidadã · Portugal
+**A Voto** — Bancada Cidadã · projecto independente
