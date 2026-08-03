@@ -121,9 +121,10 @@
 [x] 1.1–1.7  Supabase cloud
 [x] 2.1–2.5  Cloudflare Pages (https://avoto-pt.pages.dev)
 [x] 2.7      Auth site URL → pages.dev
-[ ] 5.1–5.4  Licença (rápido, qualquer altura)
-[ ] 4.1–4.6  Auth produção (confirm email + reset UI)
-[ ] 2.6      Domínio avoto.pt
+[x] 5.x      Licença AGPL-3.0
+[x] 4.x      Auth UI (recuperar / confirmar) + allow list
+[ ] 4.2–4.3  Templates email no dashboard Supabase
+[ ] 2.6      Domínio avoto.pt (OVH NS)
 [ ] 3.1–3.7  Import AR
 ```
 
