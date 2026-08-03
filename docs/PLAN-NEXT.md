@@ -112,8 +112,8 @@
 ## Ordem de execução (checklist)
 
 ```
+[x] 1.1–1.7  Supabase cloud
 [ ] 5.1–5.4  Licença (rápido, qualquer altura)
-[ ] 1.1–1.7  Supabase cloud
 [ ] 2.1–2.5  Cloudflare Pages (*.pages.dev)
 [ ] 4.1–4.6  Auth produção (com URL Pages)
 [ ] 2.6–2.7  Domínio avoto.pt + redirects finais
