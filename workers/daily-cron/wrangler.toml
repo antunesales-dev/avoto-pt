@@ -1,0 +1,12 @@
+name = "avoto-daily-cron"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Secrets (wrangler secret put …):
+#   AVOTO_CRON_SECRET
+#   SUPABASE_URL
+#   SUPABASE_ANON_OR_SERVICE_KEY  (service_role preferível para Authorization gateway)
+
+[triggers]
+# 06:15 UTC ≈ 07:15 Lisboa (inverno) — 1×/dia
+crons = ["15 6 * * *"]

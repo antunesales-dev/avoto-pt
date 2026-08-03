@@ -1,95 +1,119 @@
 /**
- * Sincronização Dados Abertos da AR (MVP).
+ * Sync Dados Abertos AR → iniciativas (upsert).
+ * Auth: x-avoto-cron-secret | Bearer service_role
  *
- * Autenticação: header `x-avoto-cron-secret` = env AVOTO_CRON_SECRET
- *              ou Authorization Bearer service_role
+ * O JSON oficial (~80 MB) ultrapassa a memória da edge free.
+ * Em produção use: `node scripts/sync-ar.mjs` ou o workflow sync-daily.yml.
  *
- * Fase actual: regista run + upsert de amostra estruturada (placeholder).
- * Próximo: fetch real JSON/XML oficiais parlamento.pt e mapeamento completo.
- *
- * Nunca usa fontes de notícias/wikis — só URLs oficiais.
+ * Esta function:
+ * - aceita POST { iniciativas: [...] } (ops / script)
+ * - tenta fetch directo só com ?limit=≤40 (pode falhar por RESOURCE_LIMIT)
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
+import { authorized } from '../_shared/auth.ts'
+import { fetchArIniciativas, type MappedIniciativa } from '../_shared/ar.ts'
 
 const OFFICIAL_PORTAL =
   'https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx'
 
-function authorized(req: Request): boolean {
-  const cron = Deno.env.get('AVOTO_CRON_SECRET') || ''
-  const headerSecret = req.headers.get('x-avoto-cron-secret') || ''
-  // Gateway exige Authorization; a autorização real é o cron secret ou service_role
-  if (cron && headerSecret && headerSecret === cron) return true
-
-  const auth = req.headers.get('Authorization') || ''
-  const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-  if (service && auth === `Bearer ${service}`) return true
-
-  return false
+async function upsertBatch(
+  admin: ReturnType<typeof createClient>,
+  items: MappedIniciativa[],
+): Promise<{ upserted: number; skipped: number; errors: string[] }> {
+  let upserted = 0
+  let skipped = 0
+  const errors: string[] = []
+  const chunk = 15
+  for (let i = 0; i < items.length; i += chunk) {
+    const slice = items.slice(i, i + chunk)
+    const results = await Promise.all(
+      slice.map(async (raw) => {
+        const { error } = await admin.rpc('upsert_iniciativa_from_ar', { p: raw })
+        if (error) return { ok: false as const, msg: error.message }
+        return { ok: true as const }
+      }),
+    )
+    for (const r of results) {
+      if (r.ok) upserted++
+      else {
+        skipped++
+        if (errors.length < 12) errors.push(r.msg)
+      }
+    }
+  }
+  return { upserted, skipped, errors }
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
-
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST' && req.method !== 'GET') {
     return jsonResponse({ error: 'METHOD_NOT_ALLOWED' }, 405)
   }
+  if (!authorized(req)) return jsonResponse({ error: 'UNAUTHORIZED' }, 401)
 
-  if (!authorized(req)) {
-    return jsonResponse({ error: 'UNAUTHORIZED' }, 401)
-  }
+  const admin = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
 
-  const url = Deno.env.get('SUPABASE_URL')!
-  const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const admin = createClient(url, service)
+  const urlObj = new URL(req.url)
+  let limit = Number(urlObj.searchParams.get('limit') || '40')
+  if (!Number.isFinite(limit) || limit < 1) limit = 40
+  // edge free: manter baixo; full sync via scripts/sync-ar.mjs
+  limit = Math.min(80, Math.floor(limit))
 
   const { data: run, error: runErr } = await admin
     .from('ar_sync_runs')
     .insert({
       status: 'running',
       source: 'parlamento.pt',
-      meta: { portal: OFFICIAL_PORTAL, mode: 'mvp_placeholder' },
+      meta: { portal: OFFICIAL_PORTAL, mode: 'fetch' },
     })
     .select('id')
     .single()
 
-  if (runErr) {
-    return jsonResponse({ error: runErr.message }, 500)
-  }
+  if (runErr) return jsonResponse({ error: runErr.message }, 500)
 
-  const runId = run.id
   let upserted = 0
   let skipped = 0
+  let mode = 'fetch'
+  let meta: Record<string, unknown> = { portal: OFFICIAL_PORTAL }
 
   try {
-    // MVP: não inventa dados de notícias. Placeholder vazio até mapeamento AR.
-    // Opcional: body JSON com array `iniciativas` para backfill controlado (ops).
-    let items: Record<string, unknown>[] = []
+    let items: MappedIniciativa[] = []
+
     if (req.method === 'POST') {
       try {
         const body = await req.json()
-        if (Array.isArray(body?.iniciativas)) {
+        if (Array.isArray(body?.iniciativas) && body.iniciativas.length) {
           items = body.iniciativas
+          mode = 'ops_payload'
         }
+        if (body?.limit) limit = Math.min(500, Number(body.limit) || limit)
       } catch {
-        // GET ou body vazio = dry run estrutural
+        /* no body */
       }
     }
 
-    for (const raw of items) {
-      const { data, error } = await admin.rpc('upsert_iniciativa_from_ar', {
-        p: raw,
-      })
-      if (error) {
-        skipped += 1
-        console.error('upsert failed', error.message)
-      } else {
-        upserted += 1
-        console.log('upserted', data)
+    if (!items.length) {
+      const fetched = await fetchArIniciativas(limit)
+      items = fetched.items
+      meta = {
+        portal: OFFICIAL_PORTAL,
+        source_label: fetched.sourceLabel,
+        source_url_base: fetched.sourceUrl,
+        raw_count: fetched.rawCount,
+        limit,
+        mode: 'ar_open_data_fetch',
       }
+      mode = 'ar_open_data_fetch'
     }
+
+    const result = await upsertBatch(admin, items)
+    upserted = result.upserted
+    skipped = result.skipped
+    meta = { ...meta, mode, sample_errors: result.errors }
 
     await admin
       .from('ar_sync_runs')
@@ -98,23 +122,19 @@ Deno.serve(async (req) => {
         finished_at: new Date().toISOString(),
         upserted,
         skipped,
-        meta: {
-          portal: OFFICIAL_PORTAL,
-          mode: items.length ? 'ops_payload' : 'dry_run',
-          note:
-            items.length === 0
-              ? 'Sem payload: run registado. Ligar fetch oficial no próximo incremento.'
-              : 'Upsert a partir de payload ops (não seed público).',
-        },
+        meta,
       })
-      .eq('id', runId)
+      .eq('id', run.id)
 
     return jsonResponse({
       ok: true,
-      run_id: runId,
+      run_id: run.id,
       upserted,
       skipped,
+      mode,
+      limit,
       portal: OFFICIAL_PORTAL,
+      meta,
     })
   } catch (e) {
     await admin
@@ -125,9 +145,10 @@ Deno.serve(async (req) => {
         error_message: String(e),
         upserted,
         skipped,
+        meta,
       })
-      .eq('id', runId)
+      .eq('id', run.id)
 
-    return jsonResponse({ ok: false, error: String(e), run_id: runId }, 500)
+    return jsonResponse({ ok: false, error: String(e), run_id: run.id }, 500)
   }
 })

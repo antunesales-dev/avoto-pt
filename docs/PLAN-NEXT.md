@@ -162,6 +162,6 @@ Ver `docs/AUTH-PWA.md`.
 
 ## Próxima acção concreta (agora)
 
-1. `supabase db push` (notifications) se ainda não aplicado.  
-2. Templates magic link/OTP em pt-PT no dashboard Supabase.  
-3. Import AR (Epic 3) + domínio avoto.pt.
+1. Tu: secrets GitHub `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `AVOTO_CRON_SECRET` para `sync-daily.yml` (se ainda não).  
+2. Tu: templates email pt-PT + DNS avoto.pt.  
+3. Opcional: `pnpm sync:ar -- --limit=200` local / workflow_dispatch para encher mais iniciativas.

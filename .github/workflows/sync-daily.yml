@@ -1,0 +1,58 @@
+# Sync diário: AR (Node) + despesa/digest (edge)
+name: Sync diário (AR + despesa + digest)
+
+on:
+  schedule:
+    # 06:30 UTC
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+    inputs:
+      ar_limit:
+        description: 'Máx. iniciativas AR a upsert'
+        default: '200'
+        required: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: AR sync (Node — JSON grande)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/sync-ar.mjs --limit=${{ github.event.inputs.ar_limit || '200' }}
+
+      - name: despesa-sync + daily-digest (edge)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AVOTO_CRON_SECRET: ${{ secrets.AVOTO_CRON_SECRET }}
+        run: |
+          set -e
+          curl -fsS -X POST "$SUPABASE_URL/functions/v1/despesa-sync?limit=80" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
+            -H "Content-Type: application/json" -d '{}'
+          echo
+          curl -fsS -X POST "$SUPABASE_URL/functions/v1/daily-digest" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
+            -H "Content-Type: application/json" -d '{}'
+          echo

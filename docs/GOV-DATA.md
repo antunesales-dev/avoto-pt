@@ -24,11 +24,12 @@ Plataforma **independente**. Usa **apenas** portais oficiais do Estado / AR.
 
 | Function | Frequência sugerida | Função |
 |----------|---------------------|--------|
-| `ar-sync` | diária | iniciativas / votações AR |
-| `daily-digest` | diária (após ar-sync) | gera `daily_digests` |
-| `despesa-sync` | diária | despesas + investimentos oficiais |
+| `ar-sync` | diária | fetch Dados Abertos AR → `iniciativas` |
+| `despesa-sync` | diária | Portal Base (SNS open data) → despesas + investimentos |
+| `daily-digest` | diária (após syncs) | digest multi-secção |
 
-Cron: Cloudflare Worker ou scheduler com `x-avoto-cron-secret`.
+Cron: `workers/daily-cron` (CF Worker, 06:15 UTC) com `x-avoto-cron-secret`.  
+Detalhe: [`docs/AR-IMPORT.md`](./AR-IMPORT.md).
 
 ## Princípios de produto
 
@@ -41,6 +42,6 @@ Cron: Cloudflare Worker ou scheduler com `x-avoto-cron-secret`.
 
 | Agora | Depois (opcional) |
 |-------|-------------------|
-| `generate_daily_digest` monta **todos os dados** por item (oficial + partidos + cidadãos) | AI só para **rephrasing** informal por item |
-| Título/summary = **templates** pt-PT | Factos continuam a mandar; AI não inventa |
-| UI `/digest` mostra cartões completos | Mesma estrutura de items |
+| Multi-secção: iniciativas + despesas + investimentos | AI só para **rephrasing** informal por item |
+| Título/summary = **templates** pt-PT | Factos mandam; AI não inventa |
+| UI `/digest` por secção | Mesma estrutura de `items.sections` |

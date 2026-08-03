@@ -1,27 +1,19 @@
 /**
- * Sync de despesa pública / contratos (MVP).
- * Fontes oficiais previstas: Base.gov.pt, dados.gov.pt, DGO — nunca notícias.
+ * Sync despesa / contratos oficiais (Portal Base via SNS Transparência) + investimentos.
+ * Auth: x-avoto-cron-secret | Bearer service_role
  *
- * Auth: x-avoto-cron-secret + Authorization Bearer
- * POST body opcional: { despesas: [...], investimentos: [...] } para ops backfill
+ * Query: ?limit=80
+ * POST body opcional: { despesas, investimentos } ops backfill
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
+import { authorized } from '../_shared/auth.ts'
+import { fetchBaseContratos } from '../_shared/despesa.ts'
 
 const OFFICIAL = {
   base: 'https://www.base.gov.pt',
   dados: 'https://dados.gov.pt',
-  dgo: 'https://www.dgo.gov.pt',
-}
-
-function authorized(req: Request): boolean {
-  const cron = Deno.env.get('AVOTO_CRON_SECRET') || ''
-  const headerSecret = req.headers.get('x-avoto-cron-secret') || ''
-  if (cron && headerSecret && headerSecret === cron) return true
-  const auth = req.headers.get('Authorization') || ''
-  const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-  if (service && auth === `Bearer ${service}`) return true
-  return false
+  sns: 'https://transparencia.sns.gov.pt/explore/dataset/portal-base/',
 }
 
 Deno.serve(async (req) => {
@@ -36,12 +28,17 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   )
 
+  const urlObj = new URL(req.url)
+  let limit = Number(urlObj.searchParams.get('limit') || '80')
+  if (!Number.isFinite(limit) || limit < 1) limit = 80
+  limit = Math.min(100, Math.floor(limit))
+
   const { data: run, error: runErr } = await admin
     .from('ar_sync_runs')
     .insert({
       status: 'running',
       source: 'despesa_publica',
-      meta: { portals: OFFICIAL, mode: 'mvp' },
+      meta: { portals: OFFICIAL, mode: 'fetch' },
     })
     .select('id')
     .single()
@@ -50,29 +47,51 @@ Deno.serve(async (req) => {
 
   let upserted = 0
   let skipped = 0
-  let despesas: Record<string, unknown>[] = []
-  let investimentos: Record<string, unknown>[] = []
+  let mode = 'fetch'
+  const errors: string[] = []
 
   try {
+    let despesas: Record<string, unknown>[] = []
+    let investimentos: Record<string, unknown>[] = []
+    let fetchMeta: Record<string, unknown> = {}
+
     if (req.method === 'POST') {
       try {
         const body = await req.json()
         if (Array.isArray(body?.despesas)) despesas = body.despesas
         if (Array.isArray(body?.investimentos)) investimentos = body.investimentos
+        if (body?.limit) limit = Math.min(100, Number(body.limit) || limit)
+        if (despesas.length || investimentos.length) mode = 'ops_payload'
       } catch {
-        /* dry run */
+        /* empty */
+      }
+    }
+
+    if (!despesas.length && !investimentos.length) {
+      const fetched = await fetchBaseContratos(limit)
+      despesas = fetched.despesas
+      investimentos = fetched.investimentos
+      mode = 'base_via_sns'
+      fetchMeta = {
+        source: fetched.source,
+        catalog_total: fetched.total,
+        limit,
       }
     }
 
     for (const d of despesas) {
       const { error } = await admin.rpc('upsert_despesa_publica', { p: d })
-      if (error) skipped++
-      else upserted++
+      if (error) {
+        skipped++
+        if (errors.length < 10) errors.push(error.message)
+      } else upserted++
     }
     for (const inv of investimentos) {
       const { error } = await admin.rpc('upsert_investimento', { p: inv })
-      if (error) skipped++
-      else upserted++
+      if (error) {
+        skipped++
+        if (errors.length < 10) errors.push(error.message)
+      } else upserted++
     }
 
     await admin
@@ -84,9 +103,11 @@ Deno.serve(async (req) => {
         skipped,
         meta: {
           portals: OFFICIAL,
-          mode: despesas.length || investimentos.length ? 'ops_payload' : 'dry_run',
-          note:
-            'Fetch automático Base/dados.gov a ligar no próximo incremento. Apenas fontes oficiais.',
+          mode,
+          ...fetchMeta,
+          sample_errors: errors,
+          n_despesas: despesas.length,
+          n_investimentos: investimentos.length,
         },
       })
       .eq('id', run.id)
@@ -96,7 +117,10 @@ Deno.serve(async (req) => {
       run_id: run.id,
       upserted,
       skipped,
+      mode,
       portals: OFFICIAL,
+      n_despesas: despesas.length,
+      n_investimentos: investimentos.length,
     })
   } catch (e) {
     await admin
@@ -109,6 +133,6 @@ Deno.serve(async (req) => {
         skipped,
       })
       .eq('id', run.id)
-    return jsonResponse({ ok: false, error: String(e) }, 500)
+    return jsonResponse({ ok: false, error: String(e), run_id: run.id }, 500)
   }
 })

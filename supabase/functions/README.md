@@ -3,32 +3,34 @@
 | Function | Auth | Função |
 |----------|------|--------|
 | `health` | pública (anon) | `platform_health` + liveness |
-| `ar-sync` | cron secret | Sync votações / iniciativas AR |
-| `daily-digest` | cron secret | Gera digest do dia (o que foi a voto e como) |
-| `despesa-sync` | cron secret | Despesa + investimentos oficiais (MVP) |
+| `ar-sync` | cron secret | Fetch Dados Abertos AR → iniciativas |
+| `despesa-sync` | cron secret | Portal Base (SNS open data) → despesas + investimentos |
+| `daily-digest` | cron secret | Digest multi-secção do dia |
+
+Detalhe: [`docs/AR-IMPORT.md`](../../docs/AR-IMPORT.md).
 
 ## Local
 
 ```bash
 supabase functions serve
-# health: http://127.0.0.1:54321/functions/v1/health
 ```
 
 ## Deploy
 
 ```bash
-supabase functions deploy health --project-ref qevavihconurfgmayzze
-supabase functions deploy ar-sync --project-ref qevavihconurfgmayzze
-supabase secrets set AVOTO_CRON_SECRET='…' --project-ref qevavihconurfgmayzze
+pnpm fn:deploy
+# ou:
+supabase functions deploy ar-sync despesa-sync daily-digest health
+supabase secrets set AVOTO_CRON_SECRET='…'
 ```
 
-## Cron (produção)
+## Cron
 
-Cloudflare Worker cron ou Supabase scheduled trigger a chamar:
+Worker em `workers/daily-cron` (CF): `15 6 * * *` UTC.
 
 ```
-POST https://qevavihconurfgmayzze.supabase.co/functions/v1/ar-sync
-Authorization: Bearer <anon_or_service_key>
-apikey: <anon_or_service_key>
-x-avoto-cron-secret: <AVOTO_CRON_SECRET>
+POST …/functions/v1/ar-sync?limit=200
+POST …/functions/v1/despesa-sync?limit=80
+POST …/functions/v1/daily-digest
+Headers: Authorization Bearer <service_role>, x-avoto-cron-secret, apikey
 ```

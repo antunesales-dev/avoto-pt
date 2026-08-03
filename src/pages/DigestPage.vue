@@ -2,14 +2,13 @@
   <div class="page-shell">
     <h1 class="page-title">Digest diário</h1>
     <p class="page-subtitle">
-      O que foi a voto e <strong>como</strong> — partidos na AR e cidadãos na A Voto. Só factos dos
-      dados da plataforma (sem interpretação nem AI).
+      Resumo factual do dia: <strong>votações</strong>, <strong>despesa</strong> e
+      <strong>investimentos</strong>. Só dados da plataforma (sem AI).
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Gerado a partir da base:
-      <code>ar-sync</code> → <code>daily-digest</code>. Cada cartão lista todos os campos úteis:
-      título, estado, partidos, cidadãos e ligações oficiais.
+      Gerado a partir das tabelas-fonte:
+      <code>ar-sync</code> → <code>despesa-sync</code> → <code>daily-digest</code>.
     </div>
 
     <p v-if="finance.loading" class="muted">A carregar…</p>
@@ -29,14 +28,19 @@
             <span class="badge badge--navy">{{ formatDate(d.digest_date) }}</span>
           </div>
           <p class="digest__summary">{{ d.summary }}</p>
-          <p v-if="d.generated_at" class="digest__meta">
-            Gerado {{ formatDate(d.generated_at) }}
-            <template v-if="d.source"> · fonte: {{ d.source }}</template>
-            · {{ (d.items || []).length }} item(ns)
+          <p class="digest__meta">
+            <template v-if="d.generated_at">Gerado {{ formatDate(d.generated_at) }} · </template>
+            {{ sectionCountsLabel(d) }}
           </p>
 
-          <div v-if="d.items?.length" class="digest__items">
-            <div v-for="(it, idx) in d.items" :key="it.iniciativa_id || idx" class="digest-item">
+          <!-- Parlamento -->
+          <section v-if="sectionItems(d, 'iniciativas').length" class="digest-section">
+            <h3 class="digest-section__title">Parlamento · iniciativas</h3>
+            <div
+              v-for="(it, idx) in sectionItems(d, 'iniciativas')"
+              :key="it.iniciativa_id || idx"
+              class="digest-item"
+            >
               <div class="digest-item__badges">
                 <router-link
                   v-if="it.iniciativa_id"
@@ -45,39 +49,21 @@
                 >
                   {{ it.id_oficial || it.iniciativa_id }}
                 </router-link>
-                <span v-else class="badge badge--muted">{{ it.id_oficial || '—' }}</span>
                 <span v-if="it.tipo" class="badge badge--navy">{{ it.tipo }}</span>
                 <span v-if="it.estado" class="badge" :class="estadoBadge(it.estado)">
                   {{ estadoLabel(it.estado) }}
                 </span>
                 <span v-if="it.tema" class="badge badge--muted">{{ it.tema }}</span>
               </div>
-
-              <h3 class="digest-item__titulo">{{ it.titulo || 'Sem título' }}</h3>
-
-              <p v-if="it.data_votacao || it.legislatura" class="digest-item__line">
-                <template v-if="it.data_votacao">
-                  Votação AR: <strong>{{ formatDate(it.data_votacao) }}</strong>
-                </template>
-                <template v-if="it.legislatura">
-                  <template v-if="it.data_votacao"> · </template>
-                  Legislatura {{ it.legislatura }}
-                </template>
+              <h4 class="digest-item__titulo">{{ it.titulo || 'Sem título' }}</h4>
+              <p v-if="it.data_votacao" class="digest-item__line">
+                Votação AR: <strong>{{ formatDate(it.data_votacao) }}</strong>
               </p>
-
-              <p v-if="autoresText(it)" class="digest-item__line">
-                Autores: {{ autoresText(it) }}
-              </p>
-
               <p v-if="it.descricao_oficial" class="digest-item__body">
-                {{ it.descricao_oficial }}
+                {{ truncate(it.descricao_oficial, 320) }}
               </p>
-              <p v-else-if="it.explicacao" class="digest-item__body">
-                {{ it.explicacao }}
-              </p>
-
               <div class="digest-item__block">
-                <h4 class="digest-item__h">Voto dos partidos na AR</h4>
+                <h5 class="digest-item__h">Partidos na AR</h5>
                 <div v-if="partyEntries(it).length" class="party-list">
                   <PartyVoteBadge
                     v-for="row in partyEntries(it)"
@@ -86,35 +72,94 @@
                     :voto="row.voto"
                   />
                 </div>
-                <p v-else class="muted sm">Sem registo de votos por partido neste item.</p>
+                <p v-else class="muted sm">Sem registo de votos por partido.</p>
               </div>
-
               <div class="digest-item__block">
-                <h4 class="digest-item__h">Voto dos cidadãos (A Voto)</h4>
+                <h5 class="digest-item__h">Cidadãos (A Voto)</h5>
                 <VoteBar :votos="cidadaosVotos(it)" />
               </div>
-
-              <div v-if="linksOf(it).length" class="digest-item__links">
-                <a
-                  v-for="l in linksOf(it)"
-                  :key="(l.url || '') + (l.label || '')"
-                  :href="l.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ l.label || l.url }} ↗
-                </a>
-              </div>
-
               <router-link
                 v-if="it.iniciativa_id"
                 :to="`/iniciativas/${it.iniciativa_id}`"
-                class="btn btn--ghost btn--sm digest-item__more"
+                class="btn btn--ghost btn--sm"
               >
-                Ver iniciativa completa
+                Ver iniciativa
               </router-link>
             </div>
-          </div>
+          </section>
+
+          <!-- Despesa -->
+          <section v-if="sectionItems(d, 'despesas').length" class="digest-section">
+            <h3 class="digest-section__title">Despesa pública</h3>
+            <div
+              v-for="(it, idx) in sectionItems(d, 'despesas')"
+              :key="it.despesa_id || idx"
+              class="digest-item"
+            >
+              <div class="digest-item__badges">
+                <span class="badge badge--navy">{{ it.tipo || 'despesa' }}</span>
+                <span v-if="it.categoria" class="badge badge--muted">{{ it.categoria }}</span>
+                <span v-if="it.montante_eur != null" class="badge badge--gold">
+                  {{ formatMoney(it.montante_eur) }}
+                </span>
+              </div>
+              <h4 class="digest-item__titulo">{{ it.titulo }}</h4>
+              <p class="digest-item__line">
+                <template v-if="it.entidade">{{ it.entidade }}</template>
+                <template v-if="it.data_publicacao">
+                  · {{ formatDate(it.data_publicacao) }}
+                </template>
+              </p>
+              <p v-if="it.descricao" class="digest-item__body">
+                {{ truncate(it.descricao, 240) }}
+              </p>
+              <router-link to="/despesa" class="btn btn--ghost btn--sm">Ver despesa</router-link>
+            </div>
+          </section>
+
+          <!-- Investimentos -->
+          <section v-if="sectionItems(d, 'investimentos').length" class="digest-section">
+            <h3 class="digest-section__title">Investimentos</h3>
+            <div
+              v-for="(it, idx) in sectionItems(d, 'investimentos')"
+              :key="it.investimento_id || idx"
+              class="digest-item"
+            >
+              <div class="digest-item__badges">
+                <span v-if="it.sector" class="badge badge--muted">{{ it.sector }}</span>
+                <span v-if="it.montante_eur != null" class="badge badge--gold">
+                  {{ formatMoney(it.montante_eur) }}
+                </span>
+                <span v-if="it.decisao_oficial" class="badge badge--navy">
+                  {{ it.decisao_oficial }}
+                </span>
+              </div>
+              <h4 class="digest-item__titulo">{{ it.titulo }}</h4>
+              <p v-if="it.entidade" class="digest-item__line">{{ it.entidade }}</p>
+              <div v-if="it.votos_cidadaos" class="digest-item__block">
+                <h5 class="digest-item__h">Cidadãos</h5>
+                <VoteBar :votos="cidadaosVotos(it)" />
+              </div>
+              <router-link
+                v-if="it.investimento_id"
+                :to="`/investimentos/${it.investimento_id}`"
+                class="btn btn--ghost btn--sm"
+              >
+                Ver investimento
+              </router-link>
+            </div>
+          </section>
+
+          <p
+            v-if="
+              !sectionItems(d, 'iniciativas').length &&
+              !sectionItems(d, 'despesas').length &&
+              !sectionItems(d, 'investimentos').length
+            "
+            class="muted sm"
+          >
+            Sem itens neste dia.
+          </p>
 
           <div v-if="d.source_urls?.length" class="digest__sources">
             <span class="digest__sources-label">Fontes</span>
@@ -153,11 +198,42 @@ function estadoBadge(estado) {
   return 'badge--muted'
 }
 
-function autoresText(it) {
-  const a = it?.autores
-  if (!a) return ''
-  if (Array.isArray(a)) return a.filter(Boolean).join(', ')
-  return String(a)
+function truncate(s, n) {
+  const t = String(s || '')
+  return t.length > n ? t.slice(0, n - 1) + '…' : t
+}
+
+function formatMoney(v) {
+  if (v == null || v === '') return '—'
+  return new Intl.NumberFormat('pt-PT', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(Number(v))
+}
+
+/** Suporta items.sections.* e array legado */
+function sectionItems(d, key) {
+  const items = d?.items
+  if (!items) return []
+  if (items.sections?.[key]?.items) return items.sections[key].items
+  if (key === 'iniciativas') {
+    if (Array.isArray(items.legacy_items)) return items.legacy_items
+    if (Array.isArray(items)) return items
+  }
+  return []
+}
+
+function sectionCountsLabel(d) {
+  const items = d?.items
+  if (items?.sections) {
+    const a = items.sections.iniciativas?.count ?? 0
+    const b = items.sections.despesas?.count ?? 0
+    const c = items.sections.investimentos?.count ?? 0
+    return `${a} iniciativa(s) · ${b} despesa(s) · ${c} investimento(s)`
+  }
+  const n = Array.isArray(items) ? items.length : Array.isArray(items?.legacy_items) ? items.legacy_items.length : 0
+  return `${n} item(ns)`
 }
 
 function cidadaosVotos(it) {
@@ -169,7 +245,6 @@ function cidadaosVotos(it) {
   }
 }
 
-/** Partidos conhecidos primeiro; depois quaisquer chaves extra no JSON */
 function partyEntries(it) {
   const map = it?.resultado_partidos || {}
   if (!map || typeof map !== 'object') return []
@@ -178,8 +253,7 @@ function partyEntries(it) {
     .filter((p) => map[p.id] != null && map[p.id] !== '')
     .map((p) => ({ id: p.id, partido: p, voto: map[p.id] }))
   for (const [id, voto] of Object.entries(map)) {
-    if (known.has(id)) continue
-    if (voto == null || voto === '') continue
+    if (known.has(id) || voto == null || voto === '') continue
     rows.push({
       id,
       partido: getPartido(id) || { id, sigla: id.toUpperCase(), cor: '#999' },
@@ -187,12 +261,6 @@ function partyEntries(it) {
     })
   }
   return rows
-}
-
-function linksOf(it) {
-  const links = it?.links
-  if (!Array.isArray(links)) return []
-  return links.filter((l) => l && l.url)
 }
 
 onMounted(() => {
@@ -238,17 +306,23 @@ onMounted(() => {
   font-size: 0.82rem;
   color: var(--pt-muted);
 }
-.digest__items {
-  display: flex;
-  flex-direction: column;
-  gap: 1.15rem;
+.digest-section {
   border-top: 1px solid var(--pt-line);
-  padding-top: 1rem;
+  padding-top: 0.85rem;
+  margin-top: 0.5rem;
+}
+.digest-section__title {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--pt-green-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .digest-item {
-  padding: 0.85rem 0 0;
+  padding: 0.75rem 0;
   border-top: 1px dashed var(--pt-line);
-  &:first-child {
+  &:first-of-type {
     border-top: none;
     padding-top: 0;
   }
@@ -257,8 +331,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  align-items: center;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 .digest-item__id {
   font-family: var(--font-mono);
@@ -268,8 +341,8 @@ onMounted(() => {
   color: var(--pt-green-dark);
 }
 .digest-item__titulo {
-  margin: 0.15rem 0 0.4rem;
-  font-size: 1.05rem;
+  margin: 0.15rem 0 0.35rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: var(--pt-navy);
   line-height: 1.3;
@@ -280,17 +353,17 @@ onMounted(() => {
   color: var(--pt-muted);
 }
 .digest-item__body {
-  margin: 0.5rem 0 0.75rem;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  margin: 0.4rem 0 0.65rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
   color: var(--pt-ink);
 }
 .digest-item__block {
-  margin: 0.75rem 0;
+  margin: 0.55rem 0;
 }
 .digest-item__h {
-  margin: 0 0 0.45rem;
-  font-size: 0.8rem;
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -300,19 +373,6 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-}
-.digest-item__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin: 0.5rem 0;
-  a {
-    font-size: 0.85rem;
-    font-weight: 700;
-  }
-}
-.digest-item__more {
-  margin-top: 0.35rem;
 }
 .digest__sources {
   margin-top: 1.15rem;
