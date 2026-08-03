@@ -57,4 +57,5 @@ Quando existir `avoto.pt`, actualizar no dashboard Supabase Auth + custom domain
 - [x] Env de build com Supabase cloud  
 - [x] Headers / redirects  
 - [x] GitHub secrets + workflow  
-- [ ] Domínio custom `avoto.pt` (quando DNS existir)  
+- [ ] Domínio custom `avoto.pt` — guia: [`DOMAIN-AVOTO-PT.md`](./DOMAIN-AVOTO-PT.md)  
+

@@ -45,7 +45,7 @@
 | **2.4** | SPA `_redirects` + headers | ✅ `/iniciativas` → 200 |
 | **2.5** | Smoke HTML + API iniciativas | ✅ |
 | **2.5b** | CI deploy (GitHub Actions + secrets) | ✅ |
-| **2.6** | Domínio `avoto.pt` | ⏳ quando DNS existir |
+| **2.6** | Domínio `avoto.pt` | ⏳ OVH em criação · CF zone pending · ver `docs/DOMAIN-AVOTO-PT.md` |
 | **2.7** | Auth site URL Pages | ✅ `https://avoto-pt.pages.dev` |
 
 **Dependências:** 1.1–1.6 (keys reais).  
