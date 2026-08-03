@@ -7,7 +7,7 @@
 | **Produto** | A Voto |
 | **Slogan** | Bancada Cidadã |
 | **Domínio** | [avoto.pt](https://avoto.pt) |
-| **Estado** | UI de demonstração (navegação completa, sem auth) |
+| **Estado** | UI de demonstração (login demo, voto com confirmação, dados mock) |
 | **Locale** | Português de Portugal (pt-PT) |
 | **Stack** | Vue 3 · Vite · Quasar · Pinia · Zod |
 
@@ -72,11 +72,15 @@ Dados de demo: [`src/data/mock.js`](./src/data/mock.js).
 
 1. **Open source total** — código e cálculos auditáveis  
 2. **Só fontes oficiais** — Dados Abertos da AR / Estado (nunca notícias ou wikis)  
-3. **Um voto por ID** — sem voto anónimo puro  
+3. **Um voto por ID** — sem voto anónimo puro; **login obrigatório para votar**  
 4. **Privacidade / RGPD** — email só para conta; sem NIF/CC obrigatório  
 5. **Métricas públicas** — participação, distribuições, exportações  
 
-Nesta fase **não há login** — só visualização para compreender o fluxo.
+### Conta e voto (sempre)
+
+- **Sem sessão:** pode ver iniciativas e métricas; **não** vota; botão **Entrar**.  
+- **Com sessão:** botão **Perfil**; pode votar **uma vez** por iniciativa (confirmação; voto imutável).  
+- Hoje a sessão é **demo** em memória; em produção será Supabase Auth (email + ID permanente).
 
 ---
 

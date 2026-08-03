@@ -36,8 +36,8 @@
           <li>Um sítio de recomendações políticas ou de “vencedores”.</li>
         </ul>
         <div class="notice" style="margin-top: 1rem">
-          Nesta build de demonstração o registo e a votação estão desactivados — apenas navegação e
-          visualização.
+          Login e voto estão activos nesta demo (sessão em memória). Em produção: conta com email
+          verificado, ID permanente e um voto por iniciativa sem possibilidade de alteração.
         </div>
       </div>
     </section>
@@ -47,12 +47,12 @@
 <script setup>
 const passos = [
   {
-    t: 'Regista-se e recebe um ID',
-    d: 'Email verificado, ID único permanente (ex.: CID-7K9M2X). Sem NIF nem Cartão de Cidadão. O email serve para conta e recuperação.',
+    t: 'Entra (conta obrigatória para votar)',
+    d: 'Sem conta só se vê. Com conta: ID único permanente (ex.: CID-7K9M2X). Sem NIF nem Cartão de Cidadão. O email serve para conta e recuperação.',
   },
   {
     t: 'Vota uma vez por iniciativa',
-    d: 'A favor, Contra ou Abstenção — o mesmo leque do hemiciclo. Um único voto por ID em cada item.',
+    d: 'A favor, Contra ou Abstenção — com confirmação para evitar cliques errados. Depois de confirmar, o voto não pode ser alterado.',
   },
   {
     t: 'Vê a comparação',

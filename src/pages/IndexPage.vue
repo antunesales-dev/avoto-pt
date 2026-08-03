@@ -82,9 +82,10 @@
     </section>
 
     <section class="notice">
-      <strong>Demonstração visual.</strong>
-      Nesta fase não há registo nem autenticação — o objectivo é navegar, compreender o layout e o
-      fluxo de informação. Os dados parlamentares e de votos são simulados e rotulados como tal.
+      <strong>Demonstração.</strong>
+      Há login e voto (sessão demo em memória). Para votar: Entrar → escolher iniciativa →
+      confirmar. O voto não pode ser alterado. Dados parlamentares e contagens base são simulados;
+      em produção: Supabase Auth + Dados Abertos da AR.
     </section>
   </div>
 </template>
