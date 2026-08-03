@@ -25,19 +25,21 @@ Plataforma cívica **independente** (não governamental), **open source**, neutr
 
 Requisitos: Node 22+, pnpm, [Supabase CLI](https://supabase.com/docs/guides/cli). Docker só se quiseres stack **local** em paralelo.
 
-### Produção (activa)
+### Ambientes
 
-| | |
-|---|---|
-| **App** | https://avoto-pt.pages.dev |
-| **Supabase** | Frankfurt · [`docs/SUPABASE-REMOTE.md`](./docs/SUPABASE-REMOTE.md) |
-| **Deploy** | [`docs/DEPLOY.md`](./docs/DEPLOY.md) |
+| | Produção | Dev |
+|---|----------|-----|
+| **Branch** | `main` | `dev` |
+| **Host** | **Cloudflare** (marca: `avoto.pt`) | **GitHub Pages** |
+| **URL** | https://avoto.pt · técnico: avoto-pt.pages.dev | https://antunesales-dev.github.io/avoto-pt/ |
+| **Docs** | [`ENVIRONMENTS.md`](./docs/ENVIRONMENTS.md) · [`DOMAIN-AVOTO-PT.md`](./docs/DOMAIN-AVOTO-PT.md) | |
 
 ```bash
 pnpm install
 # .env local (gitignored) com VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
-pnpm dev
-pnpm deploy   # build + Cloudflare Pages (requer token CF)
+pnpm dev                 # local
+git push origin dev      # → GitHub Pages (dev)
+git push origin main     # → Cloudflare (prod)
 ```
 
 ### Stack Supabase só local (opcional)
