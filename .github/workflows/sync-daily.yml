@@ -35,24 +35,24 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/sync-ar.mjs --limit=${{ github.event.inputs.ar_limit || '200' }}
+        run: node scripts/sync-ar.mjs --limit=${{ github.event.inputs.ar_limit || 'all' }}
 
-      - name: despesa-sync + daily-digest (edge)
+      - name: despesa-sync (edge, paginado)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           AVOTO_CRON_SECRET: ${{ secrets.AVOTO_CRON_SECRET }}
         run: |
           set -e
-          curl -fsS -X POST "$SUPABASE_URL/functions/v1/despesa-sync?limit=80" \
+          curl -fsS -X POST "$SUPABASE_URL/functions/v1/despesa-sync?limit=400" \
             -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
             -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
             -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
             -H "Content-Type: application/json" -d '{}'
           echo
-          curl -fsS -X POST "$SUPABASE_URL/functions/v1/daily-digest" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
-            -H "Content-Type: application/json" -d '{}'
-          echo
+
+      - name: Digests multi-secção (todas as datas com dados)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/generate-digests.mjs

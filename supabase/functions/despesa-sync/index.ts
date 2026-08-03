@@ -29,9 +29,9 @@ Deno.serve(async (req) => {
   )
 
   const urlObj = new URL(req.url)
-  let limit = Number(urlObj.searchParams.get('limit') || '80')
-  if (!Number.isFinite(limit) || limit < 1) limit = 80
-  limit = Math.min(100, Math.floor(limit))
+  let limit = Number(urlObj.searchParams.get('limit') || '200')
+  if (!Number.isFinite(limit) || limit < 1) limit = 200
+  limit = Math.min(500, Math.floor(limit))
 
   const { data: run, error: runErr } = await admin
     .from('ar_sync_runs')

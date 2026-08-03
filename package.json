@@ -21,8 +21,9 @@
     "db:push": "supabase db push",
     "fn:deploy": "supabase functions deploy health && supabase functions deploy ar-sync && supabase functions deploy daily-digest && supabase functions deploy despesa-sync",
     "fn:serve": "supabase functions serve",
-    "sync:ar": "node scripts/sync-ar.mjs",
-    "sync:ar:50": "node scripts/sync-ar.mjs --limit=50"
+    "sync:ar": "node scripts/sync-ar.mjs --limit=all",
+    "sync:ar:50": "node scripts/sync-ar.mjs --limit=50",
+    "sync:digests": "node scripts/generate-digests.mjs"
   },
   "dependencies": {
     "@quasar/extras": "^2.0.0",

@@ -30,19 +30,32 @@ export async function fetchBaseContratos(limit = 80): Promise<{
   source: string
   total: number
 }> {
-  // Ordenar por data de publicação recente
-  const url =
-    `${SNS_BASE}?limit=${Math.min(100, Math.max(1, limit))}` +
-    `&order_by=-data_de_publicacao` +
-    `&where=${encodeURIComponent('preco_contratual > 100000')}`
+  // API SNS: máx. 100 por página — paginar até `limit`
+  const pageSize = 100
+  const target = Math.max(1, Math.min(2000, limit))
+  const rows: Record<string, unknown>[] = []
+  let total = 0
+  let offset = 0
 
-  const res = await fetch(url, {
-    headers: { 'User-Agent': UA, Accept: 'application/json' },
-  })
-  if (!res.ok) throw new Error(`SNS portal-base HTTP ${res.status}`)
-  const body = await res.json()
-  const rows: Record<string, unknown>[] = body.results || []
-  const total = Number(body.total_count || rows.length)
+  while (rows.length < target) {
+    const take = Math.min(pageSize, target - rows.length)
+    const url =
+      `${SNS_BASE}?limit=${take}&offset=${offset}` +
+      `&order_by=-data_de_publicacao` +
+      `&where=${encodeURIComponent('preco_contratual > 50000')}`
+
+    const res = await fetch(url, {
+      headers: { 'User-Agent': UA, Accept: 'application/json' },
+    })
+    if (!res.ok) throw new Error(`SNS portal-base HTTP ${res.status}`)
+    const body = await res.json()
+    total = Number(body.total_count || 0)
+    const batch: Record<string, unknown>[] = body.results || []
+    if (!batch.length) break
+    rows.push(...batch)
+    offset += batch.length
+    if (batch.length < take) break
+  }
 
   const despesas: MappedDespesa[] = []
   const investimentos: MappedInvestimento[] = []
@@ -104,8 +117,8 @@ export async function fetchBaseContratos(limit = 80): Promise<{
     }
     despesas.push(despesa)
 
-    // Contratos grandes → também como investimento votável
-    if (montante != null && montante >= 500_000) {
+    // Contratos ≥ 100k € → também como investimento votável
+    if (montante != null && montante >= 100_000) {
       investimentos.push({
         id: `inv-${id}`,
         titulo: objeto.slice(0, 300),

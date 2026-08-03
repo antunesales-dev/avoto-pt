@@ -30,7 +30,12 @@ const SIGLA_TO_ID = {
 function parseArgs() {
   let limit = 200
   for (const a of process.argv.slice(2)) {
-    if (a.startsWith('--limit=')) limit = Math.min(500, Number(a.split('=')[1]) || 200)
+    if (a.startsWith('--limit=')) {
+      const n = Number(a.split('=')[1])
+      // 0 ou "all" → sem tecto prático
+      if (a.endsWith('=all') || n === 0) limit = 100_000
+      else limit = Math.min(100_000, n || 200)
+    }
   }
   return { limit }
 }
