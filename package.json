@@ -17,7 +17,7 @@
     "db:reset": "supabase db reset",
     "db:status": "supabase status",
     "db:push": "supabase db push",
-    "fn:deploy": "supabase functions deploy health && supabase functions deploy ar-sync",
+    "fn:deploy": "supabase functions deploy health && supabase functions deploy ar-sync && supabase functions deploy daily-digest && supabase functions deploy despesa-sync",
     "fn:serve": "supabase functions serve"
   },
   "dependencies": {

@@ -28,6 +28,30 @@ const routes = [
         meta: { title: 'Comparação' },
       },
       {
+        path: 'digest',
+        name: 'digest',
+        component: () => import('@/pages/DigestPage.vue'),
+        meta: { title: 'Digest diário' },
+      },
+      {
+        path: 'despesa',
+        name: 'despesa',
+        component: () => import('@/pages/DespesaPage.vue'),
+        meta: { title: 'Despesa pública' },
+      },
+      {
+        path: 'investimentos',
+        name: 'investimentos',
+        component: () => import('@/pages/InvestimentosPage.vue'),
+        meta: { title: 'Investimentos' },
+      },
+      {
+        path: 'investimentos/:id',
+        name: 'investimento-detalhe',
+        component: () => import('@/pages/InvestimentoDetailPage.vue'),
+        meta: { title: 'Investimento' },
+      },
+      {
         path: 'metricas',
         name: 'metricas',
         component: () => import('@/pages/MetricasPage.vue'),

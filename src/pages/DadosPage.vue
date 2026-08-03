@@ -14,7 +14,28 @@
           <strong>Fonte ≠ afiliação.</strong> Usar dados públicos da AR não torna a A Voto um site
           oficial, governamental ou parlamentar.
         </div>
-        <h2 class="section-title">Fonte primária</h2>
+        <h2 class="section-title">Fontes primárias</h2>
+        <ul>
+          <li>
+            <strong>Parlamento / votações:</strong>
+            <a href="https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx" target="_blank" rel="noopener noreferrer">Dados Abertos da AR</a>
+          </li>
+          <li>
+            <strong>Contratos e despesa:</strong>
+            <a href="https://www.base.gov.pt" target="_blank" rel="noopener noreferrer">Base.gov.pt</a>
+            ·
+            <a href="https://dados.gov.pt" target="_blank" rel="noopener noreferrer">dados.gov.pt</a>
+          </li>
+          <li>
+            <strong>Orçamento:</strong>
+            <a href="https://www.dgo.gov.pt" target="_blank" rel="noopener noreferrer">DGO</a>
+          </li>
+        </ul>
+        <p>
+          Jobs diários planeados: <code>ar-sync</code>, <code>daily-digest</code>,
+          <code>despesa-sync</code> (ver <code>docs/GOV-DATA.md</code>).
+        </p>
+        <h2 class="section-title">Fonte primária (AR)</h2>
         <p>
           <strong>Dados Abertos da Assembleia da República</strong> — formatos JSON e XML oficiais
           do Parlamento, em acesso livre.
@@ -45,15 +66,15 @@
 
     <section class="av-card">
       <div class="av-card-pad">
-        <h2 class="section-title">Nesta demonstração</h2>
+        <h2 class="section-title">Estado dos dados</h2>
         <p class="page-subtitle" style="margin-bottom: 0.75rem">
-          Os registos de iniciativas e votos de cidadãos são <strong>simulados</strong> para
-          permitir navegar o produto. Não representam votações reais da AR nem de utilizadores.
+          Votos de cidadãos na plataforma são reais (contas Supabase). Iniciativas, despesa e
+          investimentos com <code>source=seed</code> são estrutura de demonstração até os jobs
+          oficiais (<code>ar-sync</code>, <code>despesa-sync</code>) preencherem a base.
         </p>
         <div class="notice">
-          Quando o importador oficial estiver ligado, cada página de iniciativa indicará a data de
-          sincronização e qualquer limitação dos dados oficiais (por exemplo, votações unânimes
-          com detalhe incompleto).
+          Cada registo deve indicar a fonte. Lacunas dos dados oficiais são declaradas — nunca
+          preenchidas com notícias ou wikis.
         </div>
       </div>
     </section>

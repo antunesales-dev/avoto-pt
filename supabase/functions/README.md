@@ -3,7 +3,9 @@
 | Function | Auth | Função |
 |----------|------|--------|
 | `health` | pública (anon) | `platform_health` + liveness |
-| `ar-sync` | `x-avoto-cron-secret` ou service_role | Sync Dados Abertos AR (MVP) |
+| `ar-sync` | cron secret | Sync votações / iniciativas AR |
+| `daily-digest` | cron secret | Gera digest do dia (o que foi a voto e como) |
+| `despesa-sync` | cron secret | Despesa + investimentos oficiais (MVP) |
 
 ## Local
 

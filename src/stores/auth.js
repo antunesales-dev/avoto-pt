@@ -278,6 +278,42 @@ export const useAuthStore = defineStore('auth', () => {
     return data || []
   }
 
+  async function castVotoInvestimento(investimentoId, voto) {
+    if (!user.value) {
+      const e = new Error('AUTH_REQUIRED')
+      e.code = 'AUTH_REQUIRED'
+      throw e
+    }
+    const { data, error: err } = await supabase.rpc('cast_voto_investimento', {
+      p_investimento_id: investimentoId,
+      p_voto: voto,
+    })
+    if (err) {
+      const msg = err.message || String(err)
+      if (msg.includes('ALREADY_VOTED') || err.code === '23505') {
+        const e = new Error('ALREADY_VOTED')
+        e.code = 'ALREADY_VOTED'
+        throw e
+      }
+      if (msg.includes('RATE_LIMITED')) {
+        const e = new Error('RATE_LIMITED')
+        e.code = 'RATE_LIMITED'
+        throw e
+      }
+      throw err
+    }
+    return data
+  }
+
+  async function getVotoInvestimento(investimentoId) {
+    if (!user.value) return null
+    const { data, error: err } = await supabase.rpc('get_my_voto_investimento', {
+      p_investimento_id: investimentoId,
+    })
+    if (err) throw err
+    return data ?? null
+  }
+
   async function castVoto(iniciativaId, voto) {
     if (!user.value) {
       const e = new Error('AUTH_REQUIRED')
@@ -333,6 +369,8 @@ export const useAuthStore = defineStore('auth', () => {
     getVoto,
     listMeusVotos,
     castVoto,
+    castVotoInvestimento,
+    getVotoInvestimento,
   }
 })
 

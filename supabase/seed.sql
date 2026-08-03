@@ -147,3 +147,88 @@ insert into public.iniciativas (
 insert into public.iniciativa_voto_counts (iniciativa_id)
 select id from public.iniciativas
 on conflict (iniciativa_id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Despesa pública (estrutura; source=seed até sync oficial base.gov / dados.gov)
+-- ---------------------------------------------------------------------------
+insert into public.despesas_publicas (
+  id, tipo, titulo, entidade, montante_eur, data_publicacao, descricao, categoria, links, source
+) values
+(
+  'desp-ex-001',
+  'contrato_publico',
+  'Exemplo estrutural — contrato de serviços de TI (seed)',
+  'Ministério exemplo (dados de demonstração)',
+  1250000.00,
+  '2026-01-15',
+  'Linha de demonstração do modelo de despesa. Em produção: Base.gov.pt / Dados.gov.pt oficiais.',
+  'TIC',
+  '[{"label":"Portal BASE (oficial)","url":"https://www.base.gov.pt"},{"label":"dados.gov.pt","url":"https://dados.gov.pt"}]'::jsonb,
+  'seed'
+),
+(
+  'desp-ex-002',
+  'investimento_publico',
+  'Exemplo estrutural — investimento em infraestruturas (seed)',
+  'Administração Central (demonstração)',
+  45000000.00,
+  '2025-11-01',
+  'Montante ilustrativo para UI de transparência de spending. Não é um contrato real.',
+  'Infraestruturas',
+  '[{"label":"Dados Abertos Estado","url":"https://dados.gov.pt"}]'::jsonb,
+  'seed'
+),
+(
+  'desp-ex-003',
+  'orcamento_linha',
+  'Exemplo estrutural — linha orçamental (seed)',
+  'OE (demonstração)',
+  8900000.00,
+  '2026-01-01',
+  'Placeholder de linha de Orçamento do Estado até importação oficial.',
+  'Saúde',
+  '[{"label":"DGO / OE","url":"https://www.dgo.gov.pt"}]'::jsonb,
+  'seed'
+)
+on conflict (id) do nothing;
+
+insert into public.investimentos (
+  id, titulo, descricao, montante_eur, entidade, sector,
+  data_referencia, decisao_oficial, decisao_detalhe, despesa_id, links, source
+) values
+(
+  'inv-ex-001',
+  'Investimento em infraestruturas (exemplo seed)',
+  'Os cidadãos registados podem votar a favor, contra ou abster-se. A decisão oficial (quando existir nos dados oficiais) aparece lado a lado — sem recomendações políticas.',
+  45000000.00,
+  'Administração Central (demonstração)',
+  'Infraestruturas',
+  '2025-11-01',
+  'em_curso',
+  'Estado nos dados oficiais: a preencher pelo sync. Seed apenas para UI.',
+  'desp-ex-002',
+  '[{"label":"dados.gov.pt","url":"https://dados.gov.pt"}]'::jsonb,
+  'seed'
+),
+(
+  'inv-ex-002',
+  'Contrato TIC de serviços (exemplo seed)',
+  'Compare a opinião agregada dos cidadãos com a decisão oficial registada (quando disponível).',
+  1250000.00,
+  'Ministério exemplo (demonstração)',
+  'TIC',
+  '2026-01-15',
+  'aprovado',
+  'Seed: marcado como aprovado apenas para demonstrar a UI de comparação.',
+  'desp-ex-001',
+  '[{"label":"Base.gov.pt","url":"https://www.base.gov.pt"}]'::jsonb,
+  'seed'
+)
+on conflict (id) do nothing;
+
+insert into public.investimento_voto_counts (investimento_id)
+select id from public.investimentos
+on conflict (investimento_id) do nothing;
+
+-- Digest de exemplo (data de uma iniciativa seed)
+select public.generate_daily_digest('2026-03-18'::date);
