@@ -1,0 +1,138 @@
+<template>
+  <div class="page-shell">
+    <h1 class="page-title">Iniciativas</h1>
+    <p class="page-subtitle">
+      Iniciativas votadas (ou em discussão) no Parlamento. Compare o voto agregado dos cidadãos com
+      o sentido de voto de cada partido. Dados de demonstração — plataforma independente.
+    </p>
+
+    <div class="toolbar av-card av-card-pad">
+      <label class="search">
+        <q-icon name="search" size="20px" />
+        <input
+          v-model="query"
+          type="search"
+          placeholder="Pesquisar por título, número ou tema…"
+          aria-label="Pesquisar iniciativas"
+        />
+      </label>
+      <div class="filter-row" style="margin: 0">
+        <button
+          v-for="t in temas"
+          :key="t"
+          type="button"
+          class="chip-btn"
+          :class="{ 'is-active': tema === t }"
+          @click="tema = t"
+        >
+          {{ t }}
+        </button>
+      </div>
+      <div class="filter-row" style="margin: 0">
+        <button
+          v-for="e in estados"
+          :key="e.id"
+          type="button"
+          class="chip-btn"
+          :class="{ 'is-active': estado === e.id }"
+          @click="estado = e.id"
+        >
+          {{ e.label }}
+        </button>
+      </div>
+    </div>
+
+    <p class="results-count">
+      {{ filtradas.length }}
+      {{ filtradas.length === 1 ? 'iniciativa' : 'iniciativas' }}
+    </p>
+
+    <div v-if="filtradas.length" class="init-grid">
+      <InitiativeCard v-for="item in filtradas" :key="item.id" :item="item" />
+    </div>
+    <div v-else class="av-card av-card-pad">
+      <p style="margin: 0; color: var(--pt-muted)">
+        Nenhuma iniciativa corresponde aos filtros seleccionados.
+      </p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, ref } from 'vue'
+import InitiativeCard from '@/components/InitiativeCard.vue'
+import { iniciativas, temas } from '@/data/mock'
+
+const query = ref('')
+const tema = ref('Todos')
+const estado = ref('todos')
+
+const estados = [
+  { id: 'todos', label: 'Todos os estados' },
+  { id: 'em_discussao', label: 'Em discussão' },
+  { id: 'aprovado', label: 'Aprovado' },
+  { id: 'rejeitado', label: 'Rejeitado' },
+]
+
+const filtradas = computed(() => {
+  const q = query.value.trim().toLowerCase()
+  return iniciativas.filter((i) => {
+    if (tema.value !== 'Todos' && i.tema !== tema.value) return false
+    if (estado.value !== 'todos' && i.estado !== estado.value) return false
+    if (!q) return true
+    return (
+      i.titulo.toLowerCase().includes(q) ||
+      i.idOficial.toLowerCase().includes(q) ||
+      i.tema.toLowerCase().includes(q) ||
+      i.tipo.toLowerCase().includes(q)
+    )
+  })
+})
+</script>
+
+<style scoped lang="scss">
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--pt-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+  background: var(--pt-cream);
+  color: var(--pt-muted);
+
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 0.98rem;
+    color: var(--pt-ink);
+    outline: none;
+  }
+}
+
+.results-count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--pt-muted);
+  margin: 0 0 0.85rem;
+}
+
+.init-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>

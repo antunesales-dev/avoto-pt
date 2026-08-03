@@ -1,0 +1,110 @@
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+
+# --- Environment & secrets (NUNCA commitar) ---
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.p12
+*.key
+*.crt
+*credentials*
+*secret*
+!**/secrets.example*
+service-account*.json
+firebase*.json
+.supabase/
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+
+# --- Quasar / Vite / build ---
+.quasar/
+/dist/
+/dist-*
+.output/
+.vite/
+*.local
+quasar.config.*.temporary.compiled*
+
+# --- Logs & debug ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Test / coverage ---
+coverage/
+.nyc_output/
+*.lcov
+
+# --- IDE / editors ---
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# --- OS junk ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- Package manager noise ---
+.npm/
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# --- Mobile / desktop targets (if added later) ---
+/src-cordova/node_modules
+/src-cordova/platforms
+/src-cordova/plugins
+/src-cordova/www
+/src-capacitor/www
+/src-capacitor/node_modules
+/src-electron/unpacked
+/src-electron/packaged
+
+# --- Cloudflare / deploy local ---
+.wrangler/
+.mf/
+.miniflare/
+worker-configuration.d.ts
+
+# --- Supabase local ---
+supabase/.branches
+supabase/.temp
+
+# --- Misc local ---
+*.bak
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+.history/
+.claude/
+.cursor/
+.grok/
