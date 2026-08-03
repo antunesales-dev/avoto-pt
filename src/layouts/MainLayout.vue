@@ -9,7 +9,6 @@
       <div class="app-bar">
         <AppBrand :compact="$q.screen.lt.sm" />
 
-        <!-- Primary nav — desktop -->
         <nav v-if="$q.screen.gt.sm" class="app-bar__nav" aria-label="Principal">
           <router-link
             v-for="item in navPrincipal"
@@ -23,7 +22,6 @@
         </nav>
 
         <div class="app-bar__actions">
-          <!-- Mais (desktop only) -->
           <div v-if="$q.screen.gt.sm" class="mais">
             <button
               type="button"
@@ -52,27 +50,21 @@
             </div>
           </div>
 
-          <!-- Conta: mutuamente exclusivos -->
-          <button
-            v-if="!auth.isLoggedIn"
-            type="button"
-            class="btn-entrar"
-            @click="onEntrar"
-          >
-            Entrar
-          </button>
-          <router-link
-            v-else
-            to="/perfil"
-            class="btn-perfil"
-            :class="{ 'is-active': isActive({ to: '/perfil' }) }"
-            :aria-label="$q.screen.lt.sm ? 'Perfil' : undefined"
-          >
-            <q-icon name="person_outline" size="20px" />
-            <span v-if="$q.screen.gt.xs">Perfil</span>
-          </router-link>
+          <template v-if="auth.ready">
+            <router-link v-if="!auth.isLoggedIn" to="/entrar" class="btn-entrar">
+              Entrar
+            </router-link>
+            <router-link
+              v-else
+              to="/perfil"
+              class="btn-perfil"
+              :class="{ 'is-active': isActive({ to: '/perfil' }) }"
+            >
+              <q-icon name="person_outline" size="20px" />
+              <span v-if="$q.screen.gt.xs">{{ auth.cid || 'Perfil' }}</span>
+            </router-link>
+          </template>
 
-          <!-- Mobile menu toggle -->
           <button
             v-if="$q.screen.lt.md"
             type="button"
@@ -87,7 +79,6 @@
         </div>
       </div>
 
-      <!-- Mobile: primary + mais only (conta já está na barra) -->
       <nav
         v-if="$q.screen.lt.md && mobileOpen"
         id="mobile-menu"
@@ -105,6 +96,15 @@
           <q-icon :name="item.icon" size="20px" />
           {{ item.label }}
         </router-link>
+        <router-link
+          v-if="!auth.isLoggedIn"
+          to="/registo"
+          class="mobile-menu__link"
+          @click="mobileOpen = false"
+        >
+          <q-icon name="person_add" size="20px" />
+          Criar conta
+        </router-link>
       </nav>
     </q-header>
 
@@ -112,7 +112,13 @@
 
     <q-page-container>
       <q-page class="av-page">
-        <router-view />
+        <div v-if="!auth.ready || data.loading" class="boot-state">A carregar…</div>
+        <div v-else-if="data.error" class="boot-state boot-state--err">
+          <p>Não foi possível carregar os dados.</p>
+          <p class="boot-state__detail">{{ data.error }}</p>
+          <button type="button" class="btn btn--primary btn--sm" @click="retry">Tentar de novo</button>
+        </div>
+        <router-view v-else />
       </q-page>
     </q-page-container>
   </q-layout>
@@ -120,24 +126,19 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import AppBrand from '@/components/AppBrand.vue'
-import { navPrincipal, navMais } from '@/data/mock'
+import { navPrincipal, navMais } from '@/data/nav'
 import { useAuthStore } from '@/stores/auth'
+import { useDataStore } from '@/stores/data'
 
 const $q = useQuasar()
 const route = useRoute()
-const router = useRouter()
 const auth = useAuthStore()
+const data = useDataStore()
 const mobileOpen = ref(false)
 const maisOpen = ref(false)
-
-function onEntrar() {
-  // Demo: entra com sessão fictícia (Supabase Auth na fase real)
-  auth.loginDemo()
-  router.push('/perfil')
-}
 
 const navMobile = computed(() => [...navPrincipal, ...navMais])
 
@@ -161,6 +162,10 @@ function onKey(e) {
     maisOpen.value = false
     mobileOpen.value = false
   }
+}
+
+async function retry() {
+  await data.loadAll()
 }
 
 onMounted(() => window.addEventListener('keydown', onKey))
@@ -299,6 +304,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   cursor: pointer;
   white-space: nowrap;
   line-height: 1.2;
+  text-decoration: none;
 
   &:hover {
     background: var(--pt-navy);
@@ -312,7 +318,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   gap: 0.3rem;
   text-decoration: none;
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
   padding: 0.4rem 0.7rem;
   border-radius: 8px;
@@ -330,10 +336,6 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
   &.is-active {
     box-shadow: 0 0 0 2px rgba(4, 106, 56, 0.25);
-  }
-
-  @media (max-width: 599px) {
-    padding: 0.4rem 0.55rem;
   }
 }
 
@@ -387,5 +389,24 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 .av-page {
   min-height: calc(100vh - 60px);
+}
+
+.boot-state {
+  padding: 3rem 1.25rem;
+  text-align: center;
+  color: var(--pt-muted);
+  font-weight: 600;
+
+  &--err {
+    color: var(--pt-red-dark);
+  }
+
+  &__detail {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--pt-muted);
+    max-width: 32rem;
+    margin: 0.5rem auto 1rem;
+  }
 }
 </style>

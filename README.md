@@ -1,70 +1,13 @@
 # A Voto — Bancada Cidadã
 
-**Mostrar, de forma transparente e sem enviesamento, se existe (ou não) desvio entre a vontade dos cidadãos que se deram ao trabalho de votar e o que cada partido realmente votou na Assembleia da República.**
+Plataforma cívica **independente** (não governamental), **open source**, neutra e transparente: cidadãos registados votam nas iniciativas do Parlamento e comparam o resultado com o voto real de cada partido.
 
 | | |
 |---|---|
-| **Produto** | A Voto |
-| **Slogan** | Bancada Cidadã |
 | **Domínio** | [avoto.pt](https://avoto.pt) |
-| **Estado** | UI de demonstração (login demo, voto com confirmação, dados mock) |
-| **Locale** | Português de Portugal (pt-PT) |
-| **Stack** | Vue 3 · Vite · Quasar · Pinia · Zod |
-
----
-
-## O que é
-
-Plataforma cívica **independente** (não governamental), **open source**, neutra e transparente onde cidadãos registados votam (uma vez por item) nas iniciativas do Parlamento e comparam o resultado agregado com o voto real de cada partido.
-
-**Não é** um serviço do Estado, da AR ou de qualquer partido. **Não é** democracia directa, sondagem oficial, nem motor de recomendações políticas. Usa dados públicos oficiais da AR como fonte — fonte ≠ afiliação.
-
-Documento de requisitos: [`context.md`](./context.md).
-
----
-
-## Arranque local
-
-```bash
-pnpm install
-pnpm dev
-```
-
-```bash
-pnpm build   # produção → dist/spa
-```
-
-Requisito: Node.js 22+ (ou 24 LTS) e [pnpm](https://pnpm.io).
-
----
-
-## Páginas e navegação
-
-| Rota | Descrição |
-|------|-----------|
-| `/` | Início — hero, métricas, iniciativas recentes |
-| `/iniciativas` | Lista com pesquisa e filtros |
-| `/iniciativas/:id` | Detalhe, cidadãos vs partidos, alinhamento |
-| `/comparacao` | Alinhamento global + matriz |
-| `/metricas` | Dashboard público + export JSON demo |
-| `/como-funciona` | Fluxo do produto |
-| `/dados` | Fontes oficiais da AR |
-| `/sobre` | Missão e princípios |
-| `/privacidade` | RGPD / privacidade |
-| `/perfil` | Pré-visualização do perfil (demo) |
-
-### Layout (app shell)
-
-- Barra superior única: logo + Início / Iniciativas / Comparação / Métricas + **Mais**
-- Em ecrãs pequenos: hamburger com a mesma lista (sem sidebar, sem footer)
-
-### Identidade visual
-
-- **Cores** da Bandeira de Portugal: verde `#046A38`, vermelho `#DA291C`, ouro `#F1BF00`, azul do brasão `#00205B`, fundo creme  
-- **Tipografia:** Cormorant Garamond (títulos) · Source Sans 3 (corpo) · IBM Plex Mono (IDs)  
-- Copy e UI exclusivamente **pt-PT**
-
-Dados de demo: [`src/data/mock.js`](./src/data/mock.js).
+| **Stack** | Vue 3 · Quasar · Pinia · Zod · Supabase · Cloudflare (deploy) |
+| **Locale** | pt-PT |
+| **Repo** | https://github.com/antunesales-dev/avoto-pt |
 
 ---
 
@@ -72,51 +15,83 @@ Dados de demo: [`src/data/mock.js`](./src/data/mock.js).
 
 1. **Open source total** — código e cálculos auditáveis  
 2. **Só fontes oficiais** — Dados Abertos da AR / Estado (nunca notícias ou wikis)  
-3. **Um voto por ID** — sem voto anónimo puro; **login obrigatório para votar**  
+3. **Login obrigatório para votar** — um voto por ID por iniciativa; **imutável** após confirmação  
 4. **Privacidade / RGPD** — email só para conta; sem NIF/CC obrigatório  
-5. **Métricas públicas** — participação, distribuições, exportações  
-
-### Conta e voto (sempre)
-
-- **Sem sessão:** pode ver iniciativas e métricas; **não** vota; botão **Entrar**.  
-- **Com sessão:** botão **Perfil**; pode votar **uma vez** por iniciativa (confirmação; voto imutável).  
-- Hoje a sessão é **demo** em memória; em produção será Supabase Auth (email + ID permanente).
+5. **Métricas públicas** — agregados e exportações, sem expor quem votou o quê  
 
 ---
 
-## Estrutura do código
+## Arranque completo (local)
 
+Requisitos: Node 22+, pnpm, Docker, [Supabase CLI](https://supabase.com/docs/guides/cli).
+
+```bash
+pnpm install
+pnpm db:start          # sobe Postgres + Auth + API (portas 5542x neste projecto)
+# criar .env a partir do status local:
+#   VITE_SUPABASE_URL=...
+#   VITE_SUPABASE_ANON_KEY=...
+cp .env.example .env   # preencher com `pnpm db:status` / `supabase status -o env`
+pnpm dev
 ```
-src/
-  components/   # Brand, cards, barras de voto, footer
-  css/          # Tema PT + estilos globais
-  data/mock.js  # Iniciativas, partidos, métricas demo
-  layouts/      # MainLayout (side + top nav)
-  pages/        # Todas as rotas
-  router/       # Vue Router (history mode)
-```
+
+| Comando | Função |
+|---------|--------|
+| `pnpm dev` | App (Quasar) |
+| `pnpm build` | Build produção |
+| `pnpm db:start` | Supabase local |
+| `pnpm db:stop` | Parar Supabase |
+| `pnpm db:reset` | Migrations + seed |
+| `pnpm db:status` | URL e keys |
+
+Studio local (quando `db:start`): ver URL em `supabase status`.
+
+### Fluxo real
+
+1. **Criar conta** (`/registo`) → perfil com `CID-XXXXXX`  
+2. **Entrar** (`/entrar`)  
+3. **Votar** numa iniciativa → diálogo de confirmação → RPC `cast_voto`  
+4. Segundo voto na mesma iniciativa → **rejeitado** (constraint + RPC)  
+5. **Perfil** → histórico, preferência partidária opcional, sair  
+
+Sem sessão: só leitura. Com sessão: perfil + voto.
 
 ---
 
-## Próximos passos
+## Base de dados
 
-1. Schema Supabase / PostgreSQL + RLS  
-2. Importação dos Dados Abertos da AR  
-3. Auth, ID de cidadão e voto único  
-4. Deploy Cloudflare Pages + Supabase  
+Migrations em `supabase/migrations/`.
+
+| Objecto | Função |
+|--------|--------|
+| `profiles` | id ↔ auth.users, `cid` único, email, partido opcional |
+| `iniciativas` | metadados + resultado_partidos (JSON) |
+| `votos_cidadaos` | unique `(user_id, iniciativa_id)` — sem update/delete para clients |
+| `cast_voto()` | RPC: auth + imutabilidade |
+| `iniciativa_votos_agg` | view pública de contagens |
+| `metricas_globais` | view pública |
+
+RLS: perfil só do próprio; iniciativas públicas; votos só os próprios; insert de votos **só** via RPC.
+
+Seed de desenvolvimento: `supabase/seed.sql` (iniciativas de exemplo). Em produção: importador dos Dados Abertos da AR.
 
 ---
 
 ## Segurança do repositório
 
-Código **público** para auditoria. Escrita e secrets **só do dono**.
+Código público. Escrita e secrets só do dono. Ver [`SECURITY.md`](./SECURITY.md).
 
-- Ver [`SECURITY.md`](./SECURITY.md)
-- Não commitar `.env` (usar [`.env.example`](./.env.example))
-- Contribuições externas: **fork → PR** (sem write no repo principal)
+Nunca commitar `.env`, service role key, tokens Cloudflare.
 
-## Licença
+---
 
-A definir (MIT ou AGPL-3.0). Código público e auditável desde o primeiro dia.
+## O que falta (próximas fatias completas)
 
-**A Voto** — Bancada Cidadã · projecto independente
+1. Ligar projecto Supabase **remoto** (produção) + deploy Cloudflare Pages  
+2. Importador automático Dados Abertos da AR  
+3. Email de verificação / recuperação em produção  
+4. Licença MIT ou AGPL-3.0 no repo  
+
+---
+
+**A Voto** — Bancada Cidadã · projecto cívico independente

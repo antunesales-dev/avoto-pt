@@ -8,7 +8,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { votoLabel } from '@/data/mock'
+import { votoLabel } from '@/data/partidos'
 
 const props = defineProps({
   partido: Object,

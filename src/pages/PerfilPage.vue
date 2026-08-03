@@ -1,105 +1,64 @@
 <template>
   <div class="page-shell">
-    <!-- Sem sessão: não mostra perfil -->
-    <template v-if="!auth.isLoggedIn">
-      <h1 class="page-title">Perfil</h1>
-      <p class="page-subtitle">
-        Precisa de entrar para ver o seu perfil, histórico de votos e alinhamento pessoal.
-      </p>
-      <div class="av-card av-card-pad">
-        <p style="margin: 0 0 1rem; color: var(--pt-muted)">
-          Nesta demonstração, «Entrar» cria uma sessão fictícia (sem email nem palavra-passe).
-        </p>
-        <button type="button" class="btn btn--primary" @click="onEntrar">Entrar (demo)</button>
+    <div class="row-between" style="margin-bottom: 0.5rem">
+      <div>
+        <h1 class="page-title">Perfil</h1>
+        <p class="page-subtitle" style="margin-bottom: 0">Área pessoal — só visível para si.</p>
       </div>
-    </template>
+      <button type="button" class="btn btn--outline btn--sm" :disabled="auth.loading" @click="onSair">
+        Sair
+      </button>
+    </div>
 
-    <template v-else>
-      <div class="row-between" style="margin-bottom: 0.5rem">
-        <div>
-          <h1 class="page-title">Perfil</h1>
-          <p class="page-subtitle" style="margin-bottom: 0">
-            Área pessoal. Dados de demonstração.
-          </p>
+    <div class="profile-grid">
+      <section class="av-card">
+        <div class="flag-stripe" aria-hidden="true">
+          <span class="flag-stripe__green" />
+          <span class="flag-stripe__red" />
         </div>
-        <button type="button" class="btn btn--outline btn--sm" @click="onSair">Sair</button>
-      </div>
-
-      <div class="profile-grid">
-        <section class="av-card">
-          <div class="flag-stripe" aria-hidden="true">
-            <span class="flag-stripe__green" />
-            <span class="flag-stripe__red" />
-          </div>
-          <div class="av-card-pad">
-            <div class="profile-head">
-              <div class="avatar" aria-hidden="true">A</div>
-              <div>
-                <div class="cid-chip">{{ perfilDemo.id }}</div>
-                <p class="pref">
-                  Partido com que me identifico (opcional):
-                  <strong>{{ perfilDemo.partidoPreferencia || '—' }}</strong>
-                </p>
-                <p class="muted">{{ perfilDemo.totalVotos }} votos emitidos (demo)</p>
-              </div>
-            </div>
-            <div class="notice" style="margin-top: 1rem">
-              Campo de preferência partidária nunca é verificado nem cruzado com fontes externas.
+        <div class="av-card-pad">
+          <div class="profile-head">
+            <div class="avatar" aria-hidden="true">{{ initial }}</div>
+            <div>
+              <div class="cid-chip">{{ auth.cid || '…' }}</div>
+              <p class="pref">{{ auth.email }}</p>
+              <p class="muted">{{ historico.length }} voto(s) registado(s)</p>
             </div>
           </div>
-        </section>
 
-        <section class="av-card">
-          <div class="av-card-pad">
-            <h2 class="section-title">Alinhamento pessoal</h2>
-            <p class="muted" style="margin: 0 0 0.85rem">
-              Com base nos seus votos, percentagem de coincidência com cada partido.
-            </p>
-            <div class="align-list">
-              <div v-for="a in alinhamentos" :key="a.partidoId" class="align-row">
-                <div class="align-row__head">
-                  <span class="party-cell">
-                    <span class="party-dot" :style="{ background: a.cor }" />
-                    {{ a.sigla }}
-                  </span>
-                  <span class="pct">{{ a.percentagem }}%</span>
-                </div>
-                <div class="mini-bar">
-                  <div
-                    class="mini-bar__fill"
-                    :style="{ width: a.percentagem + '%', background: a.cor }"
-                  />
-                </div>
-              </div>
+          <label class="field" style="margin-top: 1rem">
+            <span>Partido com que me identifico (opcional)</span>
+            <div class="field-row">
+              <input v-model="partido" type="text" maxlength="80" />
+              <button type="button" class="btn btn--ghost btn--sm" @click="savePartido">Guardar</button>
             </div>
+          </label>
+          <div class="notice" style="margin-top: 1rem">
+            Preferência partidária nunca é verificada nem cruzada com fontes externas.
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <section class="av-card" style="margin-top: 1rem">
+      <section class="av-card">
         <div class="av-card-pad">
           <h2 class="section-title">Histórico de votos</h2>
-          <div class="av-table-wrap" style="border: none">
+          <p v-if="!historico.length" class="muted">Ainda não votou em nenhuma iniciativa.</p>
+          <div v-else class="av-table-wrap" style="border: none">
             <table class="av-table">
               <thead>
                 <tr>
                   <th>Data</th>
                   <th>Iniciativa</th>
-                  <th>O seu voto</th>
+                  <th>Voto</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="h in historico" :key="h.iniciativaId + h.data">
-                  <td>{{ formatDate(h.data) }}</td>
+                <tr v-for="h in historico" :key="h.iniciativa_id + h.created_at">
+                  <td>{{ formatDate(h.created_at) }}</td>
                   <td>
-                    <router-link
-                      v-if="h.titulo"
-                      :to="`/iniciativas/${h.iniciativaId}`"
-                      class="link"
-                    >
-                      {{ h.titulo }}
+                    <router-link :to="`/iniciativas/${h.iniciativa_id}`" class="link">
+                      {{ tituloDe(h.iniciativa_id) }}
                     </router-link>
-                    <span v-else>{{ h.iniciativaId }}</span>
                   </td>
                   <td>
                     <span class="badge" :class="votoClass(h.voto)">{{ votoLabel[h.voto] }}</span>
@@ -110,45 +69,31 @@
           </div>
         </div>
       </section>
-    </template>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  perfilDemo,
-  getPartido,
-  getIniciativa,
-  formatDate,
-  votoLabel,
-} from '@/data/mock'
+import { useQuasar } from 'quasar'
+import { formatDate, votoLabel } from '@/data/partidos'
 import { useAuthStore } from '@/stores/auth'
+import { useDataStore } from '@/stores/data'
 
 const auth = useAuthStore()
+const data = useDataStore()
 const router = useRouter()
+const $q = useQuasar()
 
-const alinhamentos = computed(() =>
-  perfilDemo.alinhamentos.map((a) => {
-    const p = getPartido(a.partidoId)
-    return {
-      ...a,
-      sigla: p?.sigla || a.partidoId,
-      cor: p?.cor || '#999',
-    }
-  }),
-)
+const historico = ref([])
+const partido = ref(auth.profile?.partido_preferencia || '')
 
-const historico = computed(() =>
-  perfilDemo.historico.map((h) => {
-    const ini = getIniciativa(h.iniciativaId)
-    return {
-      ...h,
-      titulo: ini?.titulo,
-    }
-  }),
-)
+const initial = computed(() => (auth.email || 'A').charAt(0).toUpperCase())
+
+function tituloDe(id) {
+  return data.getIniciativa(id)?.titulo || id
+}
 
 function votoClass(v) {
   if (v === 'favor') return 'badge--green'
@@ -156,33 +101,39 @@ function votoClass(v) {
   return 'badge--muted'
 }
 
-function onEntrar() {
-  auth.loginDemo()
-}
-
-function onSair() {
-  auth.logout()
+async function onSair() {
+  await auth.sair()
   router.push('/')
 }
+
+async function savePartido() {
+  try {
+    await auth.updatePartido(partido.value)
+    $q.notify({ type: 'positive', message: 'Preferência actualizada.', position: 'top' })
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro ao guardar.', position: 'top' })
+  }
+}
+
+onMounted(async () => {
+  partido.value = auth.profile?.partido_preferencia || ''
+  historico.value = await auth.listMeusVotos()
+})
 </script>
 
 <style scoped lang="scss">
 .profile-grid {
   display: grid;
   gap: 1rem;
-
   @media (min-width: 900px) {
-    grid-template-columns: 1fr 1.1fr;
+    grid-template-columns: 1fr 1.2fr;
     align-items: start;
   }
 }
-
 .profile-head {
   display: flex;
   gap: 1rem;
-  align-items: flex-start;
 }
-
 .avatar {
   width: 56px;
   height: 56px;
@@ -197,56 +148,38 @@ function onSair() {
   background: linear-gradient(135deg, var(--pt-green), var(--pt-red));
   flex-shrink: 0;
 }
-
 .pref {
   margin: 0.5rem 0 0.25rem;
   font-size: 0.95rem;
 }
-
 .muted {
   margin: 0;
   color: var(--pt-muted);
   font-size: 0.9rem;
 }
-
-.align-list {
+.field {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-}
-
-.align-row__head {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
-}
-
-.party-cell {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.pct {
-  font-family: var(--font-display);
+  gap: 0.35rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--pt-navy);
-}
-
-.mini-bar {
-  height: 8px;
-  background: #f5f5f4;
-  border-radius: 99px;
-  overflow: hidden;
-
-  &__fill {
-    height: 100%;
-    border-radius: 99px;
-    opacity: 0.9;
+  input {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--pt-border);
+    border-radius: 8px;
+    background: var(--pt-cream);
   }
 }
-
+.field-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
 .link {
   text-decoration: none;
   font-weight: 600;
@@ -257,9 +190,5 @@ function onSair() {
   overflow: hidden;
   white-space: normal;
   max-width: 28rem;
-
-  &:hover {
-    color: var(--pt-red);
-  }
 }
 </style>

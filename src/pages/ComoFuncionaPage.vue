@@ -36,8 +36,8 @@
           <li>Um sítio de recomendações políticas ou de “vencedores”.</li>
         </ul>
         <div class="notice" style="margin-top: 1rem">
-          Login e voto estão activos nesta demo (sessão em memória). Em produção: conta com email
-          verificado, ID permanente e um voto por iniciativa sem possibilidade de alteração.
+          Conta com email, ID permanente (CID-…), um voto por iniciativa com confirmação e sem
+          alteração posterior — persistido na base de dados (Supabase).
         </div>
       </div>
     </section>

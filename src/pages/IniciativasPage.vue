@@ -2,8 +2,8 @@
   <div class="page-shell">
     <h1 class="page-title">Iniciativas</h1>
     <p class="page-subtitle">
-      Iniciativas votadas (ou em discussão) no Parlamento. Compare o voto agregado dos cidadãos com
-      o sentido de voto de cada partido. Dados de demonstração — plataforma independente.
+      Iniciativas no Parlamento. Compare o voto agregado dos cidadãos com cada partido. Login
+      obrigatório para votar.
     </p>
 
     <div class="toolbar av-card av-card-pad">
@@ -51,9 +51,7 @@
       <InitiativeCard v-for="item in filtradas" :key="item.id" :item="item" />
     </div>
     <div v-else class="av-card av-card-pad">
-      <p style="margin: 0; color: var(--pt-muted)">
-        Nenhuma iniciativa corresponde aos filtros seleccionados.
-      </p>
+      <p style="margin: 0; color: var(--pt-muted)">Nenhuma iniciativa corresponde aos filtros.</p>
     </div>
   </div>
 </template>
@@ -61,8 +59,10 @@
 <script setup>
 import { computed, ref } from 'vue'
 import InitiativeCard from '@/components/InitiativeCard.vue'
-import { iniciativas, temas } from '@/data/mock'
+import { temas } from '@/data/partidos'
+import { useDataStore } from '@/stores/data'
 
+const data = useDataStore()
 const query = ref('')
 const tema = ref('Todos')
 const estado = ref('todos')
@@ -76,7 +76,7 @@ const estados = [
 
 const filtradas = computed(() => {
   const q = query.value.trim().toLowerCase()
-  return iniciativas.filter((i) => {
+  return data.iniciativas.filter((i) => {
     if (tema.value !== 'Todos' && i.tema !== tema.value) return false
     if (estado.value !== 'todos' && i.estado !== estado.value) return false
     if (!q) return true
@@ -97,7 +97,6 @@ const filtradas = computed(() => {
   gap: 0.85rem;
   margin-bottom: 1rem;
 }
-
 .search {
   display: flex;
   align-items: center;
@@ -107,7 +106,6 @@ const filtradas = computed(() => {
   padding: 0.55rem 0.85rem;
   background: var(--pt-cream);
   color: var(--pt-muted);
-
   input {
     flex: 1;
     border: none;
@@ -118,19 +116,16 @@ const filtradas = computed(() => {
     outline: none;
   }
 }
-
 .results-count {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--pt-muted);
   margin: 0 0 0.85rem;
 }
-
 .init-grid {
   display: grid;
   gap: 1rem;
   grid-template-columns: 1fr;
-
   @media (min-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
   }

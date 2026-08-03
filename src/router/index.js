@@ -32,6 +32,22 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   })
 
+  Router.beforeEach(async (to) => {
+    // Pinia já está montado quando o router corre em navegação
+    const { useAuthStore } = await import('@/stores/auth')
+    const auth = useAuthStore()
+    if (!auth.ready) {
+      await auth.init()
+    }
+    if (to.meta?.requiresAuth && !auth.isLoggedIn) {
+      return { name: 'entrar', query: { redirect: to.fullPath } }
+    }
+    if (to.meta?.guestOnly && auth.isLoggedIn) {
+      return { name: 'perfil' }
+    }
+    return true
+  })
+
   Router.afterEach((to) => {
     const page = to.meta?.title ? `${to.meta.title} · ` : ''
     document.title = `${page}A Voto — Bancada Cidadã`

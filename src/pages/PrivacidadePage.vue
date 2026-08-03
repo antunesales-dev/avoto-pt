@@ -37,8 +37,8 @@
         </p>
 
         <div class="notice notice-info">
-          Esta página é informativa. Nesta demonstração <strong>não há recolha de dados de
-          utilizadores</strong> — não existe registo nem sessão.
+          Com conta: email e votos associados ao ID de cidadão, guardados no Supabase com RLS.
+          Agregados públicos não revelam o voto individual.
         </div>
       </div>
     </section>

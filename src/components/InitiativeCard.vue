@@ -25,7 +25,7 @@
 <script setup>
 import { computed } from 'vue'
 import VoteBar from './VoteBar.vue'
-import { estadosLabel, formatDate } from '@/data/mock'
+import { estadosLabel, formatDate } from '@/data/partidos'
 
 const props = defineProps({
   item: { type: Object, required: true },

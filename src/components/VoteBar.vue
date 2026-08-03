@@ -21,7 +21,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { percentagens, totalVotos, formatNumber } from '@/data/mock'
+import { percentagens, totalVotos, formatNumber } from '@/data/partidos'
 
 const props = defineProps({
   votos: {

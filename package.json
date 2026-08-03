@@ -10,10 +10,15 @@
   "scripts": {
     "dev": "quasar dev",
     "build": "quasar build",
-    "postinstall": "quasar prepare --silent"
+    "postinstall": "quasar prepare --silent",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:status": "supabase status"
   },
   "dependencies": {
     "@quasar/extras": "^2.0.0",
+    "@supabase/supabase-js": "^2.112.0",
     "pinia": "^4.0.2",
     "quasar": "^2.23.3",
     "vue": "^3.5.22",
