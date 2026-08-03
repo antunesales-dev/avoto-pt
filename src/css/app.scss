@@ -90,11 +90,17 @@ a {
 .page-shell {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 1.5rem 1.1rem 3.5rem;
+  padding: 1.15rem 1rem 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
 
   @media (min-width: 1024px) {
-    padding: 2rem 1.5rem 4rem;
+    padding: 1.5rem 1.25rem 3rem;
   }
+}
+
+.stack-lg {
+  gap: 1.5rem;
 }
 
 .page-title {
@@ -268,7 +274,7 @@ a {
 .stack-lg {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .row-between {
