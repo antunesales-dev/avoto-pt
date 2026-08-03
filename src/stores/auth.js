@@ -295,6 +295,11 @@ export const useAuthStore = defineStore('auth', () => {
         e.code = 'ALREADY_VOTED'
         throw e
       }
+      if (msg.includes('RATE_LIMITED') || msg.includes('rate')) {
+        const e = new Error('RATE_LIMITED')
+        e.code = 'RATE_LIMITED'
+        throw e
+      }
       if (msg.includes('AUTH_REQUIRED')) {
         const e = new Error('AUTH_REQUIRED')
         e.code = 'AUTH_REQUIRED'

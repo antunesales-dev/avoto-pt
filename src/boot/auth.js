@@ -6,4 +6,5 @@ export default defineBoot(async () => {
   const auth = useAuthStore()
   const data = useDataStore()
   await Promise.all([auth.init(), data.loadAll().catch((e) => console.error(e))])
+  data.startRealtime()
 })

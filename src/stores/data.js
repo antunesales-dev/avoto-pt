@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 
 /**
  * Dados públicos: iniciativas + agregados (Supabase).
+ * Realtime: contagens de votos.
  */
 export const useDataStore = defineStore('data', () => {
   const iniciativas = ref([])
@@ -15,6 +16,7 @@ export const useDataStore = defineStore('data', () => {
   })
   const loading = ref(false)
   const error = ref(null)
+  let realtimeChannel = null
 
   function mapIniciativa(row, agg) {
     return {
@@ -107,6 +109,62 @@ export const useDataStore = defineStore('data', () => {
     }
   }
 
+  function applyCountRow(row) {
+    if (!row?.iniciativa_id) return
+    const idx = iniciativas.value.findIndex((i) => i.id === row.iniciativa_id)
+    if (idx < 0) return
+    const current = iniciativas.value[idx]
+    iniciativas.value[idx] = {
+      ...current,
+      votosCidadaos: {
+        favor: Number(row.favor ?? 0),
+        contra: Number(row.contra ?? 0),
+        abstencao: Number(row.abstencao ?? 0),
+      },
+    }
+  }
+
+  function startRealtime() {
+    if (realtimeChannel) return
+    realtimeChannel = supabase
+      .channel('public:voto-counts')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'iniciativa_voto_counts',
+        },
+        (payload) => {
+          const row = payload.new || payload.old
+          if (row) applyCountRow(row)
+          // métricas globais: refresh leve
+          supabase
+            .from('metricas_globais')
+            .select('*')
+            .maybeSingle()
+            .then(({ data }) => {
+              if (data) {
+                metricas.value = {
+                  cidadaos_registados: Number(data.cidadaos_registados || 0),
+                  votos_emitidos: Number(data.votos_emitidos || 0),
+                  iniciativas_disponiveis: Number(data.iniciativas_disponiveis || 0),
+                  taxa_participacao_media: Number(data.taxa_participacao_media || 0),
+                }
+              }
+            })
+        },
+      )
+      .subscribe()
+  }
+
+  function stopRealtime() {
+    if (realtimeChannel) {
+      supabase.removeChannel(realtimeChannel)
+      realtimeChannel = null
+    }
+  }
+
   return {
     iniciativas,
     metricas,
@@ -115,6 +173,8 @@ export const useDataStore = defineStore('data', () => {
     loadAll,
     getIniciativa,
     refreshAgg,
+    startRealtime,
+    stopRealtime,
   }
 })
 

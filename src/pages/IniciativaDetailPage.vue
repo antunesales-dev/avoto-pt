@@ -255,6 +255,14 @@ async function confirmarVoto(voto) {
       })
       return
     }
+    if (code === 'RATE_LIMITED' || String(e.message).includes('RATE_LIMITED')) {
+      $q.notify({
+        type: 'warning',
+        message: 'Demasiados pedidos. Espere um minuto e tente de novo.',
+        position: 'top',
+      })
+      return
+    }
     $q.notify({
       type: 'negative',
       message: e.message || 'Não foi possível registar o voto.',
