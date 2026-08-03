@@ -157,4 +157,10 @@ function exportJson() {
   font-size: 0.82rem;
   color: var(--pt-muted);
 }
+.muted {
+  margin: 0 0 0.75rem;
+  color: var(--pt-muted);
+  font-weight: 600;
+}
 </style>
+
