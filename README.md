@@ -21,17 +21,27 @@ Plataforma cívica **independente** (não governamental), **open source**, neutr
 
 ---
 
-## Arranque completo (local)
+## Arranque
 
-Requisitos: Node 22+, pnpm, Docker, [Supabase CLI](https://supabase.com/docs/guides/cli).
+Requisitos: Node 22+, pnpm, [Supabase CLI](https://supabase.com/docs/guides/cli). Docker só se quiseres stack **local** em paralelo.
+
+### Produção remota (fase 1 — activa)
+
+Projecto cloud: **avoto-pt** (Frankfurt). Detalhe: [`docs/SUPABASE-REMOTE.md`](./docs/SUPABASE-REMOTE.md).
 
 ```bash
 pnpm install
-pnpm db:start          # sobe Postgres + Auth + API (portas 5542x neste projecto)
-# criar .env a partir do status local:
-#   VITE_SUPABASE_URL=...
-#   VITE_SUPABASE_ANON_KEY=...
-cp .env.example .env   # preencher com `pnpm db:status` / `supabase status -o env`
+# .env local (gitignored) com:
+#   VITE_SUPABASE_URL=https://qevavihconurfgmayzze.supabase.co
+#   VITE_SUPABASE_ANON_KEY=<anon key do dashboard>
+pnpm dev
+```
+
+### Stack Supabase só local (opcional)
+
+```bash
+pnpm db:start
+# .env a partir de: supabase status -o env
 pnpm dev
 ```
 
@@ -41,10 +51,8 @@ pnpm dev
 | `pnpm build` | Build produção |
 | `pnpm db:start` | Supabase local |
 | `pnpm db:stop` | Parar Supabase |
-| `pnpm db:reset` | Migrations + seed |
-| `pnpm db:status` | URL e keys |
-
-Studio local (quando `db:start`): ver URL em `supabase status`.
+| `pnpm db:reset` | Migrations + seed (local) |
+| `pnpm db:status` | URL e keys locais |
 
 ### Fluxo real
 

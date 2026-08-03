@@ -7,24 +7,25 @@
 
 ---
 
-## Epic 1 — Supabase remoto (produção)
+## Epic 1 — Supabase remoto (produção) — ✅ CONCLUÍDA
 
 **Done when:** migrations + encriptação aplicadas num projecto Supabase cloud; a app local (ou deploy) aponta para ele com `.env` real; registo/login/voto persistem fora da máquina.
 
+**Projecto:** `qevavihconurfgmayzze` · Frankfurt · [dashboard](https://supabase.com/dashboard/project/qevavihconurfgmayzze) · ver `docs/SUPABASE-REMOTE.md`
+
 ### Tasks
 
-| ID | Task | Detalhe | Done when |
-|----|------|---------|-----------|
-| **1.1** | Criar projecto Supabase | Dashboard supabase.com · região EU (ex. `eu-west-1` / Frankfurt) · nome `avoto-pt` | Projecto activo; URL + anon key + service_role (só ops) copiados para password manager |
-| **1.2** | Ligar CLI ao remoto | `supabase login` · `supabase link --project-ref …` | `supabase projects list` mostra o projecto linkado |
-| **1.3** | Push migrations | `supabase db push` (inclui init + encryption) | Tabelas, RLS, Vault key, RPCs e views no remoto; sem erros |
-| **1.4** | Verificar encriptação | Signup de teste · voto · `select` directo a `votos_cidadaos` via API user → vazio; RPC devolve plaintext | Igual ao teste local documentado |
-| **1.5** | Seed ou vazio | Decisão: seed mínimo de dev **ou** zero iniciativas até import AR | Documentado no README; remoto coerente |
-| **1.6** | Env local → remoto | `.env` com `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` do cloud (nunca service_role no frontend) | `pnpm dev` regista user real no cloud |
-| **1.7** | Secrets ops | Guardar service_role + DB password só em local seguro / futuros CI secrets | Nada no git; `.env` no `.gitignore` |
+| ID | Task | Estado |
+|----|------|--------|
+| **1.1** | Criar projecto Supabase EU | ✅ |
+| **1.2** | Ligar CLI (`supabase link`) | ✅ |
+| **1.3** | `db push` (init + encryption) | ✅ |
+| **1.4** | Verificar encriptação + voto imutável no cloud | ✅ |
+| **1.5** | Seed 8 iniciativas | ✅ |
+| **1.6** | `.env` local → remoto (anon only) | ✅ gitignored |
+| **1.7** | Secrets ops (`.env.supabase.remote`) | ✅ gitignored |
 
-**Dependências:** nenhuma.  
-**Bloqueadores teus:** conta Supabase + criar projecto (não automatizável sem as tuas credenciais).
+**Dependências:** nenhuma.
 
 ---
 
