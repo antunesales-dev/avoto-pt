@@ -40,6 +40,11 @@
     "postcss": "^8.5.8",
     "wrangler": "^4.118.0"
   },
+  "pnpm": {
+    "overrides": {
+      "undici": "8.10.0"
+    }
+  },
   "keywords": [
     "quasar",
     "quasar-app",
