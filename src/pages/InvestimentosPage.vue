@@ -19,6 +19,7 @@
     <DateRangeFilter
       v-model="periodo"
       label="Data de referência"
+      :count="filtrados.length"
       style="margin-bottom: 1rem"
     />
 

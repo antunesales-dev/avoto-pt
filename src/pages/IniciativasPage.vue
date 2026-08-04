@@ -55,7 +55,11 @@
           {{ e.label }}
         </button>
       </div>
-      <DateRangeFilter v-model="periodo" label="Data da votação AR" />
+      <DateRangeFilter
+        v-model="periodo"
+        label="Data da votação AR"
+        :count="filtradas.length"
+      />
     </div>
 
     <ListPager

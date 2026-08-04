@@ -20,6 +20,7 @@
     <DateRangeFilter
       v-model="periodo"
       label="Dia do resumo"
+      :count="filtrados.length"
       style="margin-bottom: 1rem"
     />
 

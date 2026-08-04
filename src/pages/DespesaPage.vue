@@ -41,6 +41,7 @@
     <DateRangeFilter
       v-model="periodo"
       label="Data de publicação"
+      :count="filtradas.length"
       style="margin-bottom: 1rem"
     />
 
