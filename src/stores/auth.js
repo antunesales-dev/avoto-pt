@@ -15,6 +15,58 @@ function appBaseUrl() {
   return `${window.location.origin}${base}`
 }
 
+/**
+ * Extrai { error, message } do corpo da edge function.
+ * O client Supabase devolve "Edge Function returned a non-2xx status code"
+ * e esconde o JSON — sem isto o utilizador só vê lixo técnico.
+ */
+async function parseFunctionsError(fnErr, data) {
+  // Às vezes o body vem em data mesmo com error
+  if (data && typeof data === 'object' && (data.message || data.error)) {
+    return {
+      code: data.error || 'EDGE_ERROR',
+      message: data.message || data.error || String(fnErr?.message || 'Erro no serviço.'),
+    }
+  }
+  const ctx = fnErr?.context
+  if (ctx) {
+    try {
+      // Response (fetch) ou clone
+      if (typeof ctx.json === 'function') {
+        const j = await ctx.clone?.().json?.() ?? (await ctx.json())
+        if (j && (j.message || j.error)) {
+          return {
+            code: j.error || 'EDGE_ERROR',
+            message: j.message || j.error,
+          }
+        }
+      }
+      if (typeof ctx.text === 'function') {
+        const t = await ctx.clone?.().text?.() ?? (await ctx.text())
+        try {
+          const j = JSON.parse(t)
+          if (j?.message || j?.error) {
+            return { code: j.error || 'EDGE_ERROR', message: j.message || j.error }
+          }
+        } catch {
+          if (t) return { code: 'EDGE_ERROR', message: t.slice(0, 280) }
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  const raw = fnErr?.message || String(fnErr || 'Erro no serviço.')
+  if (/non-2xx|FunctionsHttpError|429/i.test(raw)) {
+    return {
+      code: 'EDGE_HTTP',
+      message:
+        'Não foi possível contactar o serviço de login. Se acabou de pedir vários códigos, espere alguns minutos e tente de novo.',
+    }
+  }
+  return { code: 'EDGE_ERROR', message: raw }
+}
+
 async function linkDeviceAfterLogin() {
   try {
     const deviceId = getDeviceId()
@@ -214,47 +266,36 @@ export const useAuthStore = defineStore('auth', () => {
           redirect_to: `${appBaseUrl()}/entrar`,
         },
       })
-      if (fnErr) {
-        const msg = fnErr.message || String(fnErr)
-        // FunctionsHttpError may include context
-        throw new Error(msg)
-      }
-      if (data?.error) {
-        const e = new Error(data.message || data.error)
-        e.code = data.error
-        throw e
+      if (fnErr || data?.error) {
+        const parsedErr = await parseFunctionsError(fnErr, data)
+        let msg = parsedErr.message
+        let code = parsedErr.code
+        if (/RATE_LIMITED|429|Demasiados/i.test(`${code} ${msg}`)) {
+          code = 'RATE_LIMITED'
+          msg =
+            'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
+        } else if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(`${code} ${msg}`)) {
+          code = 'DEVICE_ACCOUNT_LIMIT'
+          msg =
+            'Limite de contas neste dispositivo. Entre com uma conta existente ou use outro dispositivo.'
+        } else if (/TURNSTILE|anti-bot|captcha/i.test(`${code} ${msg}`)) {
+          code = 'TURNSTILE_FAILED'
+          msg = 'Complete a verificação anti-bot e tente de novo.'
+        }
+        error.value = msg
+        const err = new Error(msg)
+        err.code = code
+        throw err
       }
       return { email: parsed.data, allowCreate: data?.allow_create !== false }
     } catch (e) {
-      // parse body from FunctionsHttpError if present
-      let msg = e.message || String(e)
-      try {
-        if (e?.context?.json) {
-          const j = await e.context.json()
-          if (j?.message) msg = j.message
-          if (j?.error) e.code = j.error
-        }
-      } catch {
-        /* ignore */
+      if (e?.code) {
+        error.value = e.message
+        throw e
       }
-      if (/RATE_LIMITED|429|rate/i.test(msg)) {
-        msg =
-          'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
-        e.code = 'RATE_LIMITED'
-      }
-      if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(msg)) {
-        e.code = 'DEVICE_ACCOUNT_LIMIT'
-      }
-      if (/TURNSTILE|anti-bot|captcha/i.test(msg)) {
-        e.code = 'TURNSTILE_FAILED'
-        if (!/verifica/i.test(msg)) {
-          msg = 'Complete a verificação anti-bot e tente de novo.'
-        }
-      }
+      const msg = e.message || String(e)
       error.value = msg
-      const err = new Error(msg)
-      err.code = e.code
-      throw err
+      throw e
     } finally {
       loading.value = false
     }
