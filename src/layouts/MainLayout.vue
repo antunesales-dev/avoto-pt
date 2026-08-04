@@ -420,17 +420,18 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 }
 
 .av-page {
-  /* Altura = conteúdo; o footer é o último bloco do scroll, nunca sticky/fixed */
   display: block;
   min-height: 0 !important;
   height: auto !important;
 }
 
-/* Rodapé no fluxo normal — só aparece depois de fazer scroll até ao fim da página */
+/* Footer: no fundo do ecrã se o conteúdo for curto; se for longo, a seguir ao conteúdo.
+   O fundo navy é só a altura do footer — não sobe a tapar a página. */
 .av-footer {
   display: block;
   width: 100%;
-  margin-top: 2.5rem;
+  flex-shrink: 0;
+  margin-top: auto;
   position: static !important;
   inset: auto !important;
   z-index: auto !important;
