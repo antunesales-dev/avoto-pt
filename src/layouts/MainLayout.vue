@@ -121,6 +121,20 @@
         <router-view v-else />
       </q-page>
     </q-page-container>
+
+    <q-footer class="av-footer" :elevated="false">
+      <div class="av-footer__inner">
+        <p class="av-footer__brand">
+          <strong>A Voto</strong> — Bancada Cidadã · independente · open source · RGPD
+        </p>
+        <nav class="av-footer__legal" aria-label="Informação legal">
+          <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
+        </nav>
+        <p class="av-footer__note">
+          Não é sítio oficial do Estado. Votos na plataforma não são vinculativos.
+        </p>
+      </div>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -129,7 +143,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import AppBrand from '@/components/AppBrand.vue'
-import { navPrincipal, navMais } from '@/data/nav'
+import { navPrincipal, navMais, navLegal } from '@/data/nav'
 import { useAuthStore } from '@/stores/auth'
 import { useDataStore } from '@/stores/data'
 
@@ -386,7 +400,71 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 }
 
 .av-page {
-  min-height: calc(100vh - 62px);
+  min-height: calc(100vh - 62px - 7rem);
+}
+
+.av-footer {
+  background: var(--pt-navy) !important;
+  color: rgba(255, 255, 255, 0.88);
+  border-top: 3px solid var(--pt-red);
+  box-shadow: none !important;
+}
+
+.av-footer__inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.1rem 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  text-align: center;
+
+  @media (min-width: 640px) {
+    padding: 1.15rem 1.5rem 1.35rem;
+  }
+}
+
+.av-footer__brand {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.92);
+
+  strong {
+    font-weight: 800;
+    color: #fff;
+  }
+}
+
+.av-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.1rem;
+
+  a {
+    color: #fff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+
+    &:hover,
+    &.router-link-active {
+      border-bottom-color: var(--pt-red);
+      color: #fff;
+    }
+  }
+}
+
+.av-footer__note {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.4;
 }
 
 .boot-state {

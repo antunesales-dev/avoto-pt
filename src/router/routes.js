@@ -88,6 +88,24 @@ const routes = [
         meta: { title: 'Privacidade' },
       },
       {
+        path: 'termos',
+        name: 'termos',
+        component: () => import('@/pages/TermosPage.vue'),
+        meta: { title: 'Termos de uso' },
+      },
+      {
+        path: 'cookies',
+        name: 'cookies',
+        component: () => import('@/pages/CookiesPage.vue'),
+        meta: { title: 'Cookies' },
+      },
+      {
+        path: 'direitos',
+        name: 'direitos',
+        component: () => import('@/pages/DireitosPage.vue'),
+        meta: { title: 'Direitos RGPD' },
+      },
+      {
         path: 'perfil',
         name: 'perfil',
         component: () => import('@/pages/PerfilPage.vue'),

@@ -16,6 +16,17 @@ export const navMais = [
   { to: '/dados', label: 'Fontes de dados', icon: 'storage' },
   { to: '/sobre', label: 'Sobre', icon: 'info_outline' },
   { to: '/privacidade', label: 'Privacidade', icon: 'privacy_tip' },
+  { to: '/termos', label: 'Termos de uso', icon: 'gavel' },
+  { to: '/cookies', label: 'Cookies', icon: 'cookie' },
+  { to: '/direitos', label: 'Direitos RGPD', icon: 'policy' },
+]
+
+/** Rodapé legal (RGPD) */
+export const navLegal = [
+  { to: '/privacidade', label: 'Privacidade' },
+  { to: '/termos', label: 'Termos de uso' },
+  { to: '/cookies', label: 'Cookies' },
+  { to: '/direitos', label: 'Direitos RGPD' },
 ]
 
 export const navegacao = [...navPrincipal, ...navMais]

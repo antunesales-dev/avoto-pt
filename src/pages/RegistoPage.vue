@@ -58,6 +58,16 @@
         Já tem conta?
         <router-link to="/entrar">Entrar</router-link>
       </p>
+      <p class="auth-legal">
+        Ao criar conta, aceita os
+        <router-link to="/termos">Termos de uso</router-link>
+        e a
+        <router-link to="/privacidade">Política de Privacidade</router-link>.
+        Ver também
+        <router-link to="/cookies">Cookies</router-link>
+        e
+        <router-link to="/direitos">direitos RGPD</router-link>.
+      </p>
     </div>
   </div>
 </template>

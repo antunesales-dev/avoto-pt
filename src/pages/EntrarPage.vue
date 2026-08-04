@@ -53,6 +53,16 @@
       <p class="auth-switch">
         Primeira vez? Use o mesmo formulário — a conta é criada no primeiro acesso.
       </p>
+      <p class="auth-legal">
+        Ao continuar, aceita os
+        <router-link to="/termos">Termos de uso</router-link>
+        e a
+        <router-link to="/privacidade">Política de Privacidade</router-link>.
+        Ver também
+        <router-link to="/cookies">Cookies</router-link>
+        e
+        <router-link to="/direitos">direitos RGPD</router-link>.
+      </p>
     </form>
 
     <!-- Passo 2: código OTP -->
