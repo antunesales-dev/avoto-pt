@@ -90,7 +90,7 @@
             </tr>
             <tr>
               <td>Preferências de notificação</td>
-              <td>Toggles digest / iniciativas / etc.</td>
+              <td>Preferências de aviso (resumo do dia, iniciativas, etc.)</td>
               <td>Respeitar o que pretende ser notificado</td>
             </tr>
           </tbody>
@@ -175,7 +175,7 @@
             horas a dias), para segurança.
           </li>
           <li>
-            <strong>Dados públicos oficiais</strong> (iniciativas AR, despesa, digests) — não são
+            <strong>Dados públicos oficiais</strong> (iniciativas AR, despesa, resumos do dia) — não são
             dados pessoais seus; conservam-se enquanto forem úteis à transparência.
           </li>
         </ul>

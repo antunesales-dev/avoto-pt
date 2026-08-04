@@ -59,6 +59,10 @@ const passos = [
     d: 'Imediatamente: agregados dos cidadãos, voto de cada partido na AR, alinhamento e métricas de participação.',
   },
   {
+    t: 'Consulta o resumo do dia',
+    d: 'Um boletim diário com leis/votações, despesa e investimentos — o que a plataforma reuniu a partir de fontes oficiais, sem notícias nem opinião.',
+  },
+  {
     t: 'Usa a informação como quiser',
     d: 'Para reflectir sobre a qualidade da representação e, se o desejar, informar o voto nas próximas eleições. A plataforma não decide por si.',
   },

@@ -31,7 +31,7 @@ const routes = [
         path: 'digest',
         name: 'digest',
         component: () => import('@/pages/DigestPage.vue'),
-        meta: { title: 'Digest diário' },
+        meta: { title: 'Resumo do dia' },
       },
       {
         path: 'despesa',

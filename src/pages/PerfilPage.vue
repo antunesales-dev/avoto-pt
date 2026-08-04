@@ -43,8 +43,9 @@
         <div class="av-card-pad">
           <h2 class="section-title">Notificações</h2>
           <p class="muted" style="margin-bottom: 0.75rem">
-            Avisos sobre digests, novas leis/votações e investimentos. Instale a app (PWA) no
-            telemóvel ou desktop para um atalho e melhor experiência.
+            Avisos sobre o resumo diário da actividade pública, novas leis/votações e
+            investimentos. Instale a app (PWA) no telemóvel ou desktop para um atalho e melhor
+            experiência.
           </p>
 
           <div class="notif-permission">
@@ -63,7 +64,7 @@
           <div class="toggle-list">
             <label class="toggle">
               <input v-model="prefs.notify_digest" type="checkbox" @change="onSavePrefs" />
-              <span>Digest diário (resumo da actividade)</span>
+              <span>Resumo do dia (Parlamento, despesa e investimentos)</span>
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_iniciativas" type="checkbox" @change="onSavePrefs" />

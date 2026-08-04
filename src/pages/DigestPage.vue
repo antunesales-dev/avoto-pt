@@ -1,19 +1,21 @@
 <template>
   <div class="page-shell">
-    <h1 class="page-title">Digest diário</h1>
+    <h1 class="page-title">Resumo do dia</h1>
     <p class="page-subtitle">
-      Resumo factual do dia: <strong>votações</strong>, <strong>despesa</strong> e
-      <strong>investimentos</strong>. Só dados da plataforma (sem AI).
+      O que a plataforma reuniu em cada dia: <strong>leis e votações no Parlamento</strong>,
+      <strong>despesa pública</strong> e <strong>investimentos</strong> — com o sentido de voto
+      dos partidos e, quando existir, o dos cidadãos na A Voto.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Gerado a partir das tabelas-fonte:
-      <code>ar-sync</code> → <code>despesa-sync</code> → <code>daily-digest</code>.
+      É um <strong>boletim factual</strong>, não notícias nem opinião. Vem só de fontes oficiais
+      e dos dados já na plataforma. Sem inteligência artificial a inventar texto.
     </div>
 
     <p v-if="finance.loading" class="muted">A carregar…</p>
     <p v-else-if="!finance.digests.length" class="muted">
-      Ainda não há digests. O job diário preenche esta lista.
+      Ainda não há resumos. Quando o sistema sincroniza os dados oficiais, aparece aqui um
+      boletim por dia.
     </p>
 
     <ListPager
@@ -26,7 +28,7 @@
       :range-to="rangeTo"
       :page-window="pageWindow"
       :sizes="sizes"
-      unit="digests"
+      unit="resumos"
       @go="goPage"
       @update:page-size="setPageSize"
     />
@@ -44,13 +46,13 @@
           </div>
           <p class="digest__summary">{{ d.summary }}</p>
           <p class="digest__meta">
-            <template v-if="d.generated_at">Gerado {{ formatDate(d.generated_at) }} · </template>
+            <template v-if="d.generated_at">Compilado em {{ formatDate(d.generated_at) }} · </template>
             {{ sectionCountsLabel(d) }}
           </p>
 
           <!-- Parlamento -->
           <section v-if="sectionItems(d, 'iniciativas').length" class="digest-section">
-            <h3 class="digest-section__title">Parlamento · iniciativas</h3>
+            <h3 class="digest-section__title">No Parlamento — leis e votações</h3>
             <div
               v-for="(it, idx) in sectionItems(d, 'iniciativas').slice(0, sectionLimit)"
               :key="it.iniciativa_id || idx"
@@ -78,7 +80,7 @@
                 {{ truncate(it.descricao_oficial, 320) }}
               </p>
               <div class="digest-item__block">
-                <h5 class="digest-item__h">Partidos na AR</h5>
+                <h5 class="digest-item__h">O que cada partido votou</h5>
                 <div v-if="partyEntries(it).length" class="party-list">
                   <PartyVoteBadge
                     v-for="row in partyEntries(it)"
@@ -87,10 +89,10 @@
                     :voto="row.voto"
                   />
                 </div>
-                <p v-else class="muted sm">Sem registo de votos por partido.</p>
+                <p v-else class="muted sm">Sem registo de votos por partido neste item.</p>
               </div>
               <div class="digest-item__block">
-                <h5 class="digest-item__h">Cidadãos (A Voto)</h5>
+                <h5 class="digest-item__h">O que os cidadãos votaram na A Voto</h5>
                 <VoteBar :votos="cidadaosVotos(it)" />
               </div>
               <router-link
@@ -109,7 +111,7 @@
 
           <!-- Despesa -->
           <section v-if="sectionItems(d, 'despesas').length" class="digest-section">
-            <h3 class="digest-section__title">Despesa pública</h3>
+            <h3 class="digest-section__title">Despesa pública (contratos e orçamento)</h3>
             <div
               v-for="(it, idx) in sectionItems(d, 'despesas').slice(0, sectionLimit)"
               :key="it.despesa_id || idx"
@@ -142,7 +144,7 @@
 
           <!-- Investimentos -->
           <section v-if="sectionItems(d, 'investimentos').length" class="digest-section">
-            <h3 class="digest-section__title">Investimentos</h3>
+            <h3 class="digest-section__title">Investimentos públicos</h3>
             <div
               v-for="(it, idx) in sectionItems(d, 'investimentos').slice(0, sectionLimit)"
               :key="it.investimento_id || idx"
@@ -160,7 +162,7 @@
               <h4 class="digest-item__titulo">{{ it.titulo }}</h4>
               <p v-if="it.entidade" class="digest-item__line">{{ it.entidade }}</p>
               <div v-if="it.votos_cidadaos" class="digest-item__block">
-                <h5 class="digest-item__h">Cidadãos</h5>
+                <h5 class="digest-item__h">Voto dos cidadãos na A Voto</h5>
                 <VoteBar :votos="cidadaosVotos(it)" />
               </div>
               <router-link
@@ -215,7 +217,7 @@
       :page-window="pageWindow"
       :sizes="sizes"
       :show-size="false"
-      unit="digests"
+      unit="resumos"
       @go="goPage"
     />
   </div>

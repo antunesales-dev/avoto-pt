@@ -51,7 +51,7 @@
           </li>
           <li>Não utilize a plataforma para assédio, spam, fraude ou manipulação automatizada.</li>
           <li>
-            Métricas e digests públicos mostram <strong>agregados</strong>, não a identidade de
+            Métricas e resumos do dia públicos mostram <strong>agregados</strong>, não a identidade de
             quem votou o quê.
           </li>
         </ul>

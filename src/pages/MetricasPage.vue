@@ -13,7 +13,7 @@
         icon="gavel"
       />
       <StatCard
-        label="Digests"
+        label="Resumos do dia"
         :value="formatNumber(m.digests)"
         icon="today"
         accent="var(--pt-navy)"

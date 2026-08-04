@@ -10,7 +10,7 @@
       </p>
       <div class="hero__actions">
         <router-link to="/iniciativas" class="btn btn--primary">Iniciativas</router-link>
-        <router-link to="/digest" class="btn btn--outline">Digest</router-link>
+        <router-link to="/digest" class="btn btn--outline">Resumo do dia</router-link>
         <router-link to="/despesa" class="btn btn--outline">Despesa</router-link>
         <router-link to="/investimentos" class="btn btn--outline">Investimentos</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/registo" class="btn btn--ghost">Criar conta</router-link>
@@ -29,7 +29,7 @@
           icon="gavel"
         />
         <StatCard
-          label="Digests diários"
+          label="Resumos do dia"
           :value="formatNumber(m.digests)"
           icon="today"
           accent="var(--pt-navy)"
