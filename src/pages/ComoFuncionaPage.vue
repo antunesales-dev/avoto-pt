@@ -22,6 +22,32 @@
 
     <section class="av-card" style="margin-top: 1.25rem">
       <div class="av-card-pad prose">
+        <h2 class="section-title">Ordem dos partidos (importante)</h2>
+        <p>
+          Em quase toda a plataforma, os partidos aparecem por
+          <strong>ordem alfabética da sigla</strong> (BE, CDS-PP, CHEGA, IL, LIVRE, PAN, PCP, PS,
+          PSD…), em português.
+        </p>
+        <ul>
+          <li>
+            <strong>Porquê:</strong> para não parecer que a lista favorece o maior partido, o
+            governo ou a disposição do hemiciclo. Ordem neutra, sem “peso” por nº de deputados.
+          </li>
+          <li>
+            <strong>Excepção:</strong> quando há uma <em>métrica</em> (ex.: % de alinhamento com
+            os cidadãos), ordenamos por esse valor. Em caso de <em>empate</em> ou sem dados,
+            volta a ordem alfabética.
+          </li>
+          <li>
+            Cada partido conta como um <strong>sentido de voto</strong> (a favor / contra /
+            abstenção) no registo da AR — não como percentagem de cadeiras.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="av-card" style="margin-top: 1.25rem">
+      <div class="av-card-pad prose">
         <h2 class="section-title">O que pode e não pode esperar</h2>
         <h3>É</h3>
         <ul>

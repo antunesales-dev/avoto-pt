@@ -96,9 +96,12 @@
           <div class="av-card-pad">
             <h2 class="section-title">Voto dos partidos na AR</h2>
             <p class="hint" style="margin-bottom: 0.75rem">
-              Sentido de voto do grupo parlamentar (a favor / contra / abstenção), por ordem
-              alfabética de sigla. Não há “peso” por número de deputados — cada partido conta
-              como um sentido, como no registo oficial por grupo.
+              Sentido de voto do grupo parlamentar (a favor / contra / abstenção).
+              <strong>Ordem alfabética por sigla</strong> (BE, CDS-PP, …, PSD) — de propósito, para
+              não parecer que listamos “do maior para o menor”. Não há peso por número de
+              deputados: cada partido conta como um sentido, como no registo oficial por grupo.
+              Detalhe em
+              <router-link to="/como-funciona">Como funciona</router-link>.
             </p>
             <p v-if="!hasPartidos" class="hint">
               O registo oficial desta iniciativa ainda não tem detalhe de voto por grupo
@@ -120,6 +123,10 @@
     <section class="av-card" style="margin-top: 1rem">
       <div class="av-card-pad">
         <h2 class="section-title">Alinhamento cidadãos ↔ partidos</h2>
+        <p class="hint" style="margin: -0.35rem 0 0.85rem">
+          Com votos de cidadãos: ordenado por % de alinhamento (métrica). Sem votos ou em empate:
+          <strong>ordem alfabética por sigla</strong>.
+        </p>
         <div class="av-table-wrap">
           <table class="av-table">
             <thead>

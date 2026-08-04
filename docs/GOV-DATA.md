@@ -39,12 +39,31 @@ Detalhe: [`docs/AR-IMPORT.md`](./AR-IMPORT.md).
 - Não pretende ser amostra representativa da população.
 - Não recomenda partidos nem “vencedores”.
 - Despesa e investimentos: **transparência e comparação**, não “controlo do governo”.
-- **Voto de partidos:** sentido por grupo parlamentar (favor / contra / abstenção), sem peso por nº de deputados. Listas em **ordem alfabética de sigla**; só barras de alinhamento % ordenam por métrica (empate → alfabético).
+- **Voto de partidos:** sentido por grupo parlamentar (favor / contra / abstenção), sem peso por nº de deputados.
 - **Mudança de governo / legislatura:** cada iniciativa guarda o resultado da votação histórica da AR; o sync actualiza dados oficiais novos. Partidos novos = mapear sigla no import + metadados de UI (cor/sigla).
 
-## Partidos na UI
+## Ordem dos partidos (anti-enviesamento) — documentar ao utilizador
 
-Ficheiro `src/data/partidos.js` — só cores/siglas de apresentação. Fonte de verdade dos votos = Dados Abertos da AR (`resultado_partidos` por iniciativa).
+**Regra canónica (UI e código):** listas e badges de partidos em
+**ordem alfabética da sigla** (`localeCompare` pt-PT):  
+BE → CDS-PP → CHEGA → IL → LIVRE → PAN → PCP → PS → PSD.
+
+| Contexto | Ordem |
+|----------|--------|
+| Cartões de iniciativa, badges, matriz Comparação, resumo do dia, colunas | **Alfabética por sigla** |
+| Barras / tabela de **alinhamento %** (há métrica) | Por métrica (maior → menor) |
+| Empate de métrica, ou sem votos de cidadãos | **Alfabética por sigla** |
+
+**Porquê:** não usar ordem de bancada, “relevância política” ou hemiciclo — isso enviesa a leitura.
+Cada partido = um sentido de voto, não um peso por deputados.
+
+**Onde o utilizador lê isto na app:**  
+`/como-funciona` (secção dedicada), `/comparacao` (aviso + legendas), detalhe de iniciativa,
+`/dados`, subtítulo de `/iniciativas`.
+
+**Código:** `src/data/partidos.js` (`partidos` já sorted; `comparePartidosAlfa` / `sortPartidosAlfa`).  
+Fonte de verdade dos votos = Dados Abertos da AR (`resultado_partidos` por iniciativa) — as
+cores/siglas em `partidos.js` são só apresentação.
 
 ## Digest (agora vs depois)
 

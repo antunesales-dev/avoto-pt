@@ -55,6 +55,14 @@
           <li>Resultados de votações por partido/bancada (e por deputado, quando existirem)</li>
           <li>Ligações e documentos no site da AR / Estado</li>
         </ul>
+        <h3>Ordem dos partidos na interface</h3>
+        <p>
+          Os partidos são mostrados por <strong>ordem alfabética da sigla</strong> (BE, CDS-PP,
+          CHEGA, …, PSD), de propósito: evita parecer que a lista “favorece” o maior partido ou o
+          governo. Quando há métrica (ex. % de alinhamento com os cidadãos), ordenamos por essa
+          métrica; em empate, volta o alfabético. Não usamos peso por número de deputados. Ver
+          <router-link to="/como-funciona">Como funciona</router-link>.
+        </p>
         <h3>O que fica de fora</h3>
         <ul>
           <li>Sites de notícias, blogs, wikis, APIs de terceiros, agregadores</li>

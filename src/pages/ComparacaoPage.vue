@@ -3,13 +3,23 @@
     <h1 class="page-title">Comparação global</h1>
     <p class="page-subtitle">
       Alinhamento entre o voto agregado dos cidadãos e o voto de cada partido nas iniciativas com
-      resultado oficial. Barras por % de alinhamento (métrica); matriz de colunas em ordem
-      alfabética por sigla — não é ranking político nem ordem de bancada.
+      resultado oficial. Não é ranking político nem “quem manda” no hemiciclo.
     </p>
+
+    <div class="notice notice-info" style="margin-bottom: 1.25rem">
+      <strong>Como lemos a ordem dos partidos:</strong> as colunas da matriz e as listas sem
+      métrica estão em <strong>ordem alfabética por sigla</strong> (BE → … → PSD), de propósito —
+      para não enviesar. Só as barras de “alinhamento médio” ordenam por percentagem; em empate,
+      volta o alfabético. Ver também
+      <router-link to="/como-funciona">Como funciona</router-link>.
+    </div>
 
     <section class="av-card" style="margin-bottom: 1.25rem">
       <div class="av-card-pad">
         <h2 class="section-title">Alinhamento médio por partido</h2>
+        <p class="section-hint" style="margin-top: -0.35rem; margin-bottom: 0.85rem">
+          Ordenado do maior para o menor % (métrica). Empate → alfabético por sigla.
+        </p>
         <div class="align-list">
           <div v-for="row in mediaPartidos" :key="row.id" class="align-row">
             <div class="align-row__head">
@@ -30,6 +40,10 @@
     <section class="av-card">
       <div class="av-card-pad">
         <h2 class="section-title">Matriz por iniciativa</h2>
+        <p class="section-hint" style="margin-top: -0.35rem; margin-bottom: 0.85rem">
+          Colunas dos partidos em <strong>ordem alfabética de sigla</strong> (não por tamanho de
+          bancada).
+        </p>
 
         <ListPager
           :page="page"

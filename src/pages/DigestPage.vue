@@ -85,7 +85,7 @@
                 {{ truncate(it.descricao_oficial, 320) }}
               </p>
               <div class="digest-item__block">
-                <h5 class="digest-item__h">O que cada partido votou</h5>
+                <h5 class="digest-item__h">O que cada partido votou (A–Z por sigla)</h5>
                 <div v-if="partyEntries(it).length" class="party-list">
                   <PartyVoteBadge
                     v-for="row in partyEntries(it)"

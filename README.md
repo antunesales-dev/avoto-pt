@@ -19,6 +19,7 @@ Plataforma cívica **independente** (não governamental), **open source**, neutr
 3. **Login obrigatório para votar** — um voto por ID por iniciativa; **imutável** após confirmação  
 4. **Privacidade / RGPD** — email só para conta; sem NIF/CC obrigatório  
 5. **Métricas públicas** — agregados e exportações, sem expor quem votou o quê  
+6. **Partidos em ordem alfabética de sigla** — anti-enviesamento; só listas com métrica (% alinhamento) ordenam por valor (empate → A–Z). Explicado na UI em `/como-funciona` e `docs/GOV-DATA.md`  
 
 ---
 
