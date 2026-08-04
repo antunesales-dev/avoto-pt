@@ -23,7 +23,7 @@ function reloadOnce() {
   window.location.reload()
 }
 
-export default defineBoot(() => {
+export default defineBoot(({ router }) => {
   // boot ok → limpa o flag (evita loop se a falha for intermitente)
   try {
     sessionStorage.removeItem(KEY)
@@ -44,4 +44,13 @@ export default defineBoot(() => {
       reloadOnce()
     }
   })
+
+  // Vue Router apanha o erro de lazy import — também recarregar
+  if (router && typeof router.onError === 'function') {
+    router.onError((err) => {
+      if (shouldReload(err?.message || err)) {
+        reloadOnce()
+      }
+    })
+  }
 })

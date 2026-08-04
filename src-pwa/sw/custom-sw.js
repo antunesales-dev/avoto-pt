@@ -22,6 +22,28 @@ self.addEventListener('message', (event) => {
   }
 })
 
+// Em activate: limpar caches + revalidar tabs (sai do shell com hashes mortos)
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys()
+      await Promise.all(keys.map((k) => caches.delete(k)))
+      await self.clients.claim()
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      for (const client of windows) {
+        // força reload com HTML da rede
+        if (client.url && 'navigate' in client) {
+          try {
+            client.navigate(client.url)
+          } catch {
+            /* ignore */
+          }
+        }
+      }
+    })(),
+  )
+})
+
 precacheAndRoute(self.__WB_MANIFEST, {
   ignoreURLParametersMatching: [/^utm_/, /^fbclid$/],
 })
