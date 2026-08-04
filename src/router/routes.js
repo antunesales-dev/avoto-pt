@@ -40,6 +40,12 @@ const routes = [
         meta: { title: 'Despesa pública' },
       },
       {
+        path: 'despesa/:id',
+        name: 'despesa-detalhe',
+        component: () => import('@/pages/DespesaDetailPage.vue'),
+        meta: { title: 'Despesa' },
+      },
+      {
         path: 'investimentos',
         name: 'investimentos',
         component: () => import('@/pages/InvestimentosPage.vue'),

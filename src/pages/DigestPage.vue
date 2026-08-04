@@ -145,7 +145,16 @@
               <p v-if="it.descricao" class="digest-item__body">
                 {{ truncate(it.descricao, 240) }}
               </p>
-              <router-link to="/despesa" class="btn btn--ghost btn--sm">Ver despesa</router-link>
+              <router-link
+                v-if="it.despesa_id"
+                :to="`/despesa/${it.despesa_id}`"
+                class="btn btn--ghost btn--sm"
+              >
+                Ver detalhe
+              </router-link>
+              <router-link v-else to="/despesa" class="btn btn--ghost btn--sm">
+                Ver despesa
+              </router-link>
             </div>
             <p v-if="sectionItems(d, 'despesas').length > sectionLimit" class="muted sm">
               + {{ sectionItems(d, 'despesas').length - sectionLimit }} — ver

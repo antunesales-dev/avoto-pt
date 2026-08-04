@@ -53,8 +53,10 @@
       @update:page-size="setPageSize"
     />
 
+    <p class="list-hint">Clique numa linha para ver o detalhe, ligações oficiais e, se aplicável, voto.</p>
+
     <div class="av-table-wrap">
-      <table class="av-table">
+      <table class="av-table av-table--clickable">
         <thead>
           <tr>
             <th>Título</th>
@@ -66,9 +68,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="d in pageItems" :key="d.id">
+          <tr
+            v-for="d in pageItems"
+            :key="d.id"
+            class="row-link"
+            tabindex="0"
+            role="link"
+            :aria-label="`Ver detalhe: ${d.titulo}`"
+            @click="goDetail(d.id)"
+            @keydown.enter.prevent="goDetail(d.id)"
+            @keydown.space.prevent="goDetail(d.id)"
+          >
             <td class="wrap">
-              <strong>{{ d.titulo }}</strong>
+              <strong class="title-link">{{ d.titulo }}</strong>
               <div class="sub">{{ d.categoria }}</div>
             </td>
             <td class="wrap">{{ d.entidade }}</td>
@@ -113,6 +125,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
@@ -120,7 +133,13 @@ import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
+const router = useRouter()
 const tipo = ref('todos')
+
+function goDetail(id) {
+  if (!id) return
+  router.push({ name: 'despesa-detalhe', params: { id } })
+}
 
 const tipos = [
   { id: 'todos', label: 'Todos' },
@@ -207,6 +226,26 @@ onMounted(() => finance.loadDespesas().catch(console.error))
   color: var(--pt-muted);
   a {
     font-weight: 700;
+  }
+}
+.list-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pt-muted);
+}
+.row-link {
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--pt-paper-2);
+    outline: none;
+  }
+
+  .title-link {
+    color: var(--pt-green-dark);
   }
 }
 </style>

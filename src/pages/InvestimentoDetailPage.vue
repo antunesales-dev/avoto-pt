@@ -23,6 +23,10 @@
         <p v-if="item.decisao_detalhe" class="detalhe">
           <strong>Nota oficial / dados:</strong> {{ item.decisao_detalhe }}
         </p>
+        <p v-if="item.despesa_id" class="hint" style="margin-top: 0.75rem">
+          Ficha de consulta (sem voto):
+          <router-link :to="`/despesa/${item.despesa_id}`">ver despesa relacionada</router-link>
+        </p>
       </div>
     </div>
 

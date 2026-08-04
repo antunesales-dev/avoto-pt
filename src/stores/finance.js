@@ -67,6 +67,28 @@ export const useFinanceStore = defineStore('finance', () => {
     return investimentos.value.find((i) => i.id === id) || null
   }
 
+  function getDespesa(id) {
+    return despesas.value.find((d) => d.id === id) || null
+  }
+
+  /** Garante detalhe mesmo se a lista em memória ainda não tiver o registo. */
+  async function ensureDespesa(id) {
+    if (!id) return null
+    const existing = getDespesa(id)
+    if (existing) return existing
+    const { data, error: err } = await supabase
+      .from('despesas_publicas')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle()
+    if (err) throw err
+    if (!data) return null
+    if (!getDespesa(id)) {
+      despesas.value = [data, ...despesas.value]
+    }
+    return data
+  }
+
   function getDigest(id) {
     return digests.value.find((d) => d.id === id) || null
   }
@@ -102,6 +124,8 @@ export const useFinanceStore = defineStore('finance', () => {
     loadDespesas,
     loadInvestimentos,
     getInvestimento,
+    getDespesa,
+    ensureDespesa,
     getDigest,
     refreshInvestimentoVotes,
   }
