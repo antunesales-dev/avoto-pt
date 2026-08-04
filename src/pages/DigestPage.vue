@@ -323,7 +323,12 @@ function partyEntries(it) {
       voto,
     })
   }
-  return rows
+  // Extra / desconhecidos: alfabético por sigla no fim da lista canónica
+  return rows.sort((a, b) =>
+    (a.partido?.sigla || a.id).localeCompare(b.partido?.sigla || b.id, 'pt', {
+      sensitivity: 'base',
+    }),
+  )
 }
 
 onMounted(() => {

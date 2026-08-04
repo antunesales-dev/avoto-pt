@@ -3,7 +3,8 @@
     <h1 class="page-title">Comparação global</h1>
     <p class="page-subtitle">
       Alinhamento entre o voto agregado dos cidadãos e o voto de cada partido nas iniciativas com
-      resultado oficial. Não é ranking político.
+      resultado oficial. Barras por % de alinhamento (métrica); matriz de colunas em ordem
+      alfabética por sigla — não é ranking político nem ordem de bancada.
     </p>
 
     <section class="av-card" style="margin-bottom: 1.25rem">
@@ -133,9 +134,16 @@ const mediaPartidos = computed(() =>
         vals.length === 0
           ? 0
           : Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10
-      return { ...p, media }
+      return { ...p, media, n: vals.length }
     })
-    .sort((a, b) => b.media - a.media),
+    // Métrica (alinhamento médio) → se empate ou sem dados, alfabético (sem enviesar)
+    .sort((a, b) => {
+      if (a.n === 0 && b.n === 0) return a.sigla.localeCompare(b.sigla, 'pt', { sensitivity: 'base' })
+      if (a.n === 0) return 1
+      if (b.n === 0) return -1
+      if (b.media !== a.media) return b.media - a.media
+      return a.sigla.localeCompare(b.sigla, 'pt', { sensitivity: 'base' })
+    }),
 )
 
 function shortVoto(v) {

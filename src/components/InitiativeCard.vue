@@ -56,7 +56,7 @@ const estadoClass = computed(() => {
   return map[props.item.estado] || 'badge--muted'
 })
 
-/** Mini lista de partidos com voto AR */
+/** Mini lista de partidos com voto AR — ordem alfabética por sigla (sem enviesar) */
 const partyRows = computed(() => {
   const map = props.item.resultadoPartidos || {}
   return partidos

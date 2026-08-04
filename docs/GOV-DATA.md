@@ -37,6 +37,12 @@ Detalhe: [`docs/AR-IMPORT.md`](./AR-IMPORT.md).
 - Não pretende ser amostra representativa da população.
 - Não recomenda partidos nem “vencedores”.
 - Despesa e investimentos: **transparência e comparação**, não “controlo do governo”.
+- **Voto de partidos:** sentido por grupo parlamentar (favor / contra / abstenção), sem peso por nº de deputados. Listas em **ordem alfabética de sigla**; só barras de alinhamento % ordenam por métrica (empate → alfabético).
+- **Mudança de governo / legislatura:** cada iniciativa guarda o resultado da votação histórica da AR; o sync actualiza dados oficiais novos. Partidos novos = mapear sigla no import + metadados de UI (cor/sigla).
+
+## Partidos na UI
+
+Ficheiro `src/data/partidos.js` — só cores/siglas de apresentação. Fonte de verdade dos votos = Dados Abertos da AR (`resultado_partidos` por iniciativa).
 
 ## Digest (agora vs depois)
 

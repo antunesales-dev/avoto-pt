@@ -1,15 +1,34 @@
-/** Metadados de exibição (siglas/cores) — não são “fonte de dados” de votos da AR */
-export const partidos = [
-  { id: 'ps', sigla: 'PS', nome: 'Partido Socialista', cor: '#ff66a1' },
-  { id: 'psd', sigla: 'PSD', nome: 'Partido Social Democrata', cor: '#ff6600' },
+/**
+ * Metadados de exibição (siglas/cores) — não são fonte de votos da AR.
+ * Ordem canónica: alfabética por sigla (pt), para não enviesar por “tamanho”
+ * de bancada ou posição no hemiciclo. Listas por métrica (ex. alinhamento %)
+ * ordenam-se à parte; empates voltam a esta ordem.
+ */
+const PARTIDOS_RAW = [
+  { id: 'be', sigla: 'BE', nome: 'Bloco de Esquerda', cor: '#8b0000' },
+  { id: 'cds', sigla: 'CDS-PP', nome: 'CDS – Partido Popular', cor: '#0093d4' },
   { id: 'chega', sigla: 'CHEGA', nome: 'CHEGA', cor: '#202056' },
   { id: 'il', sigla: 'IL', nome: 'Iniciativa Liberal', cor: '#00aeee' },
-  { id: 'be', sigla: 'BE', nome: 'Bloco de Esquerda', cor: '#8b0000' },
-  { id: 'pcp', sigla: 'PCP', nome: 'Partido Comunista Português', cor: '#ff0000' },
   { id: 'livre', sigla: 'LIVRE', nome: 'LIVRE', cor: '#00c800' },
   { id: 'pan', sigla: 'PAN', nome: 'Pessoas–Animais–Natureza', cor: '#036a38' },
-  { id: 'cds', sigla: 'CDS-PP', nome: 'CDS – Partido Popular', cor: '#0093d4' },
+  { id: 'pcp', sigla: 'PCP', nome: 'Partido Comunista Português', cor: '#ff0000' },
+  { id: 'ps', sigla: 'PS', nome: 'Partido Socialista', cor: '#ff66a1' },
+  { id: 'psd', sigla: 'PSD', nome: 'Partido Social Democrata', cor: '#ff6600' },
 ]
+
+/** Compara partidos por sigla (pt-PT), estável e neutro. */
+export function comparePartidosAlfa(a, b) {
+  const sa = (a?.sigla || a?.id || '').toString()
+  const sb = (b?.sigla || b?.id || '').toString()
+  return sa.localeCompare(sb, 'pt', { sensitivity: 'base' })
+}
+
+export function sortPartidosAlfa(list) {
+  return [...(list || [])].sort(comparePartidosAlfa)
+}
+
+/** Lista canónica — sempre alfabética por sigla. */
+export const partidos = sortPartidosAlfa(PARTIDOS_RAW)
 
 export const temas = [
   'Todos',

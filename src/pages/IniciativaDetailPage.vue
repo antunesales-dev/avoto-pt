@@ -95,6 +95,11 @@
         <div class="av-card">
           <div class="av-card-pad">
             <h2 class="section-title">Voto dos partidos na AR</h2>
+            <p class="hint" style="margin-bottom: 0.75rem">
+              Sentido de voto do grupo parlamentar (a favor / contra / abstenção), por ordem
+              alfabética de sigla. Não há “peso” por número de deputados — cada partido conta
+              como um sentido, como no registo oficial por grupo.
+            </p>
             <p v-if="!hasPartidos" class="hint">
               O registo oficial desta iniciativa ainda não tem detalhe de voto por grupo
               parlamentar (ou a votação não ocorreu). Sem inventar dados.
@@ -234,6 +239,7 @@ const hasPartidos = computed(() => {
 const partidosComVoto = computed(() => {
   if (!item.value) return []
   const m = item.value.resultadoPartidos || {}
+  // partidos[] já é alfabético por sigla — só filtramos quem votou
   return partidos.filter((p) => m[p.id] && m[p.id] !== 'nao_participou')
 })
 
@@ -247,7 +253,18 @@ const alinhamentos = computed(() => {
       voto: item.value.resultadoPartidos[p.id],
       alinhamento: alinhamentoCidadaosPartido(item.value, p.id),
     }))
-    .sort((a, b) => (b.alinhamento ?? -1) - (a.alinhamento ?? -1))
+    // Com cidadãos a votar: ordenar por % alinhamento; senão / empate → alfabético
+    .sort((a, b) => {
+      const aa = a.alinhamento
+      const bb = b.alinhamento
+      if (aa == null && bb == null) {
+        return a.sigla.localeCompare(b.sigla, 'pt', { sensitivity: 'base' })
+      }
+      if (aa == null) return 1
+      if (bb == null) return -1
+      if (bb !== aa) return bb - aa
+      return a.sigla.localeCompare(b.sigla, 'pt', { sensitivity: 'base' })
+    })
 })
 
 function pedirConfirmacao(voto) {
