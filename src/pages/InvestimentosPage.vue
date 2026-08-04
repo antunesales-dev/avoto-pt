@@ -10,10 +10,14 @@
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Lista completa de contratos (incluindo valores menores):
-      <router-link to="/despesa">Despesa pública</router-link>.
-      Boletim diário (sem repetir tudo):
+      <strong>Mesma fonte que Despesa</strong> (Portal Base), filtrada a
+      ≥&nbsp;100&nbsp;000&nbsp;€ para voto cidadão. Data = publicação oficial.
+      Catálogo completo:
+      <router-link to="/despesa">Despesa</router-link>.
+      Boletim (só o dia oficial):
       <router-link to="/digest">Resumo do dia</router-link>.
+      Importações:
+      <router-link to="/dados">Fontes de dados</router-link>.
     </div>
 
     <DateRangeFilter
@@ -86,8 +90,17 @@
         </div>
       </router-link>
     </div>
-    <div v-else class="av-card av-card-pad">
-      <p style="margin: 0; color: var(--pt-muted)">Ainda não há investimentos na base.</p>
+    <div v-else class="av-card av-card-pad empty-box">
+      <p v-if="!finance.investimentos.length" style="margin: 0 0 0.65rem">
+        Ainda <strong>não há investimentos</strong> (≥&nbsp;100&nbsp;000&nbsp;€) importados.
+        Quando o <code>despesa-sync</code> trouxer contratos Base acima do limiar, aparecem
+        aqui com a mesma origem que em Despesa.
+      </p>
+      <p v-else style="margin: 0 0 0.65rem">
+        Nenhum item neste período (há
+        {{ finance.investimentos.length }} na base). Alargue o filtro de datas.
+      </p>
+      <router-link to="/dados" class="btn btn--ghost btn--sm">Ver estado das importações</router-link>
     </div>
 
     <ListPager

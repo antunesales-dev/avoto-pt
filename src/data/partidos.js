@@ -106,6 +106,19 @@ export function formatDate(iso) {
   return `${d}/${m}/${y}`
 }
 
+/** Data e hora local pt-PT a partir de ISO/timestamptz. */
+export function formatDateTime(iso) {
+  if (!iso) return '—'
+  try {
+    return new Intl.DateTimeFormat('pt-PT', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(new Date(iso))
+  } catch {
+    return formatDate(iso)
+  }
+}
+
 export function formatNumber(n) {
   return new Intl.NumberFormat('pt-PT').format(n ?? 0)
 }

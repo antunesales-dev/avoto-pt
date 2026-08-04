@@ -8,11 +8,14 @@
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Os contratos de valor elevado (≥&nbsp;100&nbsp;000&nbsp;€) aparecem também em
-      <router-link to="/investimentos">Investimentos</router-link>, onde os cidadãos registados
-      podem dar um sentido de voto. O
+      <strong>Data na tabela = data de publicação oficial</strong> no Portal Base (não a data em
+      que a A Voto sincronizou). Contratos ≥&nbsp;100&nbsp;000&nbsp;€ estão também em
+      <router-link to="/investimentos">Investimentos</router-link>
+      (voto cidadão). O
       <router-link to="/digest">Resumo do dia</router-link>
-      só junta destaques do dia — não é uma terceira lista completa.
+      só lista contratos com publicação
+      <em>nesse</em> dia. Estado das importações:
+      <router-link to="/dados">Fontes de dados</router-link>.
     </div>
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
@@ -61,9 +64,27 @@
       @update:page-size="setPageSize"
     />
 
-    <p class="list-hint">Clique numa linha para ver o detalhe, ligações oficiais e, se aplicável, voto.</p>
+    <p class="list-hint">
+      Clique numa linha para detalhe, ligações oficiais e montante. Coluna Data =
+      publicação no Base.
+    </p>
 
-    <div class="av-table-wrap">
+    <p v-if="finance.loading" class="muted">A carregar contratos…</p>
+    <div v-else-if="!finance.despesas.length" class="av-card av-card-pad empty-box">
+      <p>
+        Ainda <strong>não há despesas importadas</strong> nesta base. Quando o job
+        <code>despesa-sync</code> correr com sucesso, aparecem aqui com fonte e data de
+        publicação oficiais.
+      </p>
+      <router-link to="/dados" class="btn btn--ghost btn--sm">Ver estado das importações</router-link>
+    </div>
+    <div v-else-if="!filtradas.length" class="av-card av-card-pad empty-box">
+      <p>
+        Nenhum registo com o filtro actual (tipo / período). Os contratos existem na base
+        ({{ formatNumber(finance.despesas.length) }}) — alargue o período ou escolha “Todos”.
+      </p>
+    </div>
+    <div v-else class="av-table-wrap">
       <table class="av-table av-table--clickable">
         <thead>
           <tr>
@@ -71,7 +92,7 @@
             <th>Entidade</th>
             <th>Tipo</th>
             <th>Montante</th>
-            <th>Data</th>
+            <th>Publicação</th>
             <th>Fonte</th>
           </tr>
         </thead>
@@ -252,6 +273,21 @@ onMounted(() => finance.loadDespesas().catch(console.error))
   color: var(--pt-muted);
   a {
     font-weight: 700;
+  }
+}
+.muted {
+  color: var(--pt-muted);
+  font-weight: 600;
+}
+.empty-box {
+  p {
+    margin: 0 0 0.65rem;
+    line-height: 1.45;
+    color: var(--pt-ink);
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
   }
 }
 .list-hint {

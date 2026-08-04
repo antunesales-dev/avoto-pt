@@ -22,7 +22,9 @@
       <p class="section-hint">
         Conteúdo de fontes oficiais. Investimentos = contratos grandes (≥100&nbsp;000&nbsp;€)
         onde se pode votar; Despesa = catálogo completo (só consulta); Resumos = boletim
-        diário. Não é contagem de utilizadores.
+        por <strong>data oficial</strong> (não por data de sync). Origem e últimas
+        importações:
+        <router-link to="/dados">Fontes de dados</router-link>.
       </p>
       <div class="stats-grid">
         <StatCard
