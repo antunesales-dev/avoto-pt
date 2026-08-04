@@ -36,10 +36,12 @@
     </div>
 
     <h2 class="section-title">Participação cidadã</h2>
-    <p v-if="!m.votos_emitidos" class="page-subtitle" style="margin-bottom: 1rem">
-      Ainda não há votos de cidadãos. Contas de teste não contam como “comunidade” na página
-      inicial — aqui podes ver os agregados reais (hoje: {{ formatNumber(m.cidadaos_registados) }}
-      conta(s), {{ formatNumber(m.votos_emitidos) }} voto(s)).
+    <p v-if="!m.votos_emitidos && !m.cidadaos_registados" class="page-subtitle" style="margin-bottom: 1rem">
+      Ainda não há participação cidadã: zero contas e zero votos. Os números oficiais acima vêm
+      dos portais do Estado / AR — não inventamos utilizadores.
+    </p>
+    <p v-else-if="!m.votos_emitidos" class="page-subtitle" style="margin-bottom: 1rem">
+      Há {{ formatNumber(m.cidadaos_registados) }} conta(s), mas ainda zero votos de cidadãos.
     </p>
     <div class="stats-grid" style="margin-bottom: 1.25rem">
       <StatCard
@@ -121,8 +123,9 @@
           />
         </template>
         <p class="foot-note">
-          * Taxa = votos nesta iniciativa / contas registadas ({{ formatNumber(m.cidadaos_registados) }}).
-          Só listamos iniciativas com pelo menos 1 voto.
+          * Taxa = votos nesta iniciativa / contas registadas
+          ({{ formatNumber(m.cidadaos_registados) }}). Só listamos iniciativas com pelo menos 1
+          voto.
         </p>
         <button type="button" class="btn btn--outline btn--sm" style="margin-top: 1rem" @click="exportJson">
           Exportar JSON (agregados)

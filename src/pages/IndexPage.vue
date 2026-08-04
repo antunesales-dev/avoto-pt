@@ -64,9 +64,9 @@
         </template>
         <template v-else>
           <p class="part-box__empty">
-            Ainda <strong>não há votos de cidadãos</strong> na plataforma. Os números de
-            iniciativas e despesa vêm dos portais oficiais; a comparação com a vontade dos
-            registados começa quando alguém entra e vota.
+            Ainda <strong>não há votos nem contas de cidadãos</strong> com participação. Os
+            números de iniciativas e despesa vêm dos portais oficiais; a comparação com a
+            vontade dos registados começa quando alguém entra e vota.
           </p>
           <router-link
             v-if="!auth.isLoggedIn"
