@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    // 1) Rate limit + política de criação
+    // 1) Gate: só LÊ limites + se pode criar conta (não incrementa)
     const { data: gate, error: gateErr } = await admin.rpc('assert_auth_otp_allowed', {
       p_device_id: deviceId,
       p_ip: ip,
@@ -133,12 +133,11 @@ Deno.serve(async (req) => {
           {
             error: 'RATE_LIMITED',
             message:
-              'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.',
+              'Demasiados pedidos de código. Espere 15–60 minutos e tente de novo (ou use palavra-passe se já tiver).',
           },
           429,
         )
       }
-      // RPC em falta / permissões → mensagem clara, não 502
       if (/permission denied|does not exist|schema cache/i.test(msg)) {
         return jsonResponse(
           {
@@ -174,7 +173,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    // 2) Enviar OTP
+    // 2) Enviar OTP (só depois do gate)
     const { error: otpErr } = await admin.auth.signInWithOtp({
       email,
       options: {
@@ -186,6 +185,7 @@ Deno.serve(async (req) => {
     if (otpErr) {
       const msg = otpErr.message || String(otpErr)
       console.error('signInWithOtp', msg)
+      // Email já existe mas shouldCreateUser false / signups off
       if (!allowCreate || /signups not allowed|user not found|unable to validate/i.test(msg)) {
         return jsonResponse(
           {
@@ -197,16 +197,29 @@ Deno.serve(async (req) => {
           403,
         )
       }
-      if (/rate|too many|429/i.test(msg)) {
+      // Rate limit do próprio Supabase Auth (envio de email), não o nosso bucket
+      if (/rate|too many|429|email rate|over_email/i.test(msg)) {
         return jsonResponse(
           {
-            error: 'RATE_LIMITED',
-            message: 'Demasiados emails. Espere e tente de novo.',
+            error: 'EMAIL_RATE_LIMITED',
+            message:
+              'O fornecedor de email limitou envios por agora. Espere alguns minutos (às vezes 1h no plano free) e tente de novo. Se já tiver palavra-passe, use “Entrar com palavra-passe”.',
           },
           429,
         )
       }
       return jsonResponse({ error: 'OTP_FAILED', message: msg }, 400)
+    }
+
+    // 3) Só conta no rate limit se o email foi aceite para envio
+    try {
+      await admin.rpc('record_auth_otp_sent', {
+        p_device_id: deviceId,
+        p_ip: ip,
+        p_email: email,
+      })
+    } catch (e) {
+      console.error('record_auth_otp_sent', e)
     }
 
     return jsonResponse({
