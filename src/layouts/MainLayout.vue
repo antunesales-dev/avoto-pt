@@ -1,4 +1,5 @@
 <template>
+  <div class="av-root">
   <q-layout view="hHh Lpr lFf" class="av-layout">
     <q-header class="av-header">
       <div class="flag-stripe" aria-hidden="true">
@@ -111,33 +112,34 @@
     <div v-if="maisOpen" class="mais-backdrop" @click="maisOpen = false" />
 
     <q-page-container>
-      <q-page class="av-page">
-        <div class="av-page__body">
-          <div v-if="!auth.ready || data.loading" class="boot-state">A carregar…</div>
-          <div v-else-if="data.error" class="boot-state boot-state--err">
-            <p>Não foi possível carregar os dados.</p>
-            <p class="boot-state__detail">{{ data.error }}</p>
-            <button type="button" class="btn btn--primary btn--sm" @click="retry">Tentar de novo</button>
-          </div>
-          <router-view v-else />
+      <!-- minHeight auto: o Quasar por defeito força ~100vh e “cola” coisas ao ecrã -->
+      <q-page class="av-page" :style-fn="pageStyleFn">
+        <div v-if="!auth.ready || data.loading" class="boot-state">A carregar…</div>
+        <div v-else-if="data.error" class="boot-state boot-state--err">
+          <p>Não foi possível carregar os dados.</p>
+          <p class="boot-state__detail">{{ data.error }}</p>
+          <button type="button" class="btn btn--primary btn--sm" @click="retry">Tentar de novo</button>
         </div>
-
-        <footer class="av-footer">
-          <div class="av-footer__inner">
-            <p class="av-footer__brand">
-              <strong>A Voto</strong> — Bancada Cidadã · independente · open source · RGPD
-            </p>
-            <nav class="av-footer__legal" aria-label="Informação legal">
-              <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
-            </nav>
-            <p class="av-footer__note">
-              Não é sítio oficial do Estado. Votos na plataforma não são vinculativos.
-            </p>
-          </div>
-        </footer>
+        <router-view v-else />
       </q-page>
     </q-page-container>
   </q-layout>
+
+  <!-- Fora do q-layout: último bloco do documento, só no fim do scroll -->
+  <footer class="av-footer">
+    <div class="av-footer__inner">
+      <p class="av-footer__brand">
+        <strong>A Voto</strong> — Bancada Cidadã · independente · open source · RGPD
+      </p>
+      <nav class="av-footer__legal" aria-label="Informação legal">
+        <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
+      </nav>
+      <p class="av-footer__note">
+        Não é sítio oficial do Estado. Votos na plataforma não são vinculativos.
+      </p>
+    </div>
+  </footer>
+  </div>
 </template>
 
 <script setup>
@@ -184,14 +186,26 @@ async function retry() {
   await data.loadAll()
 }
 
+/** Altura natural do conteúdo — evita o min-height 100vh do Quasar que cola o footer ao viewport. */
+function pageStyleFn() {
+  return { minHeight: 'auto' }
+}
+
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <style scoped lang="scss">
-.av-layout {
-  min-height: 100vh;
+.av-root {
+  display: block;
+  min-height: 100%;
   background: var(--pt-paper-2);
+}
+
+.av-layout {
+  min-height: 0 !important;
+  height: auto !important;
+  background: transparent;
 }
 
 .av-header {
@@ -402,22 +416,21 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 }
 
 .av-page {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 62px);
+  /* Altura = conteúdo; o footer é o último bloco do scroll, nunca sticky/fixed */
+  display: block;
+  min-height: 0 !important;
+  height: auto !important;
 }
 
-.av-page__body {
-  flex: 1 0 auto;
-  width: 100%;
-}
-
-/* Rodapé no fluxo do documento — no fim do conteúdo, nunca fixed/sticky */
+/* Rodapé no fluxo normal — só aparece depois de fazer scroll até ao fim da página */
 .av-footer {
-  flex: 0 0 auto;
-  margin-top: auto;
+  display: block;
   width: 100%;
-  position: static;
+  margin-top: 2.5rem;
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  transform: none !important;
   background: var(--pt-navy);
   color: rgba(255, 255, 255, 0.88);
   border-top: 3px solid var(--pt-red);
