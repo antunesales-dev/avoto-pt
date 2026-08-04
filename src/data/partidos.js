@@ -87,11 +87,15 @@ export function getPartido(id) {
   return partidos.find((p) => p.id === id)
 }
 
+/**
+ * % de cidadãos cujo voto coincide com o sentido de voto do partido nesta iniciativa.
+ * null = sem base (partido não votou, ou zero votos de cidadãos) — nunca inventar 0%.
+ */
 export function alinhamentoCidadaosPartido(iniciativa, partidoId) {
   const votoP = iniciativa.resultadoPartidos?.[partidoId]
   if (!votoP || votoP === 'nao_participou') return null
   const t = totalVotos(iniciativa.votosCidadaos)
-  if (!t) return 0
+  if (!t) return null
   const key = votoP === 'favor' ? 'favor' : votoP === 'contra' ? 'contra' : 'abstencao'
   return Math.round((iniciativa.votosCidadaos[key] / t) * 1000) / 10
 }

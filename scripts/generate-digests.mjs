@@ -20,21 +20,15 @@ async function datesFrom(table, col) {
 }
 
 async function main() {
+  // Só datas oficiais do registo — nunca last_synced_at (isso enchia o “dia” com o catálogo).
   const sets = await Promise.all([
     datesFrom('iniciativas', 'data_votacao'),
     datesFrom('despesas_publicas', 'data_publicacao'),
     datesFrom('investimentos', 'data_referencia'),
   ])
-  // também dias com last_synced (despesa/inv de hoje)
-  const { data: desSync } = await admin
-    .from('despesas_publicas')
-    .select('last_synced_at')
-    .not('last_synced_at', 'is', null)
-    .limit(500)
-  const syncDays = (desSync || []).map((r) => String(r.last_synced_at).slice(0, 10))
 
-  const all = [...new Set([...sets.flat(), ...syncDays])].sort().reverse()
-  console.log('Datas a gerar:', all.length)
+  const all = [...new Set(sets.flat())].sort().reverse()
+  console.log('Datas a gerar (só oficiais):', all.length)
 
   let ok = 0
   let fail = 0

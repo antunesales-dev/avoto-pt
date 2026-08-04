@@ -1,14 +1,7 @@
 <template>
   <div class="page-shell">
-    <div class="row-between" style="margin-bottom: 0.5rem">
-      <div>
-        <h1 class="page-title">Perfil</h1>
-        <p class="page-subtitle" style="margin-bottom: 0">Área pessoal — só visível para si.</p>
-      </div>
-      <button type="button" class="btn btn--outline btn--sm" @click="onSair">
-        Sair da sessão
-      </button>
-    </div>
+    <h1 class="page-title">Perfil</h1>
+    <p class="page-subtitle">Área pessoal — só visível para si.</p>
 
     <div class="profile-grid">
       <section class="av-card">
@@ -136,17 +129,22 @@
         <div class="av-card-pad">
           <h2 class="section-title">Sessão e conta</h2>
           <p class="muted" style="margin-bottom: 0.85rem">
-            Pode terminar a sessão neste dispositivo ou apagar a conta (RGPD — direito ao
-            apagamento). Apagar remove o login, o perfil e os votos associados.
+            Um sítio só: terminar a sessão neste dispositivo, ou apagar a conta (RGPD — direito
+            ao apagamento). Apagar remove o login, o perfil e os votos associados.
           </p>
           <div class="account-actions">
-            <button type="button" class="btn btn--outline" :disabled="busy" @click="onSair">
+            <button
+              type="button"
+              class="btn btn--outline"
+              :disabled="isBusy"
+              @click="onSair"
+            >
               {{ busy === 'sair' ? 'A sair…' : 'Sair da sessão' }}
             </button>
             <button
               type="button"
               class="btn btn--danger"
-              :disabled="busy"
+              :disabled="isBusy"
               @click="onApagarConta"
             >
               {{ busy === 'apagar' ? 'A apagar…' : 'Apagar a minha conta' }}
@@ -183,7 +181,10 @@ const $q = useQuasar()
 const historico = ref([])
 const partido = ref(auth.profile?.partido_preferencia || '')
 const savingNotif = ref(false)
-const busy = ref('') // '' | 'sair' | 'apagar'
+/** null | 'sair' | 'apagar' — nunca usar '' em :disabled (Vue trata string vazia como true) */
+const busy = ref(null)
+/** Boolean explícito: :disabled exige true/false, não strings. */
+const isBusy = computed(() => busy.value != null)
 const permission = ref(notificationPermission())
 const prefs = reactive({
   notify_digest: true,
@@ -231,7 +232,7 @@ function votoClass(v) {
 }
 
 async function onSair() {
-  if (busy.value) return
+  if (busy.value != null) return
   busy.value = 'sair'
   try {
     await auth.sair()
@@ -246,12 +247,12 @@ async function onSair() {
     })
     await router.replace('/')
   } finally {
-    busy.value = ''
+    busy.value = null
   }
 }
 
 function onApagarConta() {
-  if (busy.value) return
+  if (busy.value != null) return
   $q.dialog({
     title: 'Apagar a conta?',
     message:
@@ -281,7 +282,7 @@ async function confirmarApagar() {
       timeout: 6000,
     })
   } finally {
-    busy.value = ''
+    busy.value = null
   }
 }
 
@@ -454,6 +455,25 @@ onMounted(async () => {
   flex-wrap: wrap;
   gap: 0.65rem;
 }
+.account-actions {
+  .btn {
+    min-height: 2.5rem;
+  }
+  .btn--outline:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+    border-color: var(--pt-navy);
+    color: var(--pt-navy);
+    background: #fff;
+  }
+  .btn--danger:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+    background: var(--pt-red);
+    border-color: var(--pt-red);
+    color: #fff;
+  }
+}
 .btn--danger {
   appearance: none;
   border: 1.5px solid var(--pt-red);
@@ -475,5 +495,9 @@ onMounted(async () => {
     opacity: 0.55;
     cursor: not-allowed;
   }
+}
+.account-actions .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 </style>

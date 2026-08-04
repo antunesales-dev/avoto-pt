@@ -69,6 +69,23 @@ cores/siglas em `partidos.js` são só apresentação.
 
 | Agora | Depois (opcional) |
 |-------|-------------------|
-| Multi-secção: iniciativas + despesas + investimentos | AI só para **rephrasing** informal por item |
+| Multi-secção: iniciativas + despesas (+ investimentos no JSON, não no título) | AI só para **rephrasing** informal por item |
 | Título/summary = **templates** pt-PT | Factos mandam; AI não inventa |
-| UI `/digest` por secção | Mesma estrutura de `items.sections` |
+| UI `/digest` por secção (despesa uma vez; inv ≥100k na página própria) | Mesma estrutura de `items.sections` |
+
+### Critério de data (obrigatório)
+
+O resumo do dia **não** usa `last_synced_at` (data do cron). Só datas oficiais:
+
+| Secção | Campo |
+|--------|--------|
+| Parlamento | `iniciativas.data_votacao` |
+| Despesa | `despesas_publicas.data_publicacao` |
+| Investimentos (JSON) | `investimentos.data_referencia` |
+
+Assim, sincronizar 400 contratos antigos num dia **não** enche o boletim desse dia.
+
+### Identidade de contratos
+
+IDs Base = `base-` + SHA-256 estável dos campos oficiais (NIF, datas, preço, objecto).
+Upsert por `id` / `source_id` evita re-registar o mesmo contrato em cada sync.

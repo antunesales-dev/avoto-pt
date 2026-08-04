@@ -2,19 +2,20 @@
   <div class="page-shell">
     <h1 class="page-title">Resumo do dia</h1>
     <p class="page-subtitle">
-      <strong>Boletim diário</strong> do que a plataforma reuniu nesse dia: leis e votações no
-      Parlamento e despesa pública relevante. Não substitui as listas completas de
+      <strong>Boletim diário</strong> com o que tem
+      <strong>data oficial nesse dia</strong>: votações na AR (<em>data de votação</em>) e
+      contratos públicos (<em>data de publicação</em> no Portal Base). Não é “tudo o que o
+      sistema sincronizou hoje”. Não substitui as listas completas de
       <router-link to="/iniciativas">Iniciativas</router-link>,
       <router-link to="/despesa">Despesa</router-link>
       ou
-      <router-link to="/investimentos">Investimentos</router-link>
-      — é um atalho para o que aconteceu naquele dia.
+      <router-link to="/investimentos">Investimentos</router-link>.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
       Factos oficiais e contagens da A Voto — não é notícias nem opinião. Sem inteligência
-      artificial a inventar texto. Em cada lei: o que os partidos votaram e, se existir, o que
-      os cidadãos votaram aqui.
+      artificial a inventar texto. Contratos ≥ 100&nbsp;000&nbsp;€ do mesmo dia também estão em
+      Investimentos para voto; o boletim lista-os uma vez, em Despesa.
     </div>
 
     <DateRangeFilter
@@ -130,9 +131,10 @@
           <section v-if="sectionItems(d, 'despesas').length" class="digest-section">
             <h3 class="digest-section__title">Despesa pública desse dia</h3>
             <p class="muted sm" style="margin: -0.25rem 0 0.75rem">
-              Contratos com data nesse dia. Os de valor elevado também estão em
+              Só contratos com <strong>data de publicação = este dia</strong> (Portal Base).
+              Os de valor elevado (≥ 100&nbsp;000&nbsp;€) também estão em
               <router-link to="/investimentos">Investimentos</router-link>
-              para voto cidadão — a lista completa fica em
+              para voto — não os listamos duas vezes aqui. Catálogo completo:
               <router-link to="/despesa">Despesa</router-link>.
             </p>
             <div
