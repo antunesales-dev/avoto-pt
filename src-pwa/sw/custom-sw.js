@@ -1,10 +1,12 @@
 /*
- * Service worker (InjectManifest): precache + push/notificationclick.
- * Push Web com app fechada exige VAPID + edge a enviar (ver docs/AUTH-PWA.md).
+ * Service worker (InjectManifest): precache + push + HTML network-first.
+ * Evita servir index.html antigo com hashes de chunks já inexistentes.
  */
 
 import { clientsClaim } from 'workbox-core'
+import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { NetworkFirst } from 'workbox-strategies'
 import {
   cleanupOutdatedCaches,
   createHandlerBoundToURL,
@@ -14,10 +16,29 @@ import {
 self.skipWaiting()
 clientsClaim()
 
-precacheAndRoute(self.__WB_MANIFEST)
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
+precacheAndRoute(self.__WB_MANIFEST, {
+  ignoreURLParametersMatching: [/^utm_/, /^fbclid$/],
+})
 cleanupOutdatedCaches()
 
 if (import.meta.env.QUASAR_PROD) {
+  // HTML / navegação: rede primeiro para apanhar deploys novos
+  registerRoute(
+    ({ request }) => request.mode === 'navigate',
+    new NetworkFirst({
+      cacheName: 'avoto-pages',
+      networkTimeoutSeconds: 4,
+      plugins: [new CacheableResponsePlugin({ statuses: [0, 200] })],
+    }),
+  )
+
+  // SPA fallback offline (sem /assets/)
   registerRoute(
     new NavigationRoute(
       createHandlerBoundToURL(import.meta.env.QUASAR_PWA_FALLBACK_HTML),
@@ -25,13 +46,13 @@ if (import.meta.env.QUASAR_PROD) {
         denylist: [
           new RegExp(import.meta.env.QUASAR_PWA_SERVICE_WORKER_REGEX),
           /workbox-(.)*\.js$/,
+          /\/assets\//,
         ],
       },
     ),
   )
 }
 
-/** Abre / foca a app no path do payload (digest, iniciativa, …). */
 function openApp(urlPath) {
   const base = self.registration.scope.replace(/\/$/, '')
   const path = urlPath && urlPath.startsWith('/') ? urlPath : `/${urlPath || ''}`
@@ -57,7 +78,6 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(openApp(url))
 })
 
-/** Web Push (VAPID). Payload JSON: { title, body, url, tag } */
 self.addEventListener('push', (event) => {
   let data = {
     title: 'A Voto',

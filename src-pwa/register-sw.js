@@ -1,41 +1,48 @@
 import { register } from 'register-service-worker'
 
-// The ready(), registered(), cached(), updatefound() and updated()
-// events passes a ServiceWorkerRegistration instance in their arguments.
-// ServiceWorkerRegistration: https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration
+/**
+ * Em deploys frequentes (GH Pages / CF), um SW desactualizado serve HTML/JS
+ * com hashes antigos → 404 nos chunks. Ao detectar update, recarrega 1×.
+ */
+const RELOAD_KEY = 'avoto-sw-reloaded'
 
 register(import.meta.env.QUASAR_SERVICE_WORKER_FILE, {
-  // The registrationOptions object will be passed as the second argument
-  // to ServiceWorkerContainer.register()
-  // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register#Parameter
-
-  // registrationOptions: { scope: './' },
-
-  ready (/* registration */) {
-    // console.log('Service worker is active.')
+  ready () {
+    try {
+      sessionStorage.removeItem(RELOAD_KEY)
+    } catch {
+      /* ignore */
+    }
   },
 
-  registered (/* registration */) {
-    // console.log('Service worker has been registered.')
+  registered (registration) {
+    // verifica update periodicamente (tabs longas abertas)
+    if (registration && typeof registration.update === 'function') {
+      setInterval(() => {
+        registration.update().catch(() => {})
+      }, 60 * 60 * 1000)
+    }
   },
 
-  cached (/* registration */) {
-    // console.log('Content has been cached for offline use.')
+  cached () {},
+
+  updatefound () {},
+
+  updated (registration) {
+    // pede ao SW em waiting para activar (se não tiver skipWaiting)
+    if (registration?.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+    }
+    try {
+      if (sessionStorage.getItem(RELOAD_KEY) === '1') return
+      sessionStorage.setItem(RELOAD_KEY, '1')
+    } catch {
+      /* ignore */
+    }
+    window.location.reload()
   },
 
-  updatefound (/* registration */) {
-    // console.log('New content is downloading.')
-  },
+  offline () {},
 
-  updated (/* registration */) {
-    // console.log('New content is available; please refresh.')
-  },
-
-  offline () {
-    // console.log('No internet connection found. App is running in offline mode.')
-  },
-
-  error (/* err */) {
-    // console.error('Error during service worker registration:', err)
-  }
+  error (/* err */) {},
 })
