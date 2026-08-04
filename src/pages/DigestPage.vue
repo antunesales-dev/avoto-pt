@@ -16,8 +16,23 @@
       Ainda não há digests. O job diário preenche esta lista.
     </p>
 
+    <ListPager
+      v-if="!finance.loading && finance.digests.length"
+      :page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :range-from="rangeFrom"
+      :range-to="rangeTo"
+      :page-window="pageWindow"
+      :sizes="sizes"
+      unit="digests"
+      @go="goPage"
+      @update:page-size="setPageSize"
+    />
+
     <div class="digest-list">
-      <article v-for="d in finance.digests" :key="d.id" class="av-card digest">
+      <article v-for="d in pageItems" :key="d.id" class="av-card digest">
         <div class="flag-stripe" aria-hidden="true">
           <span class="flag-stripe__green" />
           <span class="flag-stripe__red" />
@@ -37,7 +52,7 @@
           <section v-if="sectionItems(d, 'iniciativas').length" class="digest-section">
             <h3 class="digest-section__title">Parlamento · iniciativas</h3>
             <div
-              v-for="(it, idx) in sectionItems(d, 'iniciativas')"
+              v-for="(it, idx) in sectionItems(d, 'iniciativas').slice(0, sectionLimit)"
               :key="it.iniciativa_id || idx"
               class="digest-item"
             >
@@ -86,13 +101,17 @@
                 Ver iniciativa
               </router-link>
             </div>
+            <p v-if="sectionItems(d, 'iniciativas').length > sectionLimit" class="muted sm">
+              + {{ sectionItems(d, 'iniciativas').length - sectionLimit }} no dia — ver
+              <router-link to="/iniciativas">Iniciativas</router-link>.
+            </p>
           </section>
 
           <!-- Despesa -->
           <section v-if="sectionItems(d, 'despesas').length" class="digest-section">
             <h3 class="digest-section__title">Despesa pública</h3>
             <div
-              v-for="(it, idx) in sectionItems(d, 'despesas')"
+              v-for="(it, idx) in sectionItems(d, 'despesas').slice(0, sectionLimit)"
               :key="it.despesa_id || idx"
               class="digest-item"
             >
@@ -115,13 +134,17 @@
               </p>
               <router-link to="/despesa" class="btn btn--ghost btn--sm">Ver despesa</router-link>
             </div>
+            <p v-if="sectionItems(d, 'despesas').length > sectionLimit" class="muted sm">
+              + {{ sectionItems(d, 'despesas').length - sectionLimit }} — ver
+              <router-link to="/despesa">Despesa</router-link>.
+            </p>
           </section>
 
           <!-- Investimentos -->
           <section v-if="sectionItems(d, 'investimentos').length" class="digest-section">
             <h3 class="digest-section__title">Investimentos</h3>
             <div
-              v-for="(it, idx) in sectionItems(d, 'investimentos')"
+              v-for="(it, idx) in sectionItems(d, 'investimentos').slice(0, sectionLimit)"
               :key="it.investimento_id || idx"
               class="digest-item"
             >
@@ -148,6 +171,10 @@
                 Ver investimento
               </router-link>
             </div>
+            <p v-if="sectionItems(d, 'investimentos').length > sectionLimit" class="muted sm">
+              + {{ sectionItems(d, 'investimentos').length - sectionLimit }} — ver
+              <router-link to="/investimentos">Investimentos</router-link>.
+            </p>
           </section>
 
           <p
@@ -176,17 +203,53 @@
         </div>
       </article>
     </div>
+
+    <ListPager
+      v-if="totalPages > 1"
+      :page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :range-from="rangeFrom"
+      :range-to="rangeTo"
+      :page-window="pageWindow"
+      :sizes="sizes"
+      :show-size="false"
+      unit="digests"
+      @go="goPage"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import ListPager from '@/components/ListPager.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import VoteBar from '@/components/VoteBar.vue'
+import { usePagination } from '@/composables/usePagination'
 import { estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
+const digestsList = computed(() => finance.digests)
+const sectionLimit = 6
+
+const {
+  page,
+  pageSize,
+  sizes,
+  total,
+  totalPages,
+  rangeFrom,
+  rangeTo,
+  pageItems,
+  pageWindow,
+  goPage,
+} = usePagination(digestsList, { defaultSize: 5, sizes: [5, 10, 20] })
+
+function setPageSize(n) {
+  pageSize.value = n
+}
 
 function estadoLabel(estado) {
   return estadosLabel[estado] || estado || '—'

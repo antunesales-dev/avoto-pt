@@ -8,9 +8,23 @@
       dados do Estado. Não é voto vinculativo.
     </p>
 
-    <div class="init-grid">
+    <ListPager
+      :page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :range-from="rangeFrom"
+      :range-to="rangeTo"
+      :page-window="pageWindow"
+      :sizes="sizes"
+      unit="investimentos"
+      @go="goPage"
+      @update:page-size="setPageSize"
+    />
+
+    <div v-if="pageItems.length" class="init-grid">
       <router-link
-        v-for="inv in finance.investimentos"
+        v-for="inv in pageItems"
         :key="inv.id"
         :to="`/investimentos/${inv.id}`"
         class="av-card link-card inv-card"
@@ -37,16 +51,54 @@
         </div>
       </router-link>
     </div>
+    <div v-else class="av-card av-card-pad">
+      <p style="margin: 0; color: var(--pt-muted)">Ainda não há investimentos na base.</p>
+    </div>
+
+    <ListPager
+      v-if="totalPages > 1"
+      :page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :range-from="rangeFrom"
+      :range-to="rangeTo"
+      :page-window="pageWindow"
+      :sizes="sizes"
+      :show-size="false"
+      unit="investimentos"
+      @go="goPage"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import ListPager from '@/components/ListPager.vue'
 import VoteBar from '@/components/VoteBar.vue'
+import { usePagination } from '@/composables/usePagination'
 import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
+const list = computed(() => finance.investimentos)
+
+const {
+  page,
+  pageSize,
+  sizes,
+  total,
+  totalPages,
+  rangeFrom,
+  rangeTo,
+  pageItems,
+  pageWindow,
+  goPage,
+} = usePagination(list, { defaultSize: 12 })
+
+function setPageSize(n) {
+  pageSize.value = n
+}
 
 function formatMoney(n) {
   if (n == null) return '—'

@@ -29,6 +29,21 @@
     <section class="av-card">
       <div class="av-card-pad">
         <h2 class="section-title">Matriz por iniciativa</h2>
+
+        <ListPager
+          :page="page"
+          :page-size="pageSize"
+          :total="total"
+          :total-pages="totalPages"
+          :range-from="rangeFrom"
+          :range-to="rangeTo"
+          :page-window="pageWindow"
+          :sizes="sizes"
+          unit="iniciativas"
+          @go="goPage"
+          @update:page-size="setPageSize"
+        />
+
         <div class="av-table-wrap">
           <table class="av-table">
             <thead>
@@ -38,7 +53,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="ini in votadas" :key="ini.id">
+              <tr v-for="ini in pageItems" :key="ini.id">
                 <td>
                   <router-link :to="`/iniciativas/${ini.id}`" class="ini-link">
                     {{ ini.idOficial }}
@@ -56,6 +71,21 @@
             </tbody>
           </table>
         </div>
+
+        <ListPager
+          v-if="totalPages > 1"
+          :page="page"
+          :page-size="pageSize"
+          :total="total"
+          :total-pages="totalPages"
+          :range-from="rangeFrom"
+          :range-to="rangeTo"
+          :page-window="pageWindow"
+          :sizes="sizes"
+          :show-size="false"
+          unit="iniciativas"
+          @go="goPage"
+        />
       </div>
     </section>
   </div>
@@ -63,14 +93,35 @@
 
 <script setup>
 import { computed } from 'vue'
-import { partidos, alinhamentoCidadaosPartido } from '@/data/partidos'
+import ListPager from '@/components/ListPager.vue'
+import { usePagination } from '@/composables/usePagination'
+import { partidos, alinhamentoCidadaosPartido, hasPartyVotes } from '@/data/partidos'
 import { useDataStore } from '@/stores/data'
 
 const data = useDataStore()
 
 const votadas = computed(() =>
-  data.iniciativas.filter((i) => i.estado !== 'em_discussao' && i.dataVotacao),
+  data.iniciativas.filter(
+    (i) => i.dataVotacao && (i.estado !== 'em_discussao' || hasPartyVotes(i.resultadoPartidos)),
+  ),
 )
+
+const {
+  page,
+  pageSize,
+  sizes,
+  total,
+  totalPages,
+  rangeFrom,
+  rangeTo,
+  pageItems,
+  pageWindow,
+  goPage,
+} = usePagination(votadas, { defaultSize: 20, sizes: [10, 20, 50] })
+
+function setPageSize(n) {
+  pageSize.value = n
+}
 
 const mediaPartidos = computed(() =>
   partidos

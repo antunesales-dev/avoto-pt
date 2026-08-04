@@ -89,30 +89,45 @@
         <div class="av-card-pad">
           <h2 class="section-title">Histórico de votos</h2>
           <p v-if="!historico.length" class="muted">Ainda não votou em nenhuma iniciativa.</p>
-          <div v-else class="av-table-wrap" style="border: none">
-            <table class="av-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Iniciativa</th>
-                  <th>Voto</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="h in historico" :key="h.iniciativa_id + h.created_at">
-                  <td>{{ formatDate(h.created_at) }}</td>
-                  <td>
-                    <router-link :to="`/iniciativas/${h.iniciativa_id}`" class="link">
-                      {{ tituloDe(h.iniciativa_id) }}
-                    </router-link>
-                  </td>
-                  <td>
-                    <span class="badge" :class="votoClass(h.voto)">{{ votoLabel[h.voto] }}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <template v-else>
+            <ListPager
+              :page="page"
+              :page-size="pageSize"
+              :total="total"
+              :total-pages="totalPages"
+              :range-from="rangeFrom"
+              :range-to="rangeTo"
+              :page-window="pageWindow"
+              :sizes="sizes"
+              unit="votos"
+              @go="goPage"
+              @update:page-size="setPageSize"
+            />
+            <div class="av-table-wrap" style="border: none">
+              <table class="av-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Iniciativa</th>
+                    <th>Voto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="h in pageItems" :key="h.iniciativa_id + h.created_at">
+                    <td>{{ formatDate(h.created_at) }}</td>
+                    <td>
+                      <router-link :to="`/iniciativas/${h.iniciativa_id}`" class="link">
+                        {{ tituloDe(h.iniciativa_id) }}
+                      </router-link>
+                    </td>
+                    <td>
+                      <span class="badge" :class="votoClass(h.voto)">{{ votoLabel[h.voto] }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
         </div>
       </section>
     </div>
@@ -123,6 +138,8 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import ListPager from '@/components/ListPager.vue'
+import { usePagination } from '@/composables/usePagination'
 import { formatDate, votoLabel } from '@/data/partidos'
 import { useAuthStore } from '@/stores/auth'
 import { useDataStore } from '@/stores/data'
@@ -149,6 +166,23 @@ const prefs = reactive({
   notify_investimentos: true,
   notify_despesa: false,
 })
+
+const {
+  page,
+  pageSize,
+  sizes,
+  total,
+  totalPages,
+  rangeFrom,
+  rangeTo,
+  pageItems,
+  pageWindow,
+  goPage,
+} = usePagination(historico, { defaultSize: 10, sizes: [10, 20, 50], queryPrefix: 'h' })
+
+function setPageSize(n) {
+  pageSize.value = n
+}
 
 const initial = computed(() => (auth.email || 'A').charAt(0).toUpperCase())
 const canRequest = computed(

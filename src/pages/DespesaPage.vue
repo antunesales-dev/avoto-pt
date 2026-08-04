@@ -14,11 +14,11 @@
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
       <div class="stat-mini av-card av-card-pad">
-        <div class="stat-mini__l">Registos</div>
-        <div class="stat-mini__v font-display">{{ formatNumber(finance.despesas.length) }}</div>
+        <div class="stat-mini__l">Registos (filtro)</div>
+        <div class="stat-mini__v font-display">{{ formatNumber(total) }}</div>
       </div>
       <div class="stat-mini av-card av-card-pad">
-        <div class="stat-mini__l">Soma montantes (listados)</div>
+        <div class="stat-mini__l">Soma montantes (filtro)</div>
         <div class="stat-mini__v font-display">{{ formatMoney(totalMontante) }}</div>
       </div>
     </div>
@@ -36,6 +36,20 @@
       </button>
     </div>
 
+    <ListPager
+      :page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :range-from="rangeFrom"
+      :range-to="rangeTo"
+      :page-window="pageWindow"
+      :sizes="sizes"
+      unit="despesas"
+      @go="goPage"
+      @update:page-size="setPageSize"
+    />
+
     <div class="av-table-wrap">
       <table class="av-table">
         <thead>
@@ -49,7 +63,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="d in filtradas" :key="d.id">
+          <tr v-for="d in pageItems" :key="d.id">
             <td class="wrap">
               <strong>{{ d.titulo }}</strong>
               <div class="sub">{{ d.categoria }}</div>
@@ -68,6 +82,21 @@
       </table>
     </div>
 
+    <ListPager
+      v-if="totalPages > 1"
+      :page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :range-from="rangeFrom"
+      :range-to="rangeTo"
+      :page-window="pageWindow"
+      :sizes="sizes"
+      :show-size="false"
+      unit="despesas"
+      @go="goPage"
+    />
+
     <p class="foot">
       Fontes oficiais:
       <a href="https://www.base.gov.pt" target="_blank" rel="noopener noreferrer">Base.gov.pt</a>
@@ -80,7 +109,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import ListPager from '@/components/ListPager.vue'
+import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
 import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
@@ -105,6 +136,24 @@ const totalMontante = computed(() =>
   filtradas.value.reduce((s, d) => s + (Number(d.montante_eur) || 0), 0),
 )
 
+const {
+  page,
+  pageSize,
+  sizes,
+  total,
+  totalPages,
+  rangeFrom,
+  rangeTo,
+  pageItems,
+  pageWindow,
+  goPage,
+  resetPage,
+} = usePagination(filtradas, { defaultSize: 20, sizes: [10, 20, 50] })
+
+function setPageSize(n) {
+  pageSize.value = n
+}
+
 function tipoLabel(t) {
   return tipos.find((x) => x.id === t)?.label || t
 }
@@ -118,6 +167,7 @@ function formatMoney(n) {
   }).format(Number(n))
 }
 
+watch(tipo, () => resetPage())
 onMounted(() => finance.loadDespesas().catch(console.error))
 </script>
 

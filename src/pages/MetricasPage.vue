@@ -69,28 +69,57 @@
         <p v-if="!participacaoComVotos.length" class="muted">
           Nenhuma iniciativa tem ainda votos de cidadãos.
         </p>
-        <div v-else class="av-table-wrap" style="border: none">
-          <table class="av-table">
-            <thead>
-              <tr>
-                <th>Iniciativa</th>
-                <th>Votos</th>
-                <th>Taxa*</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in participacaoComVotos" :key="row.id">
-                <td>
-                  <router-link :to="`/iniciativas/${row.id}`" class="link">
-                    {{ row.idOficial }}
-                  </router-link>
-                </td>
-                <td>{{ formatNumber(row.total) }}</td>
-                <td>{{ row.taxa }}%</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <template v-else>
+          <ListPager
+            :page="page"
+            :page-size="pageSize"
+            :total="total"
+            :total-pages="totalPages"
+            :range-from="rangeFrom"
+            :range-to="rangeTo"
+            :page-window="pageWindow"
+            :sizes="sizes"
+            unit="iniciativas"
+            @go="goPage"
+            @update:page-size="setPageSize"
+          />
+          <div class="av-table-wrap" style="border: none">
+            <table class="av-table">
+              <thead>
+                <tr>
+                  <th>Iniciativa</th>
+                  <th>Votos</th>
+                  <th>Taxa*</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in pageItems" :key="row.id">
+                  <td>
+                    <router-link :to="`/iniciativas/${row.id}`" class="link">
+                      {{ row.idOficial }}
+                    </router-link>
+                  </td>
+                  <td>{{ formatNumber(row.total) }}</td>
+                  <td>{{ row.taxa }}%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ListPager
+            v-if="totalPages > 1"
+            :page="page"
+            :page-size="pageSize"
+            :total="total"
+            :total-pages="totalPages"
+            :range-from="rangeFrom"
+            :range-to="rangeTo"
+            :page-window="pageWindow"
+            :sizes="sizes"
+            :show-size="false"
+            unit="iniciativas"
+            @go="goPage"
+          />
+        </template>
         <p class="foot-note">
           * Taxa = votos nesta iniciativa / contas registadas ({{ formatNumber(m.cidadaos_registados) }}).
           Só listamos iniciativas com pelo menos 1 voto.
@@ -105,7 +134,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import ListPager from '@/components/ListPager.vue'
 import StatCard from '@/components/StatCard.vue'
+import { usePagination } from '@/composables/usePagination'
 import { formatNumber, totalVotos } from '@/data/partidos'
 import { useDataStore } from '@/stores/data'
 
@@ -122,6 +153,23 @@ const participacaoComVotos = computed(() =>
     })
     .filter((r) => r.total > 0),
 )
+
+const {
+  page,
+  pageSize,
+  sizes,
+  total,
+  totalPages,
+  rangeFrom,
+  rangeTo,
+  pageItems,
+  pageWindow,
+  goPage,
+} = usePagination(participacaoComVotos, { defaultSize: 20, sizes: [10, 20, 50] })
+
+function setPageSize(n) {
+  pageSize.value = n
+}
 
 function exportJson() {
   const payload = {
