@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref } from 'vue'
+import { fetchAllRows } from '@/lib/fetchAll'
 import { supabase } from '@/lib/supabase'
 
 /**
@@ -31,6 +32,7 @@ export const useDataStore = defineStore('data', () => {
     }
   }
   const loading = ref(false)
+  const loadingDetail = ref(false)
   const error = ref(null)
   let realtimeChannel = null
 
@@ -63,17 +65,22 @@ export const useDataStore = defineStore('data', () => {
     loading.value = true
     error.value = null
     try {
-      const [iniRes, aggRes, metRes] = await Promise.all([
-        supabase.from('iniciativas').select('*').order('data_votacao', { ascending: false, nullsFirst: false }),
-        supabase.from('iniciativa_votos_agg').select('*'),
+      // PostgREST limita a 1000 por request — paginar
+      const [iniRows, aggRows, metRes] = await Promise.all([
+        fetchAllRows(() =>
+          supabase
+            .from('iniciativas')
+            .select('*')
+            .order('data_votacao', { ascending: false, nullsFirst: false })
+            .order('id', { ascending: true }),
+        ),
+        fetchAllRows(() => supabase.from('iniciativa_votos_agg').select('*')),
         supabase.from('metricas_globais').select('*').maybeSingle(),
       ])
-      if (iniRes.error) throw iniRes.error
-      if (aggRes.error) throw aggRes.error
       if (metRes.error) throw metRes.error
 
-      const aggMap = Object.fromEntries((aggRes.data || []).map((a) => [a.iniciativa_id, a]))
-      iniciativas.value = (iniRes.data || []).map((row) => mapIniciativa(row, aggMap[row.id]))
+      const aggMap = Object.fromEntries((aggRows || []).map((a) => [a.iniciativa_id, a]))
+      iniciativas.value = (iniRows || []).map((row) => mapIniciativa(row, aggMap[row.id]))
 
       applyMetricas(metRes.data)
     } catch (e) {
@@ -86,6 +93,31 @@ export const useDataStore = defineStore('data', () => {
 
   function getIniciativa(id) {
     return iniciativas.value.find((i) => i.id === id) || null
+  }
+
+  /** Garante que o detalhe existe (mesmo se ainda não estiver na lista em memória). */
+  async function ensureIniciativa(id) {
+    if (!id) return null
+    const existing = getIniciativa(id)
+    if (existing) return existing
+
+    loadingDetail.value = true
+    try {
+      const [{ data: row, error: err }, { data: agg }] = await Promise.all([
+        supabase.from('iniciativas').select('*').eq('id', id).maybeSingle(),
+        supabase.from('iniciativa_votos_agg').select('*').eq('iniciativa_id', id).maybeSingle(),
+      ])
+      if (err) throw err
+      if (!row) return null
+      const mapped = mapIniciativa(row, agg)
+      // merge na lista sem duplicar
+      if (!getIniciativa(id)) {
+        iniciativas.value = [mapped, ...iniciativas.value]
+      }
+      return mapped
+    } finally {
+      loadingDetail.value = false
+    }
   }
 
   async function refreshAgg(iniciativaId) {
@@ -164,9 +196,11 @@ export const useDataStore = defineStore('data', () => {
     iniciativas,
     metricas,
     loading,
+    loadingDetail,
     error,
     loadAll,
     getIniciativa,
+    ensureIniciativa,
     refreshAgg,
     startRealtime,
     stopRealtime,

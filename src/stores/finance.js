@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref } from 'vue'
+import { fetchAllRows } from '@/lib/fetchAll'
 import { supabase } from '@/lib/supabase'
 
 /**
@@ -13,34 +14,33 @@ export const useFinanceStore = defineStore('finance', () => {
   const error = ref(null)
 
   async function loadDigests() {
-    const { data, error: err } = await supabase
-      .from('daily_digests')
-      .select('*')
-      .order('digest_date', { ascending: false })
-      .limit(60)
-    if (err) throw err
-    digests.value = data || []
+    // todos os digests (paginado no servidor REST)
+    digests.value = await fetchAllRows(() =>
+      supabase.from('daily_digests').select('*').order('digest_date', { ascending: false }),
+    )
   }
 
   async function loadDespesas() {
-    const { data, error: err } = await supabase
-      .from('despesas_publicas')
-      .select('*')
-      .order('montante_eur', { ascending: false, nullsFirst: false })
-      .limit(200)
-    if (err) throw err
-    despesas.value = data || []
+    despesas.value = await fetchAllRows(() =>
+      supabase
+        .from('despesas_publicas')
+        .select('*')
+        .order('montante_eur', { ascending: false, nullsFirst: false }),
+    )
   }
 
   async function loadInvestimentos() {
     const [inv, agg] = await Promise.all([
-      supabase.from('investimentos').select('*').order('montante_eur', { ascending: false, nullsFirst: false }),
-      supabase.from('investimento_votos_agg').select('*'),
+      fetchAllRows(() =>
+        supabase
+          .from('investimentos')
+          .select('*')
+          .order('montante_eur', { ascending: false, nullsFirst: false }),
+      ),
+      fetchAllRows(() => supabase.from('investimento_votos_agg').select('*')),
     ])
-    if (inv.error) throw inv.error
-    if (agg.error) throw agg.error
-    const map = Object.fromEntries((agg.data || []).map((a) => [a.investimento_id, a]))
-    investimentos.value = (inv.data || []).map((row) => ({
+    const map = Object.fromEntries((agg || []).map((a) => [a.investimento_id, a]))
+    investimentos.value = (inv || []).map((row) => ({
       ...row,
       votosCidadaos: {
         favor: Number(map[row.id]?.favor ?? 0),

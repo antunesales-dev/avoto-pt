@@ -1,5 +1,8 @@
 <template>
-  <div class="page-shell" v-if="item">
+  <div v-if="data.loadingDetail && !item" class="page-shell">
+    <p class="muted">A carregar iniciativa…</p>
+  </div>
+  <div class="page-shell" v-else-if="item">
     <router-link to="/iniciativas" class="back-link">← Voltar às iniciativas</router-link>
 
     <div class="av-card detail-hero">
@@ -176,14 +179,32 @@ const auth = useAuthStore()
 const data = useDataStore()
 
 const meuVoto = ref(null)
+const resolved = ref(null)
 
-const item = computed(() => data.getIniciativa(route.params.id))
+const item = computed(
+  () => data.getIniciativa(route.params.id) || resolved.value || null,
+)
 
 watch(
-  () => [route.params.id, auth.isLoggedIn, auth.user?.id],
+  () => route.params.id,
+  async (id) => {
+    resolved.value = null
+    if (!id) return
+    try {
+      resolved.value = await data.ensureIniciativa(id)
+    } catch (e) {
+      console.error(e)
+      resolved.value = null
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => [route.params.id, auth.isLoggedIn, auth.user?.id, item.value?.id],
   async () => {
     meuVoto.value = null
-    if (auth.isLoggedIn && route.params.id) {
+    if (auth.isLoggedIn && route.params.id && item.value) {
       try {
         meuVoto.value = await auth.getVoto(route.params.id)
       } catch (e) {
@@ -289,6 +310,10 @@ async function confirmarVoto(voto) {
 </script>
 
 <style scoped lang="scss">
+.muted {
+  color: var(--pt-muted);
+  font-weight: 600;
+}
 .back-link {
   display: inline-block;
   font-weight: 700;
