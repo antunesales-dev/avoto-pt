@@ -123,6 +123,8 @@ export const useAuthStore = defineStore('auth', () => {
           email: parsed.data.email,
           device_id: deviceId,
           mode: 'check',
+          // registo password: Turnstile no fluxo OTP é o principal; check usa token vazio se secret off
+          turnstile_token: '',
         },
       })
       if (gateErr || gate?.error) {
@@ -195,7 +197,7 @@ export const useAuthStore = defineStore('auth', () => {
    * Login / registo sem palavra-passe via edge request-otp
    * (rate limit IP + device; máx. 2 contas novas por dispositivo).
    */
-  async function enviarMagicLink(email) {
+  async function enviarMagicLink(email, turnstileToken = '') {
     const parsed = emailSchema.safeParse(email)
     if (!parsed.success) {
       throw new Error(parsed.error.issues[0]?.message || 'Email inválido.')
@@ -208,6 +210,7 @@ export const useAuthStore = defineStore('auth', () => {
         body: {
           email: parsed.data,
           device_id: deviceId,
+          turnstile_token: turnstileToken || '',
           redirect_to: `${appBaseUrl()}/entrar`,
         },
       })
@@ -241,6 +244,12 @@ export const useAuthStore = defineStore('auth', () => {
       }
       if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(msg)) {
         e.code = 'DEVICE_ACCOUNT_LIMIT'
+      }
+      if (/TURNSTILE|anti-bot|captcha/i.test(msg)) {
+        e.code = 'TURNSTILE_FAILED'
+        if (!/verifica/i.test(msg)) {
+          msg = 'Complete a verificação anti-bot e tente de novo.'
+        }
       }
       error.value = msg
       const err = new Error(msg)

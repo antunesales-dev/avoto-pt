@@ -16,8 +16,19 @@
         <span>Email</span>
         <input v-model="email" type="email" autocomplete="email" required />
       </label>
+
+      <TurnstileWidget
+        ref="turnstileRef"
+        :reset-key="turnstileReset"
+        @token="onTurnstileToken"
+      />
+
       <p v-if="formError" class="form-error">{{ formError }}</p>
-      <button type="submit" class="btn btn--primary" :disabled="auth.loading">
+      <button
+        type="submit"
+        class="btn btn--primary"
+        :disabled="auth.loading || (turnstileRequired && !turnstileToken)"
+      >
         {{ auth.loading ? 'A enviar…' : 'Receber link / código' }}
       </button>
 
@@ -67,20 +78,31 @@
       <button type="submit" class="btn btn--primary" :disabled="auth.loading">
         {{ auth.loading ? 'A verificar…' : 'Confirmar código' }}
       </button>
-      <button type="button" class="btn btn--ghost btn--sm" :disabled="auth.loading" @click="onEnviarCodigo">
+      <button
+        type="button"
+        class="btn btn--ghost btn--sm"
+        :disabled="auth.loading || (turnstileRequired && !turnstileToken)"
+        @click="onEnviarCodigo"
+      >
         Reenviar
       </button>
       <button type="button" class="btn btn--ghost btn--sm" @click="step = 'email'">
         Mudar email
       </button>
+      <TurnstileWidget
+        v-if="step === 'otp'"
+        :reset-key="turnstileReset"
+        @token="onTurnstileToken"
+      />
     </form>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
+import TurnstileWidget from '@/components/TurnstileWidget.vue'
 import { useAuthStore } from '@/stores/auth'
 import '@/css/auth.scss'
 
@@ -95,9 +117,22 @@ const otp = ref('')
 const step = ref('email')
 const showPassword = ref(false)
 const formError = ref('')
+const turnstileToken = ref('')
+const turnstileReset = ref(0)
+const turnstileRef = ref(null)
+
+const turnstileRequired = computed(() => Boolean(import.meta.env.VITE_TURNSTILE_SITE_KEY))
+
+function onTurnstileToken(t) {
+  turnstileToken.value = t || ''
+}
+
+function bumpTurnstile() {
+  turnstileToken.value = ''
+  turnstileReset.value += 1
+}
 
 onMounted(async () => {
-  // Magic link devolve aqui com sessão já estabelecida
   if (auth.isLoggedIn) {
     goAfterLogin()
   }
@@ -110,15 +145,21 @@ function goAfterLogin() {
 
 async function onEnviarCodigo() {
   formError.value = ''
+  if (turnstileRequired.value && !turnstileToken.value) {
+    formError.value = 'Complete a verificação anti-bot antes de continuar.'
+    return
+  }
   try {
-    await auth.enviarMagicLink(email.value)
+    await auth.enviarMagicLink(email.value, turnstileToken.value)
     step.value = 'otp'
+    bumpTurnstile()
     $q.notify({
       type: 'positive',
       message: 'Email enviado. Use o link ou o código.',
       position: 'top',
     })
   } catch (e) {
+    bumpTurnstile()
     if (e.code === 'RATE_LIMITED' || /RATE_LIMITED|demasiados pedidos/i.test(e.message || '')) {
       formError.value =
         'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
@@ -128,6 +169,8 @@ async function onEnviarCodigo() {
     ) {
       formError.value =
         'Limite de contas neste dispositivo. Entre com uma conta existente ou use outro dispositivo.'
+    } else if (e.code === 'TURNSTILE_FAILED' || /TURNSTILE|anti-bot/i.test(e.message || '')) {
+      formError.value = 'Verificação anti-bot falhou. Complete o desafio e tente de novo.'
     } else {
       formError.value = e.message || 'Não foi possível enviar o email.'
     }

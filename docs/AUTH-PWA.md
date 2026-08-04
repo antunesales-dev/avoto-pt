@@ -18,6 +18,21 @@ Não é perfeito (VPN, limpar `localStorage`), mas reduz abuso óbvio.
 
 Com 2 contas já no device, OTP só permite **login** (`shouldCreateUser: false`).
 
+### Cloudflare Turnstile (anti-bot)
+
+1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Turnstile** → Add widget  
+   - Domínios: `avoto-pt.pages.dev`, `avoto.pt`, `localhost`, `antunesales-dev.github.io`
+2. **Site key** → build env `VITE_TURNSTILE_SITE_KEY` (CF Pages + GH Actions secrets)
+3. **Secret key** → só na edge:
+   ```bash
+   supabase secrets set TURNSTILE_SECRET_KEY='0x…'
+   supabase functions deploy request-otp --no-verify-jwt
+   ```
+4. Sem secret na edge: Turnstile **não é obrigatório** (dev local).  
+   Com secret: token inválido/ausente → **403**.
+
+Widget em `/entrar` (`TurnstileWidget.vue`); verificação em `request-otp`.
+
 Recomendado em Cloudflare (prod): Rate Limiting no path da function `request-otp`.
 
 ## Decisão

@@ -1,9 +1,10 @@
 /**
- * Pedido de magic link / OTP com rate limit por IP + device.
- * O cliente NÃO deve chamar signInWithOtp directamente para criar contas.
+ * Pedido de magic link / OTP com:
+ * - Cloudflare Turnstile (anti-bot)
+ * - rate limit por IP + device + email
+ * - máx. 2 contas novas por device
  *
- * POST { email, device_id, redirect_to? }
- * Auth: anon (pública) — a protecção é o rate limit interno.
+ * POST { email, device_id, turnstile_token?, redirect_to?, mode?: 'otp'|'check' }
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
@@ -21,6 +22,39 @@ function isEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 }
 
+async function verifyTurnstile(
+  token: string,
+  ip: string,
+  secret: string,
+): Promise<{ ok: boolean; error?: string }> {
+  if (!secret) {
+    // secret não configurado → skip (dev local)
+    return { ok: true }
+  }
+  if (!token || token.length < 10) {
+    return { ok: false, error: 'TURNSTILE_REQUIRED' }
+  }
+  try {
+    const body = new URLSearchParams()
+    body.set('secret', secret)
+    body.set('response', token)
+    if (ip && ip !== 'unknown') body.set('remoteip', ip)
+
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+    })
+    const data = await res.json()
+    if (!data?.success) {
+      return { ok: false, error: 'TURNSTILE_FAILED' }
+    }
+    return { ok: true }
+  } catch {
+    return { ok: false, error: 'TURNSTILE_UNAVAILABLE' }
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
   if (req.method !== 'POST') return jsonResponse({ error: 'METHOD_NOT_ALLOWED' }, 405)
@@ -29,7 +63,7 @@ Deno.serve(async (req) => {
     email?: string
     device_id?: string
     redirect_to?: string
-    /** 'otp' (default) | 'check' — check não envia email (ex.: registo com password) */
+    turnstile_token?: string
     mode?: string
   }
   try {
@@ -44,15 +78,31 @@ Deno.serve(async (req) => {
   const deviceId = String(body.device_id || '').trim()
   const redirectTo = body.redirect_to ? String(body.redirect_to) : undefined
   const mode = body.mode === 'check' ? 'check' : 'otp'
+  const turnstileToken = String(body.turnstile_token || '').trim()
 
   if (!isEmail(email)) return jsonResponse({ error: 'EMAIL_INVALID' }, 400)
   if (deviceId.length < 8) return jsonResponse({ error: 'DEVICE_ID_REQUIRED' }, 400)
 
   const url = Deno.env.get('SUPABASE_URL')!
   const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY') || ''
   const admin = createClient(url, service)
-
   const ip = clientIp(req)
+
+  // 0) Turnstile (obrigatório se secret configurado)
+  const captcha = await verifyTurnstile(turnstileToken, ip, turnstileSecret)
+  if (!captcha.ok) {
+    return jsonResponse(
+      {
+        error: captcha.error || 'TURNSTILE_FAILED',
+        message:
+          captcha.error === 'TURNSTILE_REQUIRED'
+            ? 'Complete a verificação anti-bot (Turnstile) antes de continuar.'
+            : 'Verificação anti-bot falhou. Actualize e tente de novo.',
+      },
+      403,
+    )
+  }
 
   // 1) Rate limit + política de criação
   const { data: gate, error: gateErr } = await admin.rpc('assert_auth_otp_allowed', {
@@ -99,7 +149,7 @@ Deno.serve(async (req) => {
     })
   }
 
-  // 2) Enviar OTP (service role no servidor)
+  // 2) Enviar OTP
   const { error: otpErr } = await admin.auth.signInWithOtp({
     email,
     options: {
@@ -110,7 +160,6 @@ Deno.serve(async (req) => {
 
   if (otpErr) {
     const msg = otpErr.message || String(otpErr)
-    // email não existe e criação bloqueada
     if (!allowCreate || /signups not allowed|user not found|unable to validate/i.test(msg)) {
       return jsonResponse(
         {
@@ -122,7 +171,6 @@ Deno.serve(async (req) => {
         403,
       )
     }
-    // rate limit nativo Supabase Auth
     if (/rate|too many|429/i.test(msg)) {
       return jsonResponse(
         {
