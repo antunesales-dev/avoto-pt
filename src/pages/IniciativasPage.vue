@@ -55,6 +55,7 @@
           {{ e.label }}
         </button>
       </div>
+      <DateRangeFilter v-model="periodo" label="Data da votação AR" />
     </div>
 
     <ListPager
@@ -76,7 +77,11 @@
       <InitiativeCard v-for="item in pageItems" :key="item.id" :item="item" />
     </div>
     <div v-else class="av-card av-card-pad">
-      <p style="margin: 0; color: var(--pt-muted)">Nenhuma iniciativa corresponde aos filtros.</p>
+      <p style="margin: 0; color: var(--pt-muted)">
+        Nenhuma iniciativa corresponde aos filtros
+        <template v-if="periodo !== 'todos'"> (período: {{ dateRangeLabel(periodo) }})</template
+        >.
+      </p>
     </div>
 
     <ListPager
@@ -99,10 +104,12 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import InitiativeCard from '@/components/InitiativeCard.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { hasPartyVotes, temas } from '@/data/partidos'
+import { dateRangeLabel, matchesDateRange } from '@/lib/dateRange'
 import { useDataStore } from '@/stores/data'
 
 const data = useDataStore()
@@ -110,6 +117,7 @@ const query = ref('')
 const tema = ref('Todos')
 const estado = ref('todos')
 const detalhe = ref('com_partidos')
+const periodo = ref('todos')
 
 const detalheOpts = [
   { id: 'com_partidos', label: 'Com voto dos partidos' },
@@ -124,6 +132,11 @@ const estados = [
   { id: 'rejeitado', label: 'Rejeitado' },
 ]
 
+/** Data de referência: votação AR; se não houver, data de entrada (para “futuro” / calendário). */
+function dataRefIniciativa(i) {
+  return i.dataVotacao || i.dataEntrada || null
+}
+
 const filtradas = computed(() => {
   const q = query.value.trim().toLowerCase()
   return data.iniciativas.filter((i) => {
@@ -131,6 +144,7 @@ const filtradas = computed(() => {
     if (detalhe.value === 'com_votacao' && !i.dataVotacao) return false
     if (tema.value !== 'Todos' && i.tema !== tema.value) return false
     if (estado.value !== 'todos' && i.estado !== estado.value) return false
+    if (!matchesDateRange(dataRefIniciativa(i), periodo.value)) return false
     if (!q) return true
     return (
       i.titulo.toLowerCase().includes(q) ||
@@ -159,7 +173,7 @@ function setPageSize(n) {
   pageSize.value = n
 }
 
-watch([query, tema, estado, detalhe], () => resetPage())
+watch([query, tema, estado, detalhe, periodo], () => resetPage())
 </script>
 
 <style scoped lang="scss">

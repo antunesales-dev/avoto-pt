@@ -16,6 +16,12 @@
       <router-link to="/digest">Resumo do dia</router-link>.
     </div>
 
+    <DateRangeFilter
+      v-model="periodo"
+      label="Data de referência"
+      style="margin-bottom: 1rem"
+    />
+
     <ListPager
       :page="page"
       :page-size="pageSize"
@@ -100,17 +106,26 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
+import { matchesDateRange } from '@/lib/dateRange'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
 const { investimentos } = storeToRefs(finance)
 const loading = ref(true)
+const periodo = ref('todos')
+
+const filtrados = computed(() =>
+  (investimentos.value || []).filter((inv) =>
+    matchesDateRange(inv.data_referencia, periodo.value),
+  ),
+)
 
 // toRef/storeToRefs garante reactividade da lista no usePagination
 const {
@@ -124,11 +139,14 @@ const {
   pageItems,
   pageWindow,
   goPage,
-} = usePagination(investimentos, {
+  resetPage,
+} = usePagination(filtrados, {
   defaultSize: 12,
   sizes: [12, 24, 48],
   queryPrefix: 'inv',
 })
+
+watch(periodo, () => resetPage())
 
 function setPageSize(n) {
   pageSize.value = Number(n) || 12

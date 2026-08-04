@@ -17,14 +17,23 @@
       os cidadãos votaram aqui.
     </div>
 
+    <DateRangeFilter
+      v-model="periodo"
+      label="Dia do resumo"
+      style="margin-bottom: 1rem"
+    />
+
     <p v-if="finance.loading" class="muted">A carregar…</p>
     <p v-else-if="!finance.digests.length" class="muted">
       Ainda não há resumos. Quando o sistema sincroniza os dados oficiais, aparece aqui um
       boletim por dia.
     </p>
+    <p v-else-if="!filtrados.length" class="muted">
+      Nenhum resumo neste período ({{ dateRangeLabel(periodo) }}).
+    </p>
 
     <ListPager
-      v-if="!finance.loading && finance.digests.length"
+      v-if="!finance.loading && filtrados.length"
       :page="page"
       :page-size="pageSize"
       :total="total"
@@ -208,17 +217,23 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
 import { estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
+import { dateRangeLabel, matchesDateRange } from '@/lib/dateRange'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
-const digestsList = computed(() => finance.digests)
+const periodo = ref('todos')
 const sectionLimit = 6
+
+const filtrados = computed(() =>
+  (finance.digests || []).filter((d) => matchesDateRange(d.digest_date, periodo.value)),
+)
 
 const {
   page,
@@ -231,11 +246,14 @@ const {
   pageItems,
   pageWindow,
   goPage,
-} = usePagination(digestsList, { defaultSize: 5, sizes: [5, 10, 20] })
+  resetPage,
+} = usePagination(filtrados, { defaultSize: 5, sizes: [5, 10, 20] })
 
 function setPageSize(n) {
   pageSize.value = n
 }
+
+watch(periodo, () => resetPage())
 
 function estadoLabel(estado) {
   return estadosLabel[estado] || estado || '—'

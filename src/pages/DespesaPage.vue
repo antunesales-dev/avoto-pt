@@ -38,6 +38,11 @@
         {{ t.label }}
       </button>
     </div>
+    <DateRangeFilter
+      v-model="periodo"
+      label="Data de publicação"
+      style="margin-bottom: 1rem"
+    />
 
     <ListPager
       :page="page"
@@ -126,15 +131,18 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
+import { matchesDateRange } from '@/lib/dateRange'
 import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
 const router = useRouter()
 const tipo = ref('todos')
+const periodo = ref('todos')
 
 function goDetail(id) {
   if (!id) return
@@ -150,8 +158,11 @@ const tipos = [
 ]
 
 const filtradas = computed(() => {
-  if (tipo.value === 'todos') return finance.despesas
-  return finance.despesas.filter((d) => d.tipo === tipo.value)
+  return finance.despesas.filter((d) => {
+    if (tipo.value !== 'todos' && d.tipo !== tipo.value) return false
+    if (!matchesDateRange(d.data_publicacao || d.data_inicio, periodo.value)) return false
+    return true
+  })
 })
 
 const totalMontante = computed(() =>
@@ -189,7 +200,7 @@ function formatMoney(n) {
   }).format(Number(n))
 }
 
-watch(tipo, () => resetPage())
+watch([tipo, periodo], () => resetPage())
 onMounted(() => finance.loadDespesas().catch(console.error))
 </script>
 
