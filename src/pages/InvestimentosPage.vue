@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, toRef } from 'vue'
+import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import ListPager from '@/components/ListPager.vue'
 import VoteBar from '@/components/VoteBar.vue'
