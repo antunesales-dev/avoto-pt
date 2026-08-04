@@ -119,7 +119,18 @@ async function onEnviarCodigo() {
       position: 'top',
     })
   } catch (e) {
-    formError.value = e.message || 'Não foi possível enviar o email.'
+    if (e.code === 'RATE_LIMITED' || /RATE_LIMITED|demasiados pedidos/i.test(e.message || '')) {
+      formError.value =
+        'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
+    } else if (
+      e.code === 'DEVICE_ACCOUNT_LIMIT' ||
+      /limite de contas/i.test(e.message || '')
+    ) {
+      formError.value =
+        'Limite de contas neste dispositivo. Entre com uma conta existente ou use outro dispositivo.'
+    } else {
+      formError.value = e.message || 'Não foi possível enviar o email.'
+    }
   }
 }
 

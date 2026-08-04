@@ -6,6 +6,7 @@
 | `ar-sync` | cron secret | Fetch Dados Abertos AR → iniciativas |
 | `despesa-sync` | cron secret | Portal Base (SNS open data) → despesas + investimentos |
 | `daily-digest` | cron secret | Digest multi-secção do dia |
+| `request-otp` | pública (rate limited) | Magic link/OTP com limite IP+device |
 
 Detalhe: [`docs/AR-IMPORT.md`](../../docs/AR-IMPORT.md).
 

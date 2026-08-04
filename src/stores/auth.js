@@ -1,16 +1,28 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { computed, ref } from 'vue'
+import { getDeviceId } from '@/lib/deviceId'
 import { supabase } from '@/lib/supabase'
 import { emailSchema, loginSchema, passwordSchema, registoSchema } from '@/lib/schemas'
 
 /**
  * Auth real via Supabase.
  * PII e votos: encriptados na BD (Vault + pgcrypto); acesso só via RPC.
+ * OTP/criação de conta: edge request-otp (rate limit IP + device).
  */
 function appBaseUrl() {
   if (typeof window === 'undefined') return ''
   const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
   return `${window.location.origin}${base}`
+}
+
+async function linkDeviceAfterLogin() {
+  try {
+    const deviceId = getDeviceId()
+    await supabase.rpc('register_device_account', { p_device_id: deviceId })
+  } catch (e) {
+    // não bloquear sessão; log para ops
+    console.warn('register_device_account', e?.message || e)
+  }
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -57,6 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
       session.value = data.session
       if (data.session?.user) {
         await fetchProfile()
+        await linkDeviceAfterLogin()
       } else {
         profile.value = null
       }
@@ -69,6 +82,9 @@ export const useAuthStore = defineStore('auth', () => {
         if (next?.user) {
           try {
             await fetchProfile()
+            if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+              await linkDeviceAfterLogin()
+            }
           } catch (e) {
             console.error(e)
             profile.value = null
@@ -101,6 +117,24 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
+      const deviceId = getDeviceId()
+      const { data: gate, error: gateErr } = await supabase.functions.invoke('request-otp', {
+        body: {
+          email: parsed.data.email,
+          device_id: deviceId,
+          mode: 'check',
+        },
+      })
+      if (gateErr || gate?.error) {
+        const msg =
+          gate?.message ||
+          gateErr?.message ||
+          'Não foi possível criar conta a partir deste dispositivo.'
+        const e = new Error(msg)
+        e.code = gate?.error || 'DEVICE_ACCOUNT_LIMIT'
+        throw e
+      }
+
       const { data, error: err } = await supabase.auth.signUp({
         email: parsed.data.email,
         password: parsed.data.password,
@@ -114,7 +148,6 @@ export const useAuthStore = defineStore('auth', () => {
       }
       session.value = data.session
       if (data.user) {
-        // perfil criado pelo trigger; pequeno retry se CID ainda não existir
         for (let i = 0; i < 5; i++) {
           await fetchProfile()
           if (profile.value?.cid) break
@@ -123,6 +156,7 @@ export const useAuthStore = defineStore('auth', () => {
         if (parsed.data.partidoPreferencia) {
           await updatePartido(parsed.data.partidoPreferencia)
         }
+        await linkDeviceAfterLogin()
       }
       return { needsEmailConfirmation: false, user: data.user }
     } catch (e) {
@@ -158,8 +192,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Login / registo sem palavra-passe: magic link + código OTP por email.
-   * shouldCreateUser: true → primeira vez cria conta.
+   * Login / registo sem palavra-passe via edge request-otp
+   * (rate limit IP + device; máx. 2 contas novas por dispositivo).
    */
   async function enviarMagicLink(email) {
     const parsed = emailSchema.safeParse(email)
@@ -169,18 +203,49 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const { error: err } = await supabase.auth.signInWithOtp({
-        email: parsed.data,
-        options: {
-          emailRedirectTo: `${appBaseUrl()}/entrar`,
-          shouldCreateUser: true,
+      const deviceId = getDeviceId()
+      const { data, error: fnErr } = await supabase.functions.invoke('request-otp', {
+        body: {
+          email: parsed.data,
+          device_id: deviceId,
+          redirect_to: `${appBaseUrl()}/entrar`,
         },
       })
-      if (err) throw err
-      return { email: parsed.data }
+      if (fnErr) {
+        const msg = fnErr.message || String(fnErr)
+        // FunctionsHttpError may include context
+        throw new Error(msg)
+      }
+      if (data?.error) {
+        const e = new Error(data.message || data.error)
+        e.code = data.error
+        throw e
+      }
+      return { email: parsed.data, allowCreate: data?.allow_create !== false }
     } catch (e) {
-      error.value = e.message || String(e)
-      throw e
+      // parse body from FunctionsHttpError if present
+      let msg = e.message || String(e)
+      try {
+        if (e?.context?.json) {
+          const j = await e.context.json()
+          if (j?.message) msg = j.message
+          if (j?.error) e.code = j.error
+        }
+      } catch {
+        /* ignore */
+      }
+      if (/RATE_LIMITED|429|rate/i.test(msg)) {
+        msg =
+          'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
+        e.code = 'RATE_LIMITED'
+      }
+      if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(msg)) {
+        e.code = 'DEVICE_ACCOUNT_LIMIT'
+      }
+      error.value = msg
+      const err = new Error(msg)
+      err.code = e.code
+      throw err
     } finally {
       loading.value = false
     }
@@ -212,6 +277,7 @@ export const useAuthStore = defineStore('auth', () => {
           if (profile.value?.cid) break
           await new Promise((r) => setTimeout(r, 150))
         }
+        await linkDeviceAfterLogin()
       }
       return data
     } catch (e) {

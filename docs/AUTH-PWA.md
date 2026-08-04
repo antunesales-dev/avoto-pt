@@ -1,5 +1,25 @@
 # Auth sem password + PWA e notificações
 
+## Rate limit / anti-duplicação de contas
+
+Não é perfeito (VPN, limpar `localStorage`), mas reduz abuso óbvio.
+
+| Controlo | Limite |
+|----------|--------|
+| Pedidos OTP por **IP** | 8 / hora |
+| Pedidos OTP por **device_id** | 5 / hora |
+| Pedidos OTP por **email** | 4 / hora |
+| **Contas novas** por device | máx. **2** |
+
+- Cliente: `localStorage` `avoto-device-id` (`src/lib/deviceId.js`)
+- Edge: `request-otp` (IP via `cf-connecting-ip` / `x-forwarded-for`)
+- BD: `device_accounts` + `assert_auth_otp_allowed` + `register_device_account`
+- Após login: liga device → user
+
+Com 2 contas já no device, OTP só permite **login** (`shouldCreateUser: false`).
+
+Recomendado em Cloudflare (prod): Rate Limiting no path da function `request-otp`.
+
 ## Decisão
 
 **Login principal = magic link + código OTP por email** (sem palavra-passe).
