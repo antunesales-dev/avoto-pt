@@ -2,6 +2,7 @@
   <span class="pvb" :class="`pvb--${voto || 'nao_participou'}`" :title="title">
     <span class="party-dot" :style="{ background: partido?.cor || '#999' }" aria-hidden="true" />
     <span class="pvb__sigla">{{ partido?.sigla || '—' }}</span>
+    <span v-if="assentos > 0" class="pvb__seats">{{ assentos }}</span>
     <span class="pvb__voto">
       <span class="pvb__mark" aria-hidden="true">{{ mark }}</span>
       {{ label }}
@@ -16,6 +17,8 @@ import { votoLabel } from '@/data/partidos'
 const props = defineProps({
   partido: Object,
   voto: String,
+  /** Deputados da bancada (peso no hemiciclo); 0 = não mostrar */
+  assentos: { type: Number, default: 0 },
 })
 
 const label = computed(() => votoLabel[props.voto] || props.voto || '—')
@@ -29,7 +32,9 @@ const mark = computed(() => {
 
 const title = computed(() => {
   const s = props.partido?.sigla || props.partido?.nome || 'Partido'
-  return `${s}: ${label.value}`
+  const seats =
+    props.assentos > 0 ? ` · ${props.assentos} deputado${props.assentos === 1 ? '' : 's'}` : ''
+  return `${s}: ${label.value}${seats}`
 })
 </script>
 
@@ -60,6 +65,14 @@ const title = computed(() => {
     font-weight: 800;
     min-width: 2.6rem;
     letter-spacing: 0.02em;
+  }
+
+  &__seats {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--pt-muted);
+    min-width: 1.4rem;
   }
 
   &__voto {

@@ -96,11 +96,10 @@
           <div class="av-card-pad">
             <h2 class="section-title">Voto dos partidos na AR</h2>
             <p class="hint" style="margin-bottom: 0.75rem">
-              Sentido de voto do grupo parlamentar (a favor / contra / abstenção).
-              <strong>Ordem alfabética por sigla</strong> (BE, CDS-PP, …, PSD) — de propósito, para
-              não parecer que listamos “do maior para o menor”. Não há peso por número de
-              deputados: cada partido conta como um sentido, como no registo oficial por grupo.
-              Detalhe em
+              Sentido de voto do grupo parlamentar. Lista em
+              <strong>ordem alfabética por sigla</strong> (anti-enviesamento). O número a seguir à
+              sigla é a <strong>bancada</strong> (deputados) — peso no hemiciclo, não “quanto deve
+              o cidadão votar”. Ver
               <router-link to="/como-funciona">Como funciona</router-link>.
             </p>
             <p v-if="!hasPartidos" class="hint">
@@ -113,12 +112,23 @@
                 :key="p.id"
                 :partido="p"
                 :voto="item.resultadoPartidos[p.id]"
+                :assentos="assentosDe(p.id)"
               />
             </div>
           </div>
         </div>
       </section>
     </div>
+
+    <section v-if="hasPartidos" class="av-card" style="margin-top: 1rem">
+      <div class="av-card-pad">
+        <PartyWeightPanel
+          :resultado-partidos="item.resultadoPartidos"
+          :legislatura="item.legislatura"
+          :estado="item.estado"
+        />
+      </div>
+    </section>
 
     <section class="av-card" style="margin-top: 1rem">
       <div class="av-card-pad">
@@ -175,6 +185,8 @@ import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import VoteBar from '@/components/VoteBar.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
+import PartyWeightPanel from '@/components/PartyWeightPanel.vue'
+import { assentosPartido } from '@/data/composicaoAr'
 import {
   partidos,
   estadosLabel,
@@ -249,6 +261,10 @@ const partidosComVoto = computed(() => {
   // partidos[] já é alfabético por sigla — só filtramos quem votou
   return partidos.filter((p) => m[p.id] && m[p.id] !== 'nao_participou')
 })
+
+function assentosDe(partidoId) {
+  return assentosPartido(partidoId, item.value?.legislatura)
+}
 
 const alinhamentos = computed(() => {
   if (!item.value || !hasPartidos.value) return []

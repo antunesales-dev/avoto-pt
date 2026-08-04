@@ -48,14 +48,14 @@ Detalhe: [`docs/AR-IMPORT.md`](./AR-IMPORT.md).
 **ordem alfabética da sigla** (`localeCompare` pt-PT):  
 BE → CDS-PP → CHEGA → IL → LIVRE → PAN → PCP → PS → PSD.
 
-| Contexto | Ordem |
-|----------|--------|
-| Cartões de iniciativa, badges, matriz Comparação, resumo do dia, colunas | **Alfabética por sigla** |
-| Barras / tabela de **alinhamento %** (há métrica) | Por métrica (maior → menor) |
-| Empate de métrica, ou sem votos de cidadãos | **Alfabética por sigla** |
+| Contexto | Ordem / peso |
+|----------|----------------|
+| Listas, badges, matriz Comparação, resumo do dia | **Alfabética por sigla** |
+| Alinhamento % com cidadãos | Por métrica (empate → A–Z) |
+| **Peso no hemiciclo** (detalhe da iniciativa) | Assentos × sentido de voto (favor/contra/abstenção); tabela A–Z |
 
-**Porquê:** não usar ordem de bancada, “relevância política” ou hemiciclo — isso enviesa a leitura.
-Cada partido = um sentido de voto, não um peso por deputados.
+**Ordem A–Z** evita enviesar a leitura. **Peso** = aritmética legislativa (bancadas), não
+recomendação de voto. Composição em `src/data/composicaoAr.js` (actualizar após eleições).
 
 **Onde o utilizador lê isto na app:**  
 `/como-funciona` (secção dedicada), `/comparacao` (aviso + legendas), detalhe de iniciativa,

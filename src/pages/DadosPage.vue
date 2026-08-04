@@ -55,12 +55,12 @@
           <li>Resultados de votações por partido/bancada (e por deputado, quando existirem)</li>
           <li>Ligações e documentos no site da AR / Estado</li>
         </ul>
-        <h3>Ordem dos partidos na interface</h3>
+        <h3>Ordem e peso dos partidos</h3>
         <p>
-          Os partidos são mostrados por <strong>ordem alfabética da sigla</strong> (BE, CDS-PP,
-          CHEGA, …, PSD), de propósito: evita parecer que a lista “favorece” o maior partido ou o
-          governo. Quando há métrica (ex. % de alinhamento com os cidadãos), ordenamos por essa
-          métrica; em empate, volta o alfabético. Não usamos peso por número de deputados. Ver
+          <strong>Ordem alfabética da sigla</strong> nas listas (anti-enviesamento). À parte, no
+          detalhe de cada iniciativa, mostramos o <strong>peso da bancada</strong> (assentos no
+          hemiciclo) para a aritmética a favor / contra / abstenção — útil para perceber se uma
+          abstenção ou um partido pode ser decisivo. Não é ranking nem recomendação. Ver
           <router-link to="/como-funciona">Como funciona</router-link>.
         </p>
         <h3>O que fica de fora</h3>

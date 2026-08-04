@@ -22,25 +22,26 @@
 
     <section class="av-card" style="margin-top: 1.25rem">
       <div class="av-card-pad prose">
-        <h2 class="section-title">Ordem dos partidos (importante)</h2>
+        <h2 class="section-title">Ordem e peso dos partidos</h2>
         <p>
-          Em quase toda a plataforma, os partidos aparecem por
-          <strong>ordem alfabética da sigla</strong> (BE, CDS-PP, CHEGA, IL, LIVRE, PAN, PCP, PS,
-          PSD…), em português.
+          Em listas e badges, os partidos aparecem por
+          <strong>ordem alfabética da sigla</strong> (BE, CDS-PP, CHEGA… PSD), em português — para
+          não parecer que “favorecemos” o maior partido ou o governo.
         </p>
         <ul>
           <li>
-            <strong>Porquê:</strong> para não parecer que a lista favorece o maior partido, o
-            governo ou a disposição do hemiciclo. Ordem neutra, sem “peso” por nº de deputados.
+            <strong>Ordem alfabética</strong> = anti-enviesamento na apresentação. Em empate de
+            métricas (ex. % de alinhamento com cidadãos), também se usa A–Z.
           </li>
           <li>
-            <strong>Excepção:</strong> quando há uma <em>métrica</em> (ex.: % de alinhamento com
-            os cidadãos), ordenamos por esse valor. Em caso de <em>empate</em> ou sem dados,
-            volta a ordem alfabética.
+            <strong>Peso no hemiciclo</strong> = número de deputados da bancada. Isso é outra
+            camada: ajuda a perceber a <em>aritmética</em> de uma votação (quantos lugares a favor,
+            contra ou em abstenção). Abster-se pode decidir se há maioria. Não é conselho de voto
+            nem ranking político.
           </li>
           <li>
-            Cada partido conta como um <strong>sentido de voto</strong> (a favor / contra /
-            abstenção) no registo da AR — não como percentagem de cadeiras.
+            A estimativa assume voto coeso do grupo (como o registo oficial costuma registar o
+            sentido da bancada). Não substitui a contagem nominal de cada votação na AR.
           </li>
         </ul>
       </div>
