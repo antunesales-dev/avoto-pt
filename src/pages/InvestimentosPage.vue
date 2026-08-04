@@ -224,6 +224,12 @@ onMounted(async () => {
   font-weight: 600;
   margin: 0 0 1rem;
 }
+.empty-box {
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+}
 .init-grid {
   display: grid;
   gap: 1rem;
