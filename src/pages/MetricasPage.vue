@@ -20,14 +20,14 @@
         tint="rgba(0, 32, 91, 0.08)"
       />
       <StatCard
-        label="Despesas"
+        label="Despesas (catálogo)"
         :value="formatNumber(m.despesas)"
         icon="account_balance"
         accent="var(--pt-red)"
         tint="rgba(218, 41, 28, 0.1)"
       />
       <StatCard
-        label="Investimentos"
+        label="Investimentos (≥100k, voto)"
         :value="formatNumber(m.investimentos)"
         icon="savings"
         accent="#7a5f00"

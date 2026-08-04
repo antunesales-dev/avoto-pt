@@ -2,11 +2,19 @@
   <div class="page-shell">
     <h1 class="page-title">Investimentos</h1>
     <p class="page-subtitle">
-      Grandes investimentos e despesas relevantes. Os cidadãos registados podem
+      <strong>Contratos de valor elevado</strong> (≥&nbsp;100&nbsp;000&nbsp;€), retirados da
+      mesma fonte oficial de despesa, onde os cidadãos registados podem
       <strong>aprovar</strong>, <strong>rejeitar</strong> ou <strong>abster-se</strong> — um voto
-      por item, definitivo. Comparação com a <strong>decisão oficial</strong> quando existir nos
-      dados do Estado. Não é voto vinculativo.
+      por item, definitivo. Não é uma lista diferente de “outra despesa”: é o subconjunto em
+      que há voto. Não é vinculativo.
     </p>
+
+    <div class="notice notice-info" style="margin-bottom: 1.25rem">
+      Lista completa de contratos (incluindo valores menores):
+      <router-link to="/despesa">Despesa pública</router-link>.
+      Boletim diário (sem repetir tudo):
+      <router-link to="/digest">Resumo do dia</router-link>.
+    </div>
 
     <ListPager
       :page="page"

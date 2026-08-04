@@ -117,7 +117,8 @@ export async function fetchBaseContratos(limit = 80): Promise<{
     }
     despesas.push(despesa)
 
-    // Contratos ≥ 100k € → também como investimento votável
+    // Subconjunto votável: mesmo contrato Base, limiar alto — NÃO é uma fonte diferente.
+    // UI: Despesa = catálogo; Investimentos = estes; Resumo do dia não repete as duas listas.
     if (montante != null && montante >= 100_000) {
       investimentos.push({
         id: `inv-${id}`,
@@ -128,7 +129,8 @@ export async function fetchBaseContratos(limit = 80): Promise<{
         sector: tiposContrato || 'Contratos públicos',
         data_referencia: dataPub,
         decisao_oficial: 'em_curso',
-        decisao_detalhe: 'Contrato publicado no Portal Base (dados oficiais).',
+        decisao_detalhe:
+          'Contrato do Portal Base (≥ 100 000 €) exposto para voto cidadão na A Voto — não é uma segunda despesa inventada.',
         despesa_id: id,
         links,
         source: 'base.gov.pt',

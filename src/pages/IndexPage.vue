@@ -20,7 +20,9 @@
     <section>
       <h2 class="section-title">Dados oficiais na plataforma</h2>
       <p class="section-hint">
-        Conteúdo sincronizado de fontes do Estado / AR — não é contagem de utilizadores.
+        Conteúdo de fontes oficiais. Investimentos = contratos grandes (≥100&nbsp;000&nbsp;€)
+        onde se pode votar; Despesa = catálogo completo (só consulta); Resumos = boletim
+        diário. Não é contagem de utilizadores.
       </p>
       <div class="stats-grid">
         <StatCard

@@ -2,14 +2,19 @@
   <div class="page-shell">
     <h1 class="page-title">Resumo do dia</h1>
     <p class="page-subtitle">
-      O que a plataforma reuniu em cada dia: <strong>leis e votações no Parlamento</strong>,
-      <strong>despesa pública</strong> e <strong>investimentos</strong> — com o sentido de voto
-      dos partidos e, quando existir, o dos cidadãos na A Voto.
+      <strong>Boletim diário</strong> do que a plataforma reuniu nesse dia: leis e votações no
+      Parlamento e despesa pública relevante. Não substitui as listas completas de
+      <router-link to="/iniciativas">Iniciativas</router-link>,
+      <router-link to="/despesa">Despesa</router-link>
+      ou
+      <router-link to="/investimentos">Investimentos</router-link>
+      — é um atalho para o que aconteceu naquele dia.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      É um <strong>boletim factual</strong>, não notícias nem opinião. Vem só de fontes oficiais
-      e dos dados já na plataforma. Sem inteligência artificial a inventar texto.
+      Factos oficiais e contagens da A Voto — não é notícias nem opinião. Sem inteligência
+      artificial a inventar texto. Em cada lei: o que os partidos votaram e, se existir, o que
+      os cidadãos votaram aqui.
     </div>
 
     <p v-if="finance.loading" class="muted">A carregar…</p>
@@ -109,9 +114,15 @@
             </p>
           </section>
 
-          <!-- Despesa -->
+          <!-- Despesa (única secção de dinheiro — evita repetir o mesmo contrato em “investimentos”) -->
           <section v-if="sectionItems(d, 'despesas').length" class="digest-section">
-            <h3 class="digest-section__title">Despesa pública (contratos e orçamento)</h3>
+            <h3 class="digest-section__title">Despesa pública desse dia</h3>
+            <p class="muted sm" style="margin: -0.25rem 0 0.75rem">
+              Contratos com data nesse dia. Os de valor elevado também estão em
+              <router-link to="/investimentos">Investimentos</router-link>
+              para voto cidadão — a lista completa fica em
+              <router-link to="/despesa">Despesa</router-link>.
+            </p>
             <div
               v-for="(it, idx) in sectionItems(d, 'despesas').slice(0, sectionLimit)"
               :key="it.despesa_id || idx"
@@ -142,49 +153,13 @@
             </p>
           </section>
 
-          <!-- Investimentos -->
-          <section v-if="sectionItems(d, 'investimentos').length" class="digest-section">
-            <h3 class="digest-section__title">Investimentos públicos</h3>
-            <div
-              v-for="(it, idx) in sectionItems(d, 'investimentos').slice(0, sectionLimit)"
-              :key="it.investimento_id || idx"
-              class="digest-item"
-            >
-              <div class="digest-item__badges">
-                <span v-if="it.sector" class="badge badge--muted">{{ it.sector }}</span>
-                <span v-if="it.montante_eur != null" class="badge badge--gold">
-                  {{ formatMoney(it.montante_eur) }}
-                </span>
-                <span v-if="it.decisao_oficial" class="badge badge--navy">
-                  {{ it.decisao_oficial }}
-                </span>
-              </div>
-              <h4 class="digest-item__titulo">{{ it.titulo }}</h4>
-              <p v-if="it.entidade" class="digest-item__line">{{ it.entidade }}</p>
-              <div v-if="it.votos_cidadaos" class="digest-item__block">
-                <h5 class="digest-item__h">Voto dos cidadãos na A Voto</h5>
-                <VoteBar :votos="cidadaosVotos(it)" />
-              </div>
-              <router-link
-                v-if="it.investimento_id"
-                :to="`/investimentos/${it.investimento_id}`"
-                class="btn btn--ghost btn--sm"
-              >
-                Ver investimento
-              </router-link>
-            </div>
-            <p v-if="sectionItems(d, 'investimentos').length > sectionLimit" class="muted sm">
-              + {{ sectionItems(d, 'investimentos').length - sectionLimit }} — ver
-              <router-link to="/investimentos">Investimentos</router-link>.
-            </p>
-          </section>
+          <!--
+            Não listamos “investimentos” aqui: são o mesmo Portal Base (≥100k €),
+            já cobertos em Despesa + página Investimentos (voto). Evita triplicar.
+          -->
 
           <p
-            v-if="
-              !sectionItems(d, 'iniciativas').length &&
-              !sectionItems(d, 'despesas').length &&
-              !sectionItems(d, 'investimentos').length
-            "
+            v-if="!sectionItems(d, 'iniciativas').length && !sectionItems(d, 'despesas').length"
             class="muted sm"
           >
             Sem itens neste dia.
@@ -294,8 +269,8 @@ function sectionCountsLabel(d) {
   if (items?.sections) {
     const a = items.sections.iniciativas?.count ?? 0
     const b = items.sections.despesas?.count ?? 0
-    const c = items.sections.investimentos?.count ?? 0
-    return `${a} iniciativa(s) · ${b} despesa(s) · ${c} investimento(s)`
+    // investimentos = subconjunto de despesa (não contar à parte no boletim)
+    return `${a} lei(s)/votação(ões) · ${b} despesa(s)`
   }
   const n = Array.isArray(items) ? items.length : Array.isArray(items?.legacy_items) ? items.legacy_items.length : 0
   return `${n} item(ns)`

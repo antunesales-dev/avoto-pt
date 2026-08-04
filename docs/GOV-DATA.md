@@ -7,9 +7,11 @@ Plataforma **independente**. Usa **apenas** portais oficiais do Estado / AR.
 | Pilar | O quê | Tabelas | Voto cidadão |
 |-------|--------|---------|--------------|
 | **Parlamento** | Iniciativas e votações AR | `iniciativas`, contagens | A favor / Contra / Abstenção |
-| **Digest diário** | O que foi a voto e **como** (partidos + cidadãos) | `daily_digests` | (agrega votos existentes) |
-| **Despesa** | Contratos, linhas OE, spending | `despesas_publicas` | leitura + transparência |
-| **Investimentos** | Grandes investimentos | `investimentos` | Aprovar / Rejeitar / Abster + vs decisão oficial |
+| **Resumo do dia** | Boletim diário (leis + despesa do dia) | `daily_digests` | só agrega; não é 3.ª lista completa |
+| **Despesa** | Catálogo completo de contratos / spending | `despesas_publicas` | só consulta |
+| **Investimentos** | **Subconjunto** da despesa (≥ 100k €) para voto | `investimentos` (mesmo Base, `despesa_id`) | Aprovar / Rejeitar / Abster |
+
+**Importante:** despesa e investimentos **não são duas fontes**. O sync Base grava tudo em despesa e copia os contratos ≥ 100k € para investimentos (voto). O resumo do dia **não** deve listar os dois como se fossem conteúdos distintos.
 
 ## Fontes oficiais (permitidas)
 

@@ -2,14 +2,17 @@
   <div class="page-shell">
     <h1 class="page-title">Despesa pública</h1>
     <p class="page-subtitle">
-      Transparência de <strong>spending</strong> do Estado: contratos, linhas orçamentais e
-      investimentos registados a partir de fontes oficiais (Base.gov.pt, dados.gov.pt, DGO). A A
-      Voto não interpreta nem recomenda — mostra montantes e ligações oficiais.
+      <strong>Catálogo de consulta</strong> de contratos e despesa do Estado (Portal Base e
+      fontes oficiais). Aqui <strong>não se vota</strong> — só se vê montantes, entidades e
+      ligações oficiais.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Dados sincronizados de fontes oficiais (<code>despesa-sync</code>). Cada linha indica a
-      origem.
+      Os contratos de valor elevado (≥&nbsp;100&nbsp;000&nbsp;€) aparecem também em
+      <router-link to="/investimentos">Investimentos</router-link>, onde os cidadãos registados
+      podem dar um sentido de voto. O
+      <router-link to="/digest">Resumo do dia</router-link>
+      só junta destaques do dia — não é uma terceira lista completa.
     </div>
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
