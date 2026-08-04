@@ -33,7 +33,7 @@
         <ul>
           <li>Democracia directa nem voto vinculativo.</li>
           <li>Sondagem oficial ou representativa de Portugal.</li>
-          <li>Um sítio de recomendações políticas ou de “vencedores”.</li>
+          <li>Um site de recomendações políticas ou de “vencedores”.</li>
         </ul>
         <div class="notice" style="margin-top: 1rem">
           Conta com email, ID permanente (CID-…), um voto por iniciativa com confirmação e sem

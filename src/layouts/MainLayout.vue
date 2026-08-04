@@ -135,7 +135,7 @@
         <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
       </nav>
       <p class="av-footer__note">
-        Não é sítio oficial do Estado. Votos na plataforma não são vinculativos.
+        Não é site oficial do Estado. Votos na plataforma não são vinculativos.
       </p>
     </div>
   </footer>

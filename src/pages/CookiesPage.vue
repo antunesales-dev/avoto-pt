@@ -44,7 +44,7 @@
               <td><code>avoto-device-id</code> (localStorage)</td>
               <td>Essencial / segurança</td>
               <td>Limitar abuso e contas duplicadas no mesmo dispositivo</td>
-              <td>Persistente até limpar dados do sítio</td>
+              <td>Persistente até limpar dados do site</td>
             </tr>
             <tr>
               <td>Cloudflare Turnstile</td>
@@ -90,7 +90,7 @@
         <h2 class="section-title">5. Como gerir</h2>
         <ul>
           <li>
-            Pode limpar cookies e dados do sítio nas definições do browser (isso termina a sessão e
+            Pode limpar cookies e dados do site nas definições do browser (isso termina a sessão e
             gera novo <code>device-id</code>).
           </li>
           <li>
@@ -98,7 +98,7 @@
             falhar.
           </li>
           <li>
-            Em PWA, pode desinstalar a app / limpar o storage do sítio.
+            Em PWA, pode desinstalar a app / limpar o storage do site.
           </li>
         </ul>
 

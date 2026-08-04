@@ -38,7 +38,7 @@
             >
           </li>
           <li>
-            <strong>Sítio:</strong> avoto.pt (quando activo) e ambientes técnicos de pré-produção
+            <strong>Site:</strong> avoto.pt (quando activo) e ambientes técnicos de pré-produção
             (páginas Cloudflare / GitHub Pages).
           </li>
         </ul>
@@ -204,7 +204,7 @@
         <h2 class="section-title">10. Alterações</h2>
         <p>
           Podemos actualizar esta política para reflectir mudanças legais ou técnicas. A data no
-          topo indica a versão em vigor. Alterações relevantes serão assinaladas no sítio.
+          topo indica a versão em vigor. Alterações relevantes serão assinaladas no site.
         </p>
 
         <div class="notice notice-info">

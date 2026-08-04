@@ -64,7 +64,7 @@
           actualização em tempo real do Parlamento ou da Administração.
         </p>
         <p>
-          É proibido apresentar a A Voto como sítio oficial do Estado ou da Assembleia da República.
+          É proibido apresentar a A Voto como site oficial do Estado ou da Assembleia da República.
         </p>
 
         <h2 class="section-title">5. Conduta proibida</h2>
