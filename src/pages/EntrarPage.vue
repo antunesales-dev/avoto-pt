@@ -170,19 +170,28 @@ async function onEnviarCodigo() {
     })
   } catch (e) {
     bumpTurnstile()
-    if (e.code === 'RATE_LIMITED' || /RATE_LIMITED|demasiados pedidos/i.test(e.message || '')) {
+    const m = e.message || ''
+    if (
+      e.code === 'EMAIL_RATE_LIMITED' ||
+      /EMAIL_RATE_LIMITED|fornecedor de email|serviço de email/i.test(`${e.code} ${m}`)
+    ) {
       formError.value =
-        'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
+        m ||
+        'O serviço de email limitou envios (plano Supabase). Espere cerca de 1 hora, ou use palavra-passe.'
+    } else if (e.code === 'RATE_LIMITED' || /demasiados pedidos/i.test(m)) {
+      formError.value =
+        m ||
+        'Demasiados pedidos neste dispositivo ou rede. Espere e tente de novo, ou use palavra-passe.'
     } else if (
       e.code === 'DEVICE_ACCOUNT_LIMIT' ||
-      /limite de contas/i.test(e.message || '')
+      /limite de contas/i.test(m)
     ) {
       formError.value =
         'Limite de contas neste dispositivo. Entre com uma conta existente ou use outro dispositivo.'
-    } else if (e.code === 'TURNSTILE_FAILED' || /TURNSTILE|anti-bot/i.test(e.message || '')) {
+    } else if (e.code === 'TURNSTILE_FAILED' || /TURNSTILE|anti-bot/i.test(m)) {
       formError.value = 'Verificação anti-bot falhou. Complete o desafio e tente de novo.'
     } else {
-      formError.value = e.message || 'Não foi possível enviar o email.'
+      formError.value = m || 'Não foi possível enviar o email.'
     }
   }
 }

@@ -196,13 +196,17 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <style scoped lang="scss">
+/* Sticky footer: coluna ≥ ecrã; área principal cresce; navy só na faixa do footer */
 .av-root {
-  display: block;
-  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  min-height: 100vh;
   background: var(--pt-paper-2);
 }
 
 .av-layout {
+  flex: 1 0 auto;
   min-height: 0 !important;
   height: auto !important;
   background: transparent;

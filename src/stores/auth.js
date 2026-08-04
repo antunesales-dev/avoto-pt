@@ -270,10 +270,20 @@ export const useAuthStore = defineStore('auth', () => {
         const parsedErr = await parseFunctionsError(fnErr, data)
         let msg = parsedErr.message
         let code = parsedErr.code
-        if (/RATE_LIMITED|429|Demasiados/i.test(`${code} ${msg}`)) {
+        // Ordem importa: EMAIL_RATE_LIMITED contém a substring RATE_LIMITED
+        if (code === 'EMAIL_RATE_LIMITED' || /EMAIL_RATE_LIMITED|fornecedor de email/i.test(`${code} ${msg}`)) {
+          code = 'EMAIL_RATE_LIMITED'
+          msg =
+            msg && /fornecedor|email|minutos/i.test(msg)
+              ? msg
+              : 'O serviço de email limitou envios. Espere cerca de 1 hora e tente de novo, ou use palavra-passe se já tiver.'
+        } else if (
+          code === 'RATE_LIMITED' ||
+          (code !== 'EMAIL_RATE_LIMITED' && /\bRATE_LIMITED\b|Demasiados pedidos/i.test(`${code} ${msg}`))
+        ) {
           code = 'RATE_LIMITED'
           msg =
-            'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
+            'Demasiados pedidos neste dispositivo ou rede. Espere e tente de novo, ou use palavra-passe.'
         } else if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(`${code} ${msg}`)) {
           code = 'DEVICE_ACCOUNT_LIMIT'
           msg =

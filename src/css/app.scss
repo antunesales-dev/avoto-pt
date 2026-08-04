@@ -31,10 +31,16 @@ html,
 body,
 #q-app {
   min-height: 100%;
+  min-height: 100dvh;
   font-family: var(--font-body);
   color: var(--pt-ink);
   background: var(--pt-paper-2);
   -webkit-font-smoothing: antialiased;
+}
+
+#q-app {
+  display: flex;
+  flex-direction: column;
 }
 
 body {
