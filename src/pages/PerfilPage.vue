@@ -5,8 +5,8 @@
         <h1 class="page-title">Perfil</h1>
         <p class="page-subtitle" style="margin-bottom: 0">Área pessoal — só visível para si.</p>
       </div>
-      <button type="button" class="btn btn--outline btn--sm" :disabled="auth.loading" @click="onSair">
-        Sair
+      <button type="button" class="btn btn--outline btn--sm" @click="onSair">
+        Sair da sessão
       </button>
     </div>
 
@@ -131,6 +131,29 @@
           </template>
         </div>
       </section>
+
+      <section class="av-card account-danger">
+        <div class="av-card-pad">
+          <h2 class="section-title">Sessão e conta</h2>
+          <p class="muted" style="margin-bottom: 0.85rem">
+            Pode terminar a sessão neste dispositivo ou apagar a conta (RGPD — direito ao
+            apagamento). Apagar remove o login, o perfil e os votos associados.
+          </p>
+          <div class="account-actions">
+            <button type="button" class="btn btn--outline" :disabled="busy" @click="onSair">
+              {{ busy === 'sair' ? 'A sair…' : 'Sair da sessão' }}
+            </button>
+            <button
+              type="button"
+              class="btn btn--danger"
+              :disabled="busy"
+              @click="onApagarConta"
+            >
+              {{ busy === 'apagar' ? 'A apagar…' : 'Apagar a minha conta' }}
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -160,6 +183,7 @@ const $q = useQuasar()
 const historico = ref([])
 const partido = ref(auth.profile?.partido_preferencia || '')
 const savingNotif = ref(false)
+const busy = ref('') // '' | 'sair' | 'apagar'
 const permission = ref(notificationPermission())
 const prefs = reactive({
   notify_digest: true,
@@ -207,8 +231,58 @@ function votoClass(v) {
 }
 
 async function onSair() {
-  await auth.sair()
-  router.push('/')
+  if (busy.value) return
+  busy.value = 'sair'
+  try {
+    await auth.sair()
+    $q.notify({ type: 'positive', message: 'Sessão terminada.', position: 'top' })
+    await router.replace('/')
+  } catch (e) {
+    // sair() limpa estado local mesmo com erro de rede
+    $q.notify({
+      type: 'warning',
+      message: e.message || 'Sessão limpa neste dispositivo.',
+      position: 'top',
+    })
+    await router.replace('/')
+  } finally {
+    busy.value = ''
+  }
+}
+
+function onApagarConta() {
+  if (busy.value) return
+  $q.dialog({
+    title: 'Apagar a conta?',
+    message:
+      'Isto é <strong>definitivo</strong>. Remove o login, o perfil e os votos associados a esta conta. Não pode ser desfeito.',
+    html: true,
+    persistent: true,
+    ok: { label: 'Sim, apagar a conta', color: 'negative', unelevated: true },
+    cancel: { label: 'Cancelar', flat: true },
+  }).onOk(() => confirmarApagar())
+}
+
+async function confirmarApagar() {
+  busy.value = 'apagar'
+  try {
+    await auth.apagarConta()
+    $q.notify({
+      type: 'positive',
+      message: 'Conta apagada.',
+      position: 'top',
+    })
+    await router.replace('/')
+  } catch (e) {
+    $q.notify({
+      type: 'negative',
+      message: e.message || 'Não foi possível apagar a conta.',
+      position: 'top',
+      timeout: 6000,
+    })
+  } finally {
+    busy.value = ''
+  }
 }
 
 async function savePartido() {
@@ -371,5 +445,35 @@ onMounted(async () => {
   overflow: hidden;
   white-space: normal;
   max-width: 28rem;
+}
+.account-danger {
+  border-color: #e8a0a8;
+}
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.btn--danger {
+  appearance: none;
+  border: 1.5px solid var(--pt-red);
+  background: var(--pt-red);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.5rem 0.9rem;
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 1.2;
+
+  &:hover:not(:disabled) {
+    background: var(--pt-red-dark);
+    border-color: var(--pt-red-dark);
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
 }
 </style>

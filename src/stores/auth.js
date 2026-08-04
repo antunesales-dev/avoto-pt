@@ -301,11 +301,64 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const { error: err } = await supabase.auth.signOut()
-      if (err) throw err
+      // Global primeiro; se falhar/rede, limpa sessão local na mesma
+      const global = supabase.auth.signOut({ scope: 'global' })
+      await Promise.race([
+        global,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('SIGNOUT_TIMEOUT')), 4000)),
+      ]).catch(async () => {
+        await supabase.auth.signOut({ scope: 'local' })
+      })
+    } catch (e) {
+      // Último recurso: limpar estado da app mesmo sem resposta do servidor
+      try {
+        await supabase.auth.signOut({ scope: 'local' })
+      } catch {
+        /* ignore */
+      }
+      error.value = e.message || String(e)
+    } finally {
       session.value = null
       profile.value = null
       passwordRecovery.value = false
+      loading.value = false
+    }
+  }
+
+  /**
+   * Apaga a conta (auth.users + cascata profiles/votos) via edge delete-my-account.
+   * Requer sessão válida. Depois limpa estado local.
+   */
+  async function apagarConta() {
+    if (!session.value?.access_token) {
+      const e = new Error('Não tem sessão activa.')
+      e.code = 'AUTH_REQUIRED'
+      throw e
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke('delete-my-account', {
+        method: 'POST',
+        body: {},
+      })
+      if (fnErr) {
+        const msg = fnErr.message || String(fnErr)
+        // Edge não deployada / 404
+        if (/not found|404|Failed to send/i.test(msg)) {
+          const e = new Error(
+            'Serviço de apagar conta ainda não está activo no servidor. Contacte o suporte ou tente mais tarde.',
+          )
+          e.code = 'EDGE_MISSING'
+          throw e
+        }
+        throw new Error(msg)
+      }
+      if (data?.error) {
+        throw new Error(data.message || data.error)
+      }
+      await sair()
+      return true
     } catch (e) {
       error.value = e.message || String(e)
       throw e
@@ -503,6 +556,7 @@ export const useAuthStore = defineStore('auth', () => {
     enviarMagicLink,
     verificarOtp,
     sair,
+    apagarConta,
     pedirRecuperacao,
     atualizarPassword,
     reenviarConfirmacao,
