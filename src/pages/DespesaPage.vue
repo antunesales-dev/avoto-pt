@@ -41,7 +41,9 @@
     <DateRangeFilter
       v-model="periodo"
       label="Data de publicação"
+      :options="periodoOpts"
       :count="filtradas.length"
+      hint="Só períodos com contratos nesta lista. Despesa é retrospectiva — não há filtro “Futuro”."
       style="margin-bottom: 1rem"
     />
 
@@ -136,7 +138,7 @@ import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
-import { matchesDateRange } from '@/lib/dateRange'
+import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
@@ -150,6 +152,10 @@ function goDetail(id) {
   router.push({ name: 'despesa-detalhe', params: { id } })
 }
 
+function dataRefDespesa(d) {
+  return d.data_publicacao || d.data_inicio || null
+}
+
 const tipos = [
   { id: 'todos', label: 'Todos' },
   { id: 'contrato_publico', label: 'Contratos' },
@@ -158,13 +164,21 @@ const tipos = [
   { id: 'outro', label: 'Outro' },
 ]
 
-const filtradas = computed(() => {
-  return finance.despesas.filter((d) => {
-    if (tipo.value !== 'todos' && d.tipo !== tipo.value) return false
-    if (!matchesDateRange(d.data_publicacao || d.data_inicio, periodo.value)) return false
-    return true
-  })
+const baseFiltradas = computed(() => {
+  if (tipo.value === 'todos') return finance.despesas
+  return finance.despesas.filter((d) => d.tipo === tipo.value)
 })
+
+const periodoOpts = computed(() =>
+  optionsForContext(
+    'despesa',
+    baseFiltradas.value.map((d) => dataRefDespesa(d)),
+  ),
+)
+
+const filtradas = computed(() =>
+  baseFiltradas.value.filter((d) => matchesDateRange(dataRefDespesa(d), periodo.value)),
+)
 
 const totalMontante = computed(() =>
   filtradas.value.reduce((s, d) => s + (Number(d.montante_eur) || 0), 0),

@@ -18,8 +18,10 @@
 
     <DateRangeFilter
       v-model="periodo"
-      label="Data de referência"
+      label="Data de referência do contrato"
+      :options="periodoOpts"
       :count="filtrados.length"
+      hint="Só períodos com investimentos nesta lista. Contratos do Portal Base são em geral passados — sem “Futuro”."
       style="margin-bottom: 1rem"
     />
 
@@ -113,7 +115,7 @@ import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
-import { matchesDateRange } from '@/lib/dateRange'
+import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
@@ -121,6 +123,13 @@ const finance = useFinanceStore()
 const { investimentos } = storeToRefs(finance)
 const loading = ref(true)
 const periodo = ref('todos')
+
+const periodoOpts = computed(() =>
+  optionsForContext(
+    'investimentos',
+    (investimentos.value || []).map((inv) => inv.data_referencia),
+  ),
+)
 
 const filtrados = computed(() =>
   (investimentos.value || []).filter((inv) =>

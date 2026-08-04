@@ -19,8 +19,10 @@
 
     <DateRangeFilter
       v-model="periodo"
-      label="Dia do resumo"
+      label="Dia do boletim"
+      :options="periodoOpts"
       :count="filtrados.length"
+      hint="Só dias em que já existe resumo gerado. Boletins são do passado — sem “Futuro”."
       style="margin-bottom: 1rem"
     />
 
@@ -225,12 +227,19 @@ import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
 import { estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
-import { dateRangeLabel, matchesDateRange } from '@/lib/dateRange'
+import { dateRangeLabel, matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
 const periodo = ref('todos')
 const sectionLimit = 6
+
+const periodoOpts = computed(() =>
+  optionsForContext(
+    'digest',
+    (finance.digests || []).map((d) => d.digest_date),
+  ),
+)
 
 const filtrados = computed(() =>
   (finance.digests || []).filter((d) => matchesDateRange(d.digest_date, periodo.value)),

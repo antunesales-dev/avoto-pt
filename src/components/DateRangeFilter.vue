@@ -1,5 +1,10 @@
 <template>
-  <div class="date-range" role="group" :aria-label="ariaLabel">
+  <div
+    v-if="visibleOptions.length > 1"
+    class="date-range"
+    role="group"
+    :aria-label="ariaLabel"
+  >
     <div class="date-range__head">
       <span v-if="showLabel" class="date-range__label">{{ label }}</span>
       <span v-if="count != null" class="date-range__count">
@@ -8,7 +13,7 @@
     </div>
     <div class="filter-row date-range__chips">
       <button
-        v-for="opt in options"
+        v-for="opt in visibleOptions"
         :key="opt.id"
         type="button"
         class="chip-btn"
@@ -17,6 +22,9 @@
         @click="select(opt.id)"
       >
         {{ opt.label }}
+        <span v-if="opt.id !== 'todos' && opt.count != null" class="chip-btn__n">
+          {{ opt.count }}
+        </span>
       </button>
     </div>
     <p v-if="hint" class="date-range__hint">{{ hint }}</p>
@@ -24,27 +32,45 @@
 </template>
 
 <script setup>
-import { DATE_RANGE_OPTIONS } from '@/lib/dateRange'
+import { computed, watch } from 'vue'
+import { DATE_RANGE_OPTIONS, coerceDateRange } from '@/lib/dateRange'
 
 const model = defineModel({ type: String, default: 'todos' })
 
-defineProps({
+const props = defineProps({
   label: { type: String, default: 'Quando' },
   showLabel: { type: Boolean, default: true },
   ariaLabel: { type: String, default: 'Filtrar por data' },
-  options: { type: Array, default: () => DATE_RANGE_OPTIONS },
-  /** Nº de itens após filtro (opcional, feedback visual) */
+  /**
+   * Opções já filtradas pela página (optionsForContext).
+   * Se omitido, mostra a lista canónica completa.
+   */
+  options: { type: Array, default: null },
   count: { type: Number, default: null },
   hint: {
     type: String,
     default:
-      'Usa a data do registo oficial. “Hoje” só mostra o que tem essa data exacta — se a lista ficar vazia, experimente “Últimos 30 dias”.',
+      'Só aparecem períodos com dados nesta lista. “Hoje” exige a data exacta do registo oficial.',
   },
+})
+
+const visibleOptions = computed(() => {
+  if (Array.isArray(props.options) && props.options.length) return props.options
+  return DATE_RANGE_OPTIONS.map((o) => ({ ...o }))
 })
 
 function select(id) {
   model.value = id
 }
+
+// Se o período activo desapareceu (ex.: sem dados “hoje”), volta a Todas
+watch(
+  visibleOptions,
+  (opts) => {
+    model.value = coerceDateRange(model.value, opts)
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped lang="scss">
@@ -89,5 +115,17 @@ function select(id) {
   color: var(--pt-muted);
   line-height: 1.4;
   max-width: 42rem;
+}
+
+.chip-btn__n {
+  margin-left: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.chip-btn.is-active .chip-btn__n {
+  opacity: 1;
 }
 </style>

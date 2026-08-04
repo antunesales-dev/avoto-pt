@@ -147,3 +147,57 @@ export function matchesDateRange(iso, rangeId) {
 export function dateRangeLabel(rangeId) {
   return DATE_RANGE_OPTIONS.find((o) => o.id === rangeId)?.label || 'Todas as datas'
 }
+
+/**
+ * Períodos candidatos por tipo de página (ainda filtrados pelos dados reais).
+ * Despesa/investimentos/digest: sem “Futuro” (registos são retrospectivos).
+ * Iniciativas: “Futuro” só se houver datas de votação/entrada futuras.
+ */
+export const DATE_RANGE_BY_CONTEXT = {
+  iniciativas: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'futuro', 'passados'],
+  despesa: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
+  investimentos: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
+  digest: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
+}
+
+/**
+ * Devolve só opções com resultados nos dados actuais (+ “Todas”).
+ * @param {Array<string|Date|null|undefined>} isoDates
+ * @param {string[]} candidateIds
+ * @returns {{ id: string, label: string, count: number }[]}
+ */
+export function availableDateRanges(isoDates, candidateIds = null) {
+  const list = Array.isArray(isoDates) ? isoDates : []
+  const ids =
+    candidateIds ||
+    DATE_RANGE_OPTIONS.map((o) => o.id)
+
+  const out = []
+  for (const id of ids) {
+    const base = DATE_RANGE_OPTIONS.find((o) => o.id === id)
+    if (!base) continue
+    if (id === 'todos') {
+      out.push({ ...base, count: list.length })
+      continue
+    }
+    let n = 0
+    for (const iso of list) {
+      if (matchesDateRange(iso, id)) n += 1
+    }
+    if (n > 0) out.push({ ...base, count: n })
+  }
+  return out
+}
+
+/** Opções úteis para uma página, com base nos dados carregados. */
+export function optionsForContext(context, isoDates) {
+  const ids = DATE_RANGE_BY_CONTEXT[context] || DATE_RANGE_OPTIONS.map((o) => o.id)
+  return availableDateRanges(isoDates, ids)
+}
+
+/** Se o período activo deixou de existir (0 resultados), volta a “todos”. */
+export function coerceDateRange(rangeId, options) {
+  if (!rangeId || rangeId === 'todos') return 'todos'
+  if (Array.isArray(options) && options.some((o) => o.id === rangeId)) return rangeId
+  return 'todos'
+}

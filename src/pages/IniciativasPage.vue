@@ -57,8 +57,10 @@
       </div>
       <DateRangeFilter
         v-model="periodo"
-        label="Data da votação AR"
+        label="Data da votação AR (ou entrada)"
+        :options="periodoOpts"
         :count="filtradas.length"
+        hint="Só períodos com iniciativas nesta lista. A data é a da votação na AR; se não houver, usa a data de entrada."
       />
     </div>
 
@@ -113,7 +115,7 @@ import InitiativeCard from '@/components/InitiativeCard.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { hasPartyVotes, temas } from '@/data/partidos'
-import { dateRangeLabel, matchesDateRange } from '@/lib/dateRange'
+import { dateRangeLabel, matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { useDataStore } from '@/stores/data'
 
 const data = useDataStore()
@@ -141,14 +143,14 @@ function dataRefIniciativa(i) {
   return i.dataVotacao || i.dataEntrada || null
 }
 
-const filtradas = computed(() => {
+/** Lista base (sem período) — para calcular que chips de data fazem sentido. */
+const baseFiltradas = computed(() => {
   const q = query.value.trim().toLowerCase()
   return data.iniciativas.filter((i) => {
     if (detalhe.value === 'com_partidos' && !hasPartyVotes(i.resultadoPartidos)) return false
     if (detalhe.value === 'com_votacao' && !i.dataVotacao) return false
     if (tema.value !== 'Todos' && i.tema !== tema.value) return false
     if (estado.value !== 'todos' && i.estado !== estado.value) return false
-    if (!matchesDateRange(dataRefIniciativa(i), periodo.value)) return false
     if (!q) return true
     return (
       i.titulo.toLowerCase().includes(q) ||
@@ -158,6 +160,17 @@ const filtradas = computed(() => {
     )
   })
 })
+
+const periodoOpts = computed(() =>
+  optionsForContext(
+    'iniciativas',
+    baseFiltradas.value.map((i) => dataRefIniciativa(i)),
+  ),
+)
+
+const filtradas = computed(() =>
+  baseFiltradas.value.filter((i) => matchesDateRange(dataRefIniciativa(i), periodo.value)),
+)
 
 const {
   page,
