@@ -18,11 +18,14 @@
       :page-window="pageWindow"
       :sizes="sizes"
       unit="investimentos"
+      aria-label="Paginação de investimentos"
       @go="goPage"
       @update:page-size="setPageSize"
     />
 
-    <div v-if="pageItems.length" class="init-grid">
+    <p v-if="loading" class="muted">A carregar investimentos…</p>
+
+    <div v-else-if="pageItems.length" class="init-grid">
       <router-link
         v-for="inv in pageItems"
         :key="inv.id"
@@ -67,13 +70,15 @@
       :sizes="sizes"
       :show-size="false"
       unit="investimentos"
+      aria-label="Paginação de investimentos (rodapé)"
       @go="goPage"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, toRef } from 'vue'
+import { storeToRefs } from 'pinia'
 import ListPager from '@/components/ListPager.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
@@ -81,8 +86,10 @@ import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
-const list = computed(() => finance.investimentos)
+const { investimentos } = storeToRefs(finance)
+const loading = ref(true)
 
+// toRef/storeToRefs garante reactividade da lista no usePagination
 const {
   page,
   pageSize,
@@ -94,10 +101,14 @@ const {
   pageItems,
   pageWindow,
   goPage,
-} = usePagination(list, { defaultSize: 12 })
+} = usePagination(investimentos, {
+  defaultSize: 12,
+  sizes: [12, 24, 48],
+  queryPrefix: 'inv',
+})
 
 function setPageSize(n) {
-  pageSize.value = n
+  pageSize.value = Number(n) || 12
 }
 
 function formatMoney(n) {
@@ -127,10 +138,24 @@ function decisaoClass(d) {
   return 'badge--muted'
 }
 
-onMounted(() => finance.loadInvestimentos().catch(console.error))
+onMounted(async () => {
+  loading.value = true
+  try {
+    await finance.loadInvestimentos()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <style scoped lang="scss">
+.muted {
+  color: var(--pt-muted);
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
 .init-grid {
   display: grid;
   gap: 1rem;

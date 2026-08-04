@@ -1,12 +1,14 @@
 <template>
-  <div class="list-pager">
+  <div class="list-pager" :class="{ 'list-pager--footer': !showSize }">
     <div class="list-pager__bar">
       <p class="list-pager__count">
-        <template v-if="total">
+        <template v-if="total > 0">
           A mostrar <strong>{{ rangeFrom }}–{{ rangeTo }}</strong> de
           <strong>{{ total }}</strong>
           <template v-if="unit"> {{ unit }}</template>
-          · página {{ page }} / {{ totalPages }}
+          <template v-if="totalPages > 1">
+            · página <strong>{{ page }}</strong> / <strong>{{ totalPages }}</strong>
+          </template>
         </template>
         <template v-else>Sem resultados</template>
       </p>
@@ -18,15 +20,21 @@
       </label>
     </div>
 
+    <!-- Sempre mostrar controlos se houver mais do que uma página -->
     <nav v-if="totalPages > 1" class="list-pager__nav" :aria-label="ariaLabel">
-      <button type="button" class="btn btn--outline btn--sm" :disabled="page <= 1" @click="$emit('go', 1)">
+      <button
+        type="button"
+        class="btn btn--outline btn--sm"
+        :disabled="page <= 1"
+        @click="emit('go', 1)"
+      >
         «
       </button>
       <button
         type="button"
         class="btn btn--outline btn--sm"
         :disabled="page <= 1"
-        @click="$emit('go', page - 1)"
+        @click="emit('go', page - 1)"
       >
         Anterior
       </button>
@@ -37,7 +45,7 @@
         class="list-pager__num"
         :class="{ 'is-active': p === page, 'is-ellipsis': p === '…' }"
         :disabled="p === '…'"
-        @click="p !== '…' && $emit('go', p)"
+        @click="p !== '…' && emit('go', p)"
       >
         {{ p }}
       </button>
@@ -45,7 +53,7 @@
         type="button"
         class="btn btn--outline btn--sm"
         :disabled="page >= totalPages"
-        @click="$emit('go', page + 1)"
+        @click="emit('go', page + 1)"
       >
         Seguinte
       </button>
@@ -53,7 +61,7 @@
         type="button"
         class="btn btn--outline btn--sm"
         :disabled="page >= totalPages"
-        @click="$emit('go', totalPages)"
+        @click="emit('go', totalPages)"
       >
         »
       </button>
@@ -84,18 +92,27 @@ function onSize(e) {
 </script>
 
 <style scoped lang="scss">
+.list-pager {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--pt-border);
+  border-radius: 10px;
+  background: #fff;
+}
+.list-pager--footer {
+  margin: 1.25rem 0 0.35rem;
+}
 .list-pager__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.65rem 1rem;
-  margin: 0 0 0.85rem;
 }
 .list-pager__count {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  color: var(--pt-muted);
+  color: var(--pt-navy);
   margin: 0;
 }
 .list-pager__size {
@@ -109,8 +126,8 @@ function onSize(e) {
     font-family: var(--font-body);
     font-size: 0.9rem;
     font-weight: 600;
-    padding: 0.3rem 0.45rem;
-    border: 1px solid var(--pt-border);
+    padding: 0.35rem 0.5rem;
+    border: 1.5px solid var(--pt-border);
     border-radius: 6px;
     background: var(--pt-cream);
     color: var(--pt-navy);
@@ -122,11 +139,13 @@ function onSize(e) {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  margin: 1.25rem 0 0.35rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--pt-line, var(--pt-border));
 }
 .list-pager__num {
-  min-width: 2.25rem;
-  height: 2.25rem;
+  min-width: 2.35rem;
+  height: 2.35rem;
   padding: 0 0.45rem;
   border: 1.5px solid var(--pt-border);
   border-radius: 6px;

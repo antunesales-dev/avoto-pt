@@ -20,7 +20,10 @@ export function usePagination(sourceList, opts = {}) {
   const pageSize = ref(defaultSize)
 
   const list = computed(() => {
-    const v = unref(sourceList)
+    // Aceita Ref, ComputedRef, array Pinia (proxy) ou getter
+    let v = typeof sourceList === 'function' ? sourceList() : unref(sourceList)
+    // storeToRefs / nested ref edge case
+    if (v && !Array.isArray(v) && Array.isArray(v.value)) v = v.value
     return Array.isArray(v) ? v : []
   })
 
