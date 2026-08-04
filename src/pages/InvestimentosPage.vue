@@ -57,8 +57,23 @@
           <h2 class="inv-card__title link-card__title">{{ inv.titulo }}</h2>
           <p class="inv-card__money font-display">{{ formatMoney(inv.montante_eur) }}</p>
           <p class="inv-card__ent">{{ inv.entidade }}</p>
+          <p class="inv-card__src">
+            Fonte: {{ sourceLabel(inv.source) }}
+            <template v-if="primarySourceUrl(inv)">
+              ·
+              <a
+                :href="primarySourceUrl(inv)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inv-card__ext"
+                @click.stop
+              >
+                portal oficial ↗
+              </a>
+            </template>
+          </p>
           <VoteBar :votos="inv.votosCidadaos" :show-counts="false" />
-          <div class="inv-card__foot">Ver e votar →</div>
+          <div class="inv-card__foot">Ver detalhe e votar →</div>
         </div>
       </router-link>
     </div>
@@ -90,7 +105,7 @@ import { storeToRefs } from 'pinia'
 import ListPager from '@/components/ListPager.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
-import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
+import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
@@ -126,6 +141,10 @@ function formatMoney(n) {
     currency: 'EUR',
     maximumFractionDigits: 0,
   }).format(Number(n))
+}
+
+function primarySourceUrl(inv) {
+  return resolveSourceLinks(inv)[0]?.url || null
 }
 
 function decisaoLabel(d) {
@@ -191,9 +210,23 @@ onMounted(async () => {
   margin: 0 0 0.25rem;
 }
 .inv-card__ent {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.35rem;
   font-size: 0.9rem;
   color: var(--pt-muted);
+}
+.inv-card__src {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pt-muted);
+}
+.inv-card__ext {
+  color: var(--pt-green-dark);
+  font-weight: 700;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 .inv-card__foot {
   margin-top: 0.75rem;

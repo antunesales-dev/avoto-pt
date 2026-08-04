@@ -112,7 +112,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { formatDate } from '@/data/partidos'
-import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
+import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const route = useRoute()
@@ -129,10 +129,7 @@ const meta = computed(() => {
   return m && typeof m === 'object' ? m : {}
 })
 
-const links = computed(() => {
-  const raw = item.value?.links
-  return Array.isArray(raw) ? raw.filter((l) => l?.url) : []
-})
+const links = computed(() => resolveSourceLinks(item.value))
 
 const investimentoId = computed(() => {
   if (!item.value) return null

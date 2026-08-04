@@ -82,6 +82,27 @@
         </div>
       </section>
     </div>
+
+    <section class="av-card" style="margin-top: 1rem">
+      <div class="av-card-pad">
+        <h2 class="section-title">Fontes e ligações oficiais</h2>
+        <p class="hint" style="margin-bottom: 0.75rem">
+          Origem:
+          <strong>{{ sourceLabel(item.source) }}</strong>.
+          O feed do Portal Base (via SNS) não traz URL directa a cada contrato — usamos os portais
+          oficiais de consulta.
+        </p>
+        <ul v-if="sourceLinks.length" class="source-links">
+          <li v-for="(l, i) in sourceLinks" :key="i">
+            <a :href="l.url" target="_blank" rel="noopener noreferrer">{{ l.label }} ↗</a>
+          </li>
+        </ul>
+        <p v-if="item.despesa_id" class="hint" style="margin-top: 0.85rem">
+          Ficha de despesa (mesmo contrato):
+          <router-link :to="`/despesa/${item.despesa_id}`">abrir despesa relacionada</router-link>
+        </p>
+      </div>
+    </section>
   </div>
   <div v-else class="page-shell">
     <h1 class="page-title">Investimento não encontrado</h1>
@@ -95,6 +116,7 @@ import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import VoteBar from '@/components/VoteBar.vue'
 import { formatDate, votoLabel } from '@/data/partidos'
+import { resolveSourceLinks, sourceLabel } from '@/lib/sources'
 import { useAuthStore } from '@/stores/auth'
 import { useFinanceStore } from '@/stores/finance'
 
@@ -106,12 +128,28 @@ const meuVoto = ref(null)
 
 const item = computed(() => finance.getInvestimento(route.params.id))
 
+/** Links do investimento + da despesa irmã + fallbacks oficiais por source */
+const sourceLinks = computed(() => {
+  const inv = item.value
+  if (!inv) return []
+  const despesa = inv.despesa_id ? finance.getDespesa(inv.despesa_id) : null
+  return resolveSourceLinks(inv, [despesa?.links])
+})
+
 watch(
   () => [route.params.id, auth.isLoggedIn],
   async () => {
     meuVoto.value = null
     if (!finance.investimentos.length) {
       await finance.loadInvestimentos().catch(console.error)
+    }
+    // despesa irmã para links / ficha de consulta
+    if (!finance.despesas.length) {
+      await finance.loadDespesas().catch(() => {})
+    }
+    const inv = finance.getInvestimento(route.params.id)
+    if (inv?.despesa_id) {
+      await finance.ensureDespesa(inv.despesa_id).catch(() => {})
     }
     if (auth.isLoggedIn && route.params.id) {
       meuVoto.value = await auth.getVotoInvestimento(route.params.id).catch(() => null)
@@ -233,5 +271,21 @@ async function confirmar(voto) {
   margin: 0.5rem 0 0;
   font-size: 0.85rem;
   color: var(--pt-muted);
+  line-height: 1.45;
+}
+.source-links {
+  margin: 0;
+  padding-left: 1.15rem;
+  li {
+    margin: 0.4rem 0;
+  }
+  a {
+    font-weight: 700;
+    color: var(--pt-green-dark);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 </style>
