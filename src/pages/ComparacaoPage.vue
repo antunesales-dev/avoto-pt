@@ -215,23 +215,29 @@ function shortVoto(v) {
   height: 28px;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 2px;
   font-size: 0.78rem;
   font-weight: 800;
+  border: 1px solid transparent;
   &--favor {
-    background: rgba(4, 106, 56, 0.15);
-    color: var(--pt-green-dark);
+    background: var(--pt-green);
+    border-color: var(--pt-green-dark);
+    color: #fff;
   }
   &--contra {
-    background: rgba(218, 41, 28, 0.15);
-    color: var(--pt-red-dark);
+    background: var(--pt-red);
+    border-color: var(--pt-red-dark);
+    color: #fff;
   }
   &--abstencao {
-    background: #f5f5f4;
-    color: var(--pt-muted);
+    background: var(--pt-gold);
+    border-color: #b8860b;
+    color: #3d3200;
   }
   &--nao_participou {
     color: #a8a29e;
+    background: #f0eeea;
+    border-color: var(--pt-line);
   }
 }
 </style>

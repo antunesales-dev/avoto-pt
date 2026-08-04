@@ -1,8 +1,11 @@
 <template>
-  <span class="pvb" :class="`pvb--${voto}`">
-    <span class="party-dot" :style="{ background: partido?.cor || '#999' }" />
+  <span class="pvb" :class="`pvb--${voto || 'nao_participou'}`" :title="title">
+    <span class="party-dot" :style="{ background: partido?.cor || '#999' }" aria-hidden="true" />
     <span class="pvb__sigla">{{ partido?.sigla || '—' }}</span>
-    <span class="pvb__voto">{{ label }}</span>
+    <span class="pvb__voto">
+      <span class="pvb__mark" aria-hidden="true">{{ mark }}</span>
+      {{ label }}
+    </span>
   </span>
 </template>
 
@@ -15,53 +18,118 @@ const props = defineProps({
   voto: String,
 })
 
-const label = computed(() => votoLabel[props.voto] || props.voto)
+const label = computed(() => votoLabel[props.voto] || props.voto || '—')
+
+const mark = computed(() => {
+  if (props.voto === 'favor') return '✓'
+  if (props.voto === 'contra') return '✕'
+  if (props.voto === 'abstencao') return '−'
+  return '·'
+})
+
+const title = computed(() => {
+  const s = props.partido?.sigla || props.partido?.nome || 'Partido'
+  return `${s}: ${label.value}`
+})
 </script>
 
 <style scoped lang="scss">
 .pvb {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
+  gap: 0.45rem;
+  padding: 0.4rem 0.55rem 0.4rem 0.55rem;
+  border-radius: 2px;
+  font-size: 0.84rem;
   font-weight: 600;
-  border: 1px solid var(--pt-border);
-  background: #fafaf9;
+  border: 1.5px solid var(--pt-border);
+  border-left-width: 4px;
+  background: var(--pt-cream);
+  line-height: 1.2;
+
+  .party-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+  }
 
   &__sigla {
     color: var(--pt-navy);
-    min-width: 3.2rem;
+    font-weight: 800;
+    min-width: 2.6rem;
+    letter-spacing: 0.02em;
   }
 
   &__voto {
-    color: var(--pt-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.45rem;
+    border-radius: 2px;
+    border: 1px solid transparent;
   }
 
+  &__mark {
+    font-size: 0.85rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* A favor — verde forte */
   &--favor {
-    border-color: rgba(4, 106, 56, 0.25);
-    background: rgba(4, 106, 56, 0.06);
+    border-color: #7abf96;
+    border-left-color: var(--pt-green);
+    background: #e8f5ee;
+
     .pvb__voto {
-      color: var(--pt-green-dark);
+      color: #fff;
+      background: var(--pt-green);
+      border-color: var(--pt-green-dark);
     }
   }
 
+  /* Contra — vermelho forte */
   &--contra {
-    border-color: rgba(218, 41, 28, 0.25);
-    background: rgba(218, 41, 28, 0.06);
+    border-color: #e8a0a8;
+    border-left-color: var(--pt-red);
+    background: #fdeceb;
+
     .pvb__voto {
-      color: var(--pt-red-dark);
+      color: #fff;
+      background: var(--pt-red);
+      border-color: var(--pt-red-dark);
     }
   }
 
+  /* Abstenção — âmbar / ouro (não cinza “apagado”) */
   &--abstencao {
-    border-color: #d6d3d1;
-    background: #f5f5f4;
+    border-color: #e0c86a;
+    border-left-color: #b8860b;
+    background: #fbf3d5;
+
+    .pvb__voto {
+      color: #3d3200;
+      background: var(--pt-gold);
+      border-color: #b8860b;
+    }
   }
 
   &--nao_participou {
-    opacity: 0.7;
+    opacity: 0.72;
+    border-left-color: var(--pt-muted);
+
+    .pvb__voto {
+      color: var(--pt-muted);
+      background: #eceae6;
+      border-color: var(--pt-line);
+      font-weight: 700;
+    }
   }
 }
 </style>
