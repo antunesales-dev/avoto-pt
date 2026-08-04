@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="av-layout">
+  <q-layout view="hHh Lpr lFf" class="av-layout">
     <q-header class="av-header">
       <div class="flag-stripe" aria-hidden="true">
         <span class="flag-stripe__green" />
@@ -112,29 +112,31 @@
 
     <q-page-container>
       <q-page class="av-page">
-        <div v-if="!auth.ready || data.loading" class="boot-state">A carregar…</div>
-        <div v-else-if="data.error" class="boot-state boot-state--err">
-          <p>Não foi possível carregar os dados.</p>
-          <p class="boot-state__detail">{{ data.error }}</p>
-          <button type="button" class="btn btn--primary btn--sm" @click="retry">Tentar de novo</button>
+        <div class="av-page__body">
+          <div v-if="!auth.ready || data.loading" class="boot-state">A carregar…</div>
+          <div v-else-if="data.error" class="boot-state boot-state--err">
+            <p>Não foi possível carregar os dados.</p>
+            <p class="boot-state__detail">{{ data.error }}</p>
+            <button type="button" class="btn btn--primary btn--sm" @click="retry">Tentar de novo</button>
+          </div>
+          <router-view v-else />
         </div>
-        <router-view v-else />
+
+        <footer class="av-footer">
+          <div class="av-footer__inner">
+            <p class="av-footer__brand">
+              <strong>A Voto</strong> — Bancada Cidadã · independente · open source · RGPD
+            </p>
+            <nav class="av-footer__legal" aria-label="Informação legal">
+              <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
+            </nav>
+            <p class="av-footer__note">
+              Não é sítio oficial do Estado. Votos na plataforma não são vinculativos.
+            </p>
+          </div>
+        </footer>
       </q-page>
     </q-page-container>
-
-    <q-footer class="av-footer" :elevated="false">
-      <div class="av-footer__inner">
-        <p class="av-footer__brand">
-          <strong>A Voto</strong> — Bancada Cidadã · independente · open source · RGPD
-        </p>
-        <nav class="av-footer__legal" aria-label="Informação legal">
-          <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
-        </nav>
-        <p class="av-footer__note">
-          Não é sítio oficial do Estado. Votos na plataforma não são vinculativos.
-        </p>
-      </div>
-    </q-footer>
   </q-layout>
 </template>
 
@@ -400,14 +402,25 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 }
 
 .av-page {
-  min-height: calc(100vh - 62px - 7rem);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 62px);
 }
 
+.av-page__body {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+/* Rodapé no fluxo do documento — no fim do conteúdo, nunca fixed/sticky */
 .av-footer {
-  background: var(--pt-navy) !important;
+  flex: 0 0 auto;
+  margin-top: auto;
+  width: 100%;
+  position: static;
+  background: var(--pt-navy);
   color: rgba(255, 255, 255, 0.88);
   border-top: 3px solid var(--pt-red);
-  box-shadow: none !important;
 }
 
 .av-footer__inner {
