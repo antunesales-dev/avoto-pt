@@ -8,8 +8,8 @@
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>Data na tabela = data de publicação oficial</strong> no Portal Base (não a data em
-      que a A Voto sincronizou). Contratos ≥&nbsp;100&nbsp;000&nbsp;€ estão também em
+      <strong>Data = publicação oficial</strong> no Portal Base (não a data em que a A Voto
+      sincronizou). Contratos ≥&nbsp;100&nbsp;000&nbsp;€ estão também em
       <router-link to="/investimentos">Investimentos</router-link>
       (voto cidadão). O
       <router-link to="/digest">Resumo do dia</router-link>
@@ -64,11 +64,6 @@
       @update:page-size="setPageSize"
     />
 
-    <p class="list-hint">
-      Clique numa linha para detalhe, ligações oficiais e montante. Coluna Data =
-      publicação no Base.
-    </p>
-
     <p v-if="finance.loading" class="muted">A carregar contratos…</p>
     <div v-else-if="!finance.despesas.length" class="av-card av-card-pad empty-box">
       <p>
@@ -84,46 +79,47 @@
         ({{ formatNumber(finance.despesas.length) }}) — alargue o período ou escolha “Todos”.
       </p>
     </div>
-    <div v-else class="av-table-wrap">
-      <table class="av-table av-table--clickable">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Entidade</th>
-            <th>Tipo</th>
-            <th>Montante</th>
-            <th>Publicação</th>
-            <th>Fonte</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="d in pageItems"
-            :key="d.id"
-            class="row-link"
-            tabindex="0"
-            role="link"
-            :aria-label="`Ver detalhe: ${d.titulo}`"
-            @click="goDetail(d.id)"
-            @keydown.enter.prevent="goDetail(d.id)"
-            @keydown.space.prevent="goDetail(d.id)"
-          >
-            <td class="wrap">
-              <strong class="title-link">{{ d.titulo }}</strong>
-              <div class="sub">{{ d.categoria }}</div>
-            </td>
-            <td class="wrap">{{ d.entidade }}</td>
-            <td><span class="badge badge--muted">{{ tipoLabel(d.tipo) }}</span></td>
-            <td>{{ formatMoney(d.montante_eur) }}</td>
-            <td>{{ formatDate(d.data_publicacao) }}</td>
-            <td>
-              <span class="badge" :class="sourceBadgeClass(d.source)">
-                {{ sourceLabel(d.source) }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="init-grid">
+      <router-link
+        v-for="d in pageItems"
+        :key="d.id"
+        :to="`/despesa/${d.id}`"
+        class="av-card link-card des-card"
+      >
+        <div class="flag-stripe" aria-hidden="true">
+          <span class="flag-stripe__green" />
+          <span class="flag-stripe__red" />
+        </div>
+        <div class="av-card-pad">
+          <div class="meta">
+            <span class="badge badge--muted">{{ tipoLabel(d.tipo) }}</span>
+            <span v-if="d.categoria" class="badge badge--navy">{{ d.categoria }}</span>
+            <span class="badge" :class="sourceBadgeClass(d.source)">
+              {{ sourceLabel(d.source) }}
+            </span>
+          </div>
+          <h2 class="des-card__title link-card__title">{{ d.titulo }}</h2>
+          <p class="des-card__money font-display">{{ formatMoney(d.montante_eur) }}</p>
+          <p class="des-card__ent">{{ d.entidade || '—' }}</p>
+          <p class="des-card__src">
+            Publicação: {{ formatDate(d.data_publicacao) }}
+            · Fonte: {{ sourceLabel(d.source) }}
+            <template v-if="primarySourceUrl(d)">
+              ·
+              <a
+                :href="primarySourceUrl(d)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="des-card__ext"
+                @click.stop
+              >
+                portal oficial ↗
+              </a>
+            </template>
+          </p>
+          <div class="des-card__foot">Ver detalhe →</div>
+        </div>
+      </router-link>
     </div>
 
     <ListPager
@@ -154,27 +150,25 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
 import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
-import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
+import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
-const router = useRouter()
 const tipo = ref('todos')
 const periodo = ref('todos')
 
-function goDetail(id) {
-  if (!id) return
-  router.push({ name: 'despesa-detalhe', params: { id } })
-}
-
 function dataRefDespesa(d) {
   return d.data_publicacao || d.data_inicio || null
+}
+
+function primarySourceUrl(d) {
+  const links = resolveSourceLinks(d)
+  return links[0]?.url || null
 }
 
 const tipos = [
@@ -217,7 +211,7 @@ const {
   pageWindow,
   goPage,
   resetPage,
-} = usePagination(filtradas, { defaultSize: 20, sizes: [10, 20, 50] })
+} = usePagination(filtradas, { defaultSize: 12, sizes: [12, 24, 48] })
 
 function setPageSize(n) {
   pageSize.value = n
@@ -258,15 +252,6 @@ onMounted(() => finance.loadDespesas().catch(console.error))
   margin-top: 0.25rem;
   color: var(--pt-navy);
 }
-.wrap {
-  white-space: normal;
-  max-width: 18rem;
-}
-.sub {
-  font-size: 0.8rem;
-  color: var(--pt-muted);
-  font-weight: 500;
-}
 .foot {
   margin-top: 1rem;
   font-size: 0.88rem;
@@ -290,24 +275,56 @@ onMounted(() => finance.loadDespesas().catch(console.error))
     font-size: 0.85rem;
   }
 }
-.list-hint {
-  margin: 0 0 0.5rem;
-  font-size: 0.85rem;
+.init-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+.des-card__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 0 0 0.35rem;
+  color: var(--pt-navy);
+  line-height: 1.3;
+}
+.des-card__money {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--pt-navy);
+  margin: 0 0 0.25rem;
+}
+.des-card__ent {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--pt-muted);
+}
+.des-card__src {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--pt-muted);
 }
-.row-link {
-  cursor: pointer;
-  transition: background 0.12s ease;
-
-  &:hover,
-  &:focus-visible {
-    background: var(--pt-paper-2);
-    outline: none;
+.des-card__ext {
+  color: var(--pt-green-dark);
+  font-weight: 700;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
   }
-
-  .title-link {
-    color: var(--pt-green-dark);
-  }
+}
+.des-card__foot {
+  margin-top: 0.75rem;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--pt-green-dark);
 }
 </style>
