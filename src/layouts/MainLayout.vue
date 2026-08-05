@@ -36,18 +36,26 @@
               <q-icon :name="maisOpen ? 'expand_less' : 'expand_more'" size="18px" />
             </button>
             <div v-if="maisOpen" class="mais__menu" role="menu">
-              <router-link
-                v-for="item in navMais"
-                :key="item.to"
-                :to="item.to"
-                class="mais__item"
-                role="menuitem"
-                :class="{ 'is-active': isActive(item) }"
-                @click="maisOpen = false"
+              <div
+                v-for="(group, gi) in navMaisGroups"
+                :key="group.id"
+                class="mais__group"
+                :class="{ 'mais__group--first': gi === 0 }"
               >
-                <q-icon :name="item.icon" size="18px" />
-                {{ item.label }}
-              </router-link>
+                <div class="mais__group-label" role="presentation">{{ group.label }}</div>
+                <router-link
+                  v-for="item in group.items"
+                  :key="item.to"
+                  :to="item.to"
+                  class="mais__item"
+                  role="menuitem"
+                  :class="{ 'is-active': isActive(item) }"
+                  @click="maisOpen = false"
+                >
+                  <q-icon :name="item.icon" size="18px" />
+                  {{ item.label }}
+                </router-link>
+              </div>
             </div>
           </div>
 
