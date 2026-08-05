@@ -51,7 +51,9 @@ O balde de email é **por projecto**, não só por endereço.
 
 1. **SMTP próprio** (Auth → SMTP) no dashboard Supabase — limites e deliverability melhores.
 2. Site URL + Redirect URLs com o domínio real (`github.io` e/ou `avoto.pt`).
-3. Turnstile configurado em produção.
+3. **Turnstile** (hoje pode estar *off* se faltar secret no CI/edge — ver `docs/CONSOLE-NOISE.md`):
+   - `VITE_TURNSTILE_SITE_KEY` no GitHub Actions
+   - `TURNSTILE_SECRET_KEY` em `supabase secrets`
 4. (Pro+) Leaked password protection no dashboard.
 
 ## O que o agente / ops **não** deve fazer

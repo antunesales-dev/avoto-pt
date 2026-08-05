@@ -33,27 +33,30 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Build (dev / GitHub Pages)
+      # SPA (não PWA): no GH Pages o service worker cacheava index.html antigo
+      # (CSP inline + chunks 404). PWA fica para Cloudflare prod.
+      - name: Build (dev / GitHub Pages SPA)
         env:
-          # Opcional: criar secrets VITE_SUPABASE_*_DEV para um projecto Supabase de staging
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
           PUBLIC_PATH: /avoto-pt/
-        run: pnpm build
+        run: pnpm build:spa
 
-      # SPA history mode no GitHub Pages: 404.html = index.html
+      # History mode: qualquer rota (ex. /investimentos) serve o index via 404.html
       - name: SPA 404 fallback
         run: |
-          OUT=dist/pwa
-          if [ ! -d "$OUT" ]; then OUT=dist/spa; fi
+          OUT=dist/spa
+          test -d "$OUT" || { echo "missing $OUT"; exit 1; }
           cp "$OUT/index.html" "$OUT/404.html"
+          test -f "$OUT/sw-cleanup.js" || echo "warn: no sw-cleanup.js"
+          # Cache-bust hint no 404 (mesmo conteúdo que index)
           echo "out=$OUT" >> "$GITHUB_ENV"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.out || 'dist/pwa' }}
+          path: ${{ env.out || 'dist/spa' }}
 
   deploy:
     needs: build
