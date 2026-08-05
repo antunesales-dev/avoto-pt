@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entrar na A Voto</title>
+  </head>
+  <body style="margin: 0; padding: 0; background: #f3efe6; font-family: 'Segoe UI', system-ui, sans-serif; color: #12141a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f3efe6; padding: 24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" style="max-width: 520px; background: #ffffff; border: 1px solid #c8c4bb;">
+            <tr>
+              <td style="height: 4px; background: #006633; width: 40%;"></td>
+              <td style="height: 4px; background: #c8102e; width: 60%;"></td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 28px 28px 8px;">
+                <p style="margin: 0 0 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #4a4f59;">
+                  A Voto · Bancada Cidadã
+                </p>
+                <h1 style="margin: 0; font-size: 22px; line-height: 1.25; color: #0c1b33; font-weight: 700;">
+                  Entrar na plataforma
+                </h1>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 8px 28px 20px; font-size: 15px; line-height: 1.5;">
+                <p style="margin: 0 0 14px;">
+                  Recebeu este email porque pediu acesso à <strong>A Voto</strong> — plataforma
+                  cívica independente (não é site oficial do Estado).
+                </p>
+                <p style="margin: 0 0 18px;">
+                  Clique no botão para entrar (valida o seu email). Se preferir, use o código
+                  abaixo na página Entrar, no <strong>mesmo browser</strong> em que pediu o
+                  acesso.
+                </p>
+                <p style="margin: 0 0 22px; text-align: center;">
+                  <a
+                    href="{{ .ConfirmationURL }}"
+                    style="display: inline-block; background: #006633; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 12px 22px; border-radius: 2px;"
+                  >
+                    Entrar na A Voto
+                  </a>
+                </p>
+                <p style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: #0c1b33;">
+                  Código de verificação
+                </p>
+                <p
+                  style="margin: 0 0 18px; font-family: ui-monospace, monospace; font-size: 28px; font-weight: 700; letter-spacing: 0.2em; color: #0c1b33;"
+                >
+                  {{ .Token }}
+                </p>
+                <p style="margin: 0; font-size: 13px; color: #4a4f59; line-height: 1.45;">
+                  O link e o código expiram em cerca de uma hora. Se não pediu este email, ignore-o
+                  — ninguém entra na sua conta sem o código ou o link.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding: 16px 28px 24px; border-top: 1px solid #e8e4dc; font-size: 12px; color: #4a4f59; line-height: 1.4;">
+                A Voto — independente · open source · RGPD<br />
+                Votos na plataforma não são vinculativos.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

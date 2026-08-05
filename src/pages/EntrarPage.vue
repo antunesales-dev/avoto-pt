@@ -2,8 +2,9 @@
   <div class="page-shell auth-page">
     <h1 class="page-title">Entrar</h1>
     <p class="page-subtitle">
-      Sem palavra-passe: enviamos um <strong>link</strong> e um <strong>código</strong> para o seu
-      email. Mais simples e evita reutilizar passwords. Um ID de cidadão por pessoa.
+      Só por <strong>email</strong>: enviamos um <strong>link</strong> e um
+      <strong>código de 6 dígitos</strong>. Assim confirmamos que o email é seu — sem palavra-passe
+      para reutilizar ou esquecer. Um ID de cidadão (CID-…) por pessoa, criado no primeiro acesso.
     </p>
 
     <!-- Passo 1: pedir email -->
@@ -25,37 +26,14 @@
 
       <p v-if="formError" class="form-error">{{ formError }}</p>
       <p v-if="cooldownLeft > 0" class="form-info cooldown-hint">
-        Aguarde {{ formatCooldown(cooldownLeft) }} antes de pedir outro código (evita esgotar o
-        limite de email da Supabase).
+        Aguarde {{ formatCooldown(cooldownLeft) }} antes de pedir outro código.
       </p>
-      <button
-        type="submit"
-        class="btn btn--primary"
-        :disabled="otpSendDisabled"
-      >
+      <button type="submit" class="btn btn--primary" :disabled="otpSendDisabled">
         {{ sendButtonLabel }}
       </button>
 
-      <button type="button" class="btn btn--ghost btn--sm" @click="showPassword = !showPassword">
-        {{ showPassword ? 'Esconder palavra-passe' : 'Entrar com palavra-passe (opcional)' }}
-      </button>
-
-      <template v-if="showPassword">
-        <label class="field">
-          <span>Palavra-passe</span>
-          <input v-model="password" type="password" autocomplete="current-password" />
-        </label>
-        <button type="button" class="btn btn--outline" :disabled="auth.loading" @click="onPassword">
-          Entrar com palavra-passe
-        </button>
-      </template>
-
-      <div class="auth-links">
-        <router-link to="/recuperar-password">Recuperar palavra-passe</router-link>
-        <router-link to="/confirmar-email">Reenviar confirmação</router-link>
-      </div>
       <p class="auth-switch">
-        Primeira vez? Use o mesmo formulário — a conta é criada no primeiro acesso.
+        Primeira vez? Use o mesmo formulário — a conta cria-se ao validar o email.
       </p>
       <p class="auth-legal">
         Ao continuar, aceita os
@@ -72,8 +50,9 @@
     <!-- Passo 2: código OTP -->
     <form v-else class="av-card av-card-pad auth-form" @submit.prevent="onVerificarCodigo">
       <p class="form-info">
-        Enviámos um email para <strong>{{ email }}</strong>. Pode clicar no link ou introduzir o
-        código aqui.
+        Enviámos um email para <strong>{{ email }}</strong>. Pode clicar no
+        <strong>link</strong> ou introduzir o <strong>código</strong> aqui (no mesmo browser em que
+        pediu o email).
       </p>
       <label class="field">
         <span>Código do email</span>
@@ -120,7 +99,6 @@ import TurnstileWidget from '@/components/TurnstileWidget.vue'
 import { useAuthStore } from '@/stores/auth'
 import '@/css/auth.scss'
 
-/** Cooldown local: após envio OK (60s) ou EMAIL_RATE_LIMITED (1h) — não martelar /otp. */
 const COOLDOWN_OK_MS = 60_000
 const COOLDOWN_EMAIL_LIMIT_MS = 60 * 60_000
 const COOLDOWN_KEY = 'avoto_otp_cooldown_until'
@@ -131,10 +109,8 @@ const route = useRoute()
 const $q = useQuasar()
 
 const email = ref('')
-const password = ref('')
 const otp = ref('')
 const step = ref('email')
-const showPassword = ref(false)
 const formError = ref('')
 const turnstileToken = ref('')
 const turnstileReset = ref(0)
@@ -144,16 +120,13 @@ const nowTick = ref(Date.now())
 let cooldownTimer = null
 
 const turnstileRequired = computed(() => Boolean(import.meta.env.VITE_TURNSTILE_SITE_KEY))
-
 const cooldownLeft = computed(() => Math.max(0, cooldownUntil.value - nowTick.value))
-
 const otpSendDisabled = computed(
   () =>
     auth.loading ||
     cooldownLeft.value > 0 ||
     (turnstileRequired.value && !turnstileToken.value),
 )
-
 const sendButtonLabel = computed(() => {
   if (auth.loading) return 'A enviar…'
   if (cooldownLeft.value > 0) return `Aguarde ${formatCooldown(cooldownLeft.value)}`
@@ -200,7 +173,6 @@ onMounted(async () => {
   cooldownTimer = setInterval(() => {
     nowTick.value = Date.now()
   }, 1000)
-  // Erro vindo do callback do magic link (?error= ou auth.error)
   if (typeof route.query.error === 'string' && route.query.error) {
     formError.value = route.query.error
   } else if (auth.error && !auth.isLoggedIn) {
@@ -211,7 +183,6 @@ onMounted(async () => {
   }
 })
 
-// Magic link: a sessão pode chegar depois do mount (async)
 watch(
   () => auth.isLoggedIn,
   (v) => {
@@ -258,18 +229,13 @@ async function onEnviarCodigo() {
       setCooldown(COOLDOWN_EMAIL_LIMIT_MS)
       formError.value =
         m ||
-        'O serviço de email da Supabase limitou envios. Espere cerca de 1 hora, ou use palavra-passe se já tiver.'
+        'O serviço de email limitou envios. Espere cerca de 1 hora e tente de novo.'
     } else if (e.code === 'RATE_LIMITED' || /demasiados pedidos/i.test(m)) {
       setCooldown(COOLDOWN_OK_MS * 5)
+      formError.value = m || 'Demasiados pedidos. Espere e tente de novo.'
+    } else if (e.code === 'DEVICE_ACCOUNT_LIMIT' || /limite de contas/i.test(m)) {
       formError.value =
-        m ||
-        'Demasiados pedidos neste dispositivo ou rede. Espere e tente de novo, ou use palavra-passe.'
-    } else if (
-      e.code === 'DEVICE_ACCOUNT_LIMIT' ||
-      /limite de contas/i.test(m)
-    ) {
-      formError.value =
-        'Limite de contas neste dispositivo. Entre com uma conta existente ou use outro dispositivo.'
+        'Limite de contas neste dispositivo. Use uma conta já existente ou outro dispositivo.'
     } else if (e.code === 'TURNSTILE_FAILED' || /TURNSTILE|anti-bot/i.test(m)) {
       formError.value = 'Verificação anti-bot falhou. Complete o desafio e tente de novo.'
     } else {
@@ -290,21 +256,6 @@ async function onVerificarCodigo() {
     goAfterLogin()
   } catch (e) {
     formError.value = e.message || 'Código inválido ou expirado.'
-  }
-}
-
-async function onPassword() {
-  formError.value = ''
-  try {
-    await auth.entrar({ email: email.value, password: password.value })
-    goAfterLogin()
-  } catch (e) {
-    const msg = e.message || 'Não foi possível entrar.'
-    if (/confirm|verif|email/i.test(msg)) {
-      formError.value = 'Confirme o email antes de entrar com palavra-passe.'
-    } else {
-      formError.value = msg
-    }
   }
 }
 </script>
