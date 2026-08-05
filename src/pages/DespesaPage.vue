@@ -46,7 +46,6 @@
       label="Data de publicação"
       :options="periodoOpts"
       :count="filtradas.length"
-      hint="Só períodos com contratos nesta lista. Despesa é retrospectiva — não há filtro “Futuro”."
       style="margin-bottom: 1rem"
     />
 

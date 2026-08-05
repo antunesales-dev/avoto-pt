@@ -23,7 +23,6 @@
       label="Dia do boletim"
       :options="periodoOpts"
       :count="filtrados.length"
-      hint="Só dias em que já existe resumo gerado. Boletins são do passado — sem “Futuro”."
       style="margin-bottom: 1rem"
     />
 

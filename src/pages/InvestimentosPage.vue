@@ -25,7 +25,6 @@
       label="Data de referência do contrato"
       :options="periodoOpts"
       :count="filtrados.length"
-      hint="Só períodos com investimentos nesta lista. Contratos do Portal Base são em geral passados — sem “Futuro”."
       style="margin-bottom: 1rem"
     />
 

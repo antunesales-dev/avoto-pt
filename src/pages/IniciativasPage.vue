@@ -60,7 +60,7 @@
         label="Data da votação AR (ou entrada)"
         :options="periodoOpts"
         :count="filtradas.length"
-        hint="Só períodos com iniciativas nesta lista. A data é a da votação na AR; se não houver, usa a data de entrada."
+
       />
     </div>
 
