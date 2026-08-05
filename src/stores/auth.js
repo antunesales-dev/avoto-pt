@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { computed, ref } from 'vue'
+import { consumeAuthCallbackFromUrl } from '@/lib/authCallback'
 import { getDeviceId } from '@/lib/deviceId'
 import { supabase } from '@/lib/supabase'
 import { emailSchema, loginSchema, passwordSchema, registoSchema } from '@/lib/schemas'
@@ -14,6 +15,17 @@ function appBaseUrl() {
   const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
   return `${window.location.origin}${base}`
 }
+
+/** Destino do magic link / confirmação de email (SPA + GH Pages). */
+export function authCallbackUrl(nextPath = '') {
+  const base = appBaseUrl()
+  const path = `${base}/auth/callback`
+  if (!nextPath) return path
+  const n = nextPath.startsWith('/') ? nextPath : `/${nextPath}`
+  return `${path}?next=${encodeURIComponent(n)}`
+}
+
+let initPromise = null
 
 /**
  * Extrai { error, message } do corpo da edge function.
@@ -126,46 +138,61 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function init() {
-    loading.value = true
-    error.value = null
-    try {
-      const { data, error: err } = await supabase.auth.getSession()
-      if (err) throw err
-      session.value = data.session
-      if (data.session?.user) {
-        await fetchProfile()
-        await linkDeviceAfterLogin()
-      } else {
-        profile.value = null
-      }
-
-      supabase.auth.onAuthStateChange(async (event, next) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          passwordRecovery.value = true
+    if (initPromise) return initPromise
+    initPromise = (async () => {
+      loading.value = true
+      error.value = null
+      try {
+        // 1) Magic link / PKCE / hash tokens na URL (antes de getSession “vazio”)
+        const cb = await consumeAuthCallbackFromUrl()
+        if (cb.error) {
+          error.value = cb.error
         }
-        session.value = next
-        if (next?.user) {
-          try {
+        if (cb.session?.user) {
+          session.value = cb.session
+          await fetchProfile()
+          await linkDeviceAfterLogin()
+        } else {
+          const { data, error: err } = await supabase.auth.getSession()
+          if (err) throw err
+          session.value = data.session
+          if (data.session?.user) {
             await fetchProfile()
-            if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-              await linkDeviceAfterLogin()
-            }
-          } catch (e) {
-            console.error(e)
+            await linkDeviceAfterLogin()
+          } else {
             profile.value = null
           }
-        } else {
-          profile.value = null
         }
-      })
-    } catch (e) {
-      error.value = e.message || String(e)
-      session.value = null
-      profile.value = null
-    } finally {
-      ready.value = true
-      loading.value = false
-    }
+
+        supabase.auth.onAuthStateChange(async (event, next) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            passwordRecovery.value = true
+          }
+          session.value = next
+          if (next?.user) {
+            try {
+              await fetchProfile()
+              if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+                await linkDeviceAfterLogin()
+              }
+            } catch (e) {
+              console.error(e)
+              profile.value = null
+            }
+          } else {
+            profile.value = null
+          }
+        })
+      } catch (e) {
+        error.value = e.message || String(e)
+        session.value = null
+        profile.value = null
+      } finally {
+        ready.value = true
+        loading.value = false
+      }
+    })()
+    return initPromise
   }
 
   async function registar({ email, password, passwordConfirm, partidoPreferencia }) {
@@ -206,7 +233,7 @@ export const useAuthStore = defineStore('auth', () => {
         email: parsed.data.email,
         password: parsed.data.password,
         options: {
-          emailRedirectTo: `${appBaseUrl()}/entrar`,
+          emailRedirectTo: authCallbackUrl('/perfil'),
         },
       })
       if (err) throw err
@@ -276,7 +303,7 @@ export const useAuthStore = defineStore('auth', () => {
           email: parsed.data,
           device_id: deviceId,
           turnstile_token: turnstileToken || '',
-          redirect_to: `${appBaseUrl()}/entrar`,
+          redirect_to: authCallbackUrl('/perfil'),
         },
       })
       if (fnErr || data?.error) {
@@ -441,7 +468,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { error: err } = await supabase.auth.resetPasswordForEmail(parsed.data, {
-        redirectTo: `${appBaseUrl()}/atualizar-password`,
+        redirectTo: authCallbackUrl('/atualizar-password'),
       })
       if (err) throw err
       return true
@@ -488,7 +515,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { error: err } = await supabase.auth.resend({
         type: 'signup',
         email: parsed.data,
-        options: { emailRedirectTo: `${appBaseUrl()}/entrar` },
+        options: { emailRedirectTo: authCallbackUrl('/perfil') },
       })
       if (err) throw err
       return true

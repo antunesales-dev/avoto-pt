@@ -118,6 +118,12 @@ const routes = [
         meta: { title: 'Perfil', requiresAuth: true },
       },
       {
+        path: 'auth/callback',
+        name: 'auth-callback',
+        component: () => import('@/pages/AuthCallbackPage.vue'),
+        meta: { title: 'Validar link' },
+      },
+      {
         path: 'entrar',
         name: 'entrar',
         component: () => import('@/pages/EntrarPage.vue'),

@@ -20,7 +20,9 @@ export const supabase = createClient(url, anonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    // true: o client tenta ler a URL; authCallback.js faz o resto (code / token_hash / hash)
     detectSessionInUrl: true,
+    flowType: 'pkce',
     storageKey: 'avoto-auth',
   },
 })

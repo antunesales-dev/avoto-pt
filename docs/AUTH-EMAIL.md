@@ -3,8 +3,29 @@
 ## Fluxo
 
 1. Browser → edge `request-otp` (Turnstile + gate device/IP).
-2. Edge → `auth.signInWithOtp` (Supabase Auth envia o email).
-3. Utilizador: link no email **ou** código de 6 dígitos em `/entrar`.
+2. Edge → `auth.signInWithOtp` com `emailRedirectTo` =
+   `{origin}{base}/auth/callback?next=/perfil` (ex. GitHub Pages:
+   `https://antunesales-dev.github.io/avoto-pt/auth/callback?next=/perfil`).
+3. Utilizador: **link** no email → `/auth/callback` processa `code` / `token_hash` / hash
+   e redirecciona; **ou** código de 6 dígitos em `/entrar` (mesmo browser em que pediu o OTP).
+
+### Dashboard Supabase (obrigatório)
+
+Authentication → URL configuration:
+
+| Campo | Valor (dev GH Pages) |
+|-------|----------------------|
+| Site URL | `https://antunesales-dev.github.io/avoto-pt` |
+| Redirect URLs | `https://antunesales-dev.github.io/avoto-pt/**` |
+| | `https://antunesales-dev.github.io/avoto-pt/auth/callback` |
+| | `https://antunesales-dev.github.io/avoto-pt/entrar` |
+
+Sem o callback na allowlist, o link cai no site **sem** tokens → parece “só login de novo”.
+
+### PKCE
+
+O magic link com `flowType: pkce` precisa do `code_verifier` no **mesmo browser** onde pediu o
+email. Se abrir o mail noutro dispositivo, use o **código de 6 dígitos** no browser original.
 
 ## Limites
 
