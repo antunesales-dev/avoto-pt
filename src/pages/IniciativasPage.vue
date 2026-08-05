@@ -60,7 +60,6 @@
         label="Data da votação AR (ou entrada)"
         :options="periodoOpts"
         :count="filtradas.length"
-
       />
     </div>
 
