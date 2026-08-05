@@ -97,7 +97,20 @@ export const useAuthStore = defineStore('auth', () => {
       return null
     }
     const { data, error: err } = await supabase.rpc('get_my_profile')
-    if (err) throw err
+    if (err) {
+      // 403/JWT expirado: não rebentar a app; limpar perfil e deixar sessão ser renovada
+      const msg = err.message || String(err)
+      if (
+        err.code === '42501' ||
+        err.status === 403 ||
+        /403|permission denied|JWT|not authorized|PGRST301/i.test(msg)
+      ) {
+        console.warn('get_my_profile', msg)
+        profile.value = null
+        return null
+      }
+      throw err
+    }
     // rpc returns setof → array
     const row = Array.isArray(data) ? data[0] : data
     profile.value = row
