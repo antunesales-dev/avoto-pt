@@ -1,19 +1,33 @@
 /**
- * GitHub Pages: desregista service workers legados que servem chunks com hash antigo (404).
- * Ficheiro externo — o CSP não permite script inline (script-src 'self').
+ * GitHub Pages: desregista service workers e limpa Cache API.
+ * Builds antigos em PWA serviam index/chunks desactualizados (tabela em vez de cards).
+ * CSP: ficheiro externo (script-src 'self').
  */
 (function () {
   try {
     var h = location.hostname || ''
     if (!h.endsWith('github.io') && h !== 'localhost' && h !== '127.0.0.1') return
     if (!('serviceWorker' in navigator)) return
+
+    var FLAG = 'avoto-sw-nuked-v3'
+    var already = false
+    try {
+      already = sessionStorage.getItem(FLAG) === '1'
+    } catch (e) {
+      /* private mode */
+    }
+
     navigator.serviceWorker.getRegistrations().then(function (regs) {
-      if (!regs.length) return
-      return Promise.all(
-        regs.map(function (r) {
-          return r.unregister()
-        }),
-      )
+      var had = regs && regs.length > 0
+      var p = had
+        ? Promise.all(
+            regs.map(function (r) {
+              return r.unregister()
+            }),
+          )
+        : Promise.resolve()
+
+      return p
         .then(function () {
           if (!window.caches) return
           return caches.keys().then(function (keys) {
@@ -25,13 +39,16 @@
           })
         })
         .then(function () {
+          // Se havia SW ou ainda não marcámos esta sessão: recarregar uma vez
+          if (!had && already) return
           try {
-            if (sessionStorage.getItem('avoto-sw-nuked') === '1') return
-            sessionStorage.setItem('avoto-sw-nuked', '1')
-          } catch (e) {
+            sessionStorage.setItem(FLAG, '1')
+          } catch (e2) {
             /* ignore */
           }
-          location.reload()
+          if (had || !already) {
+            location.reload()
+          }
         })
     })
   } catch (e) {
