@@ -15,13 +15,35 @@ const UA = 'A-Voto/1.0 (+https://avoto.pt; civic open data)'
 export type MappedDespesa = Record<string, unknown>
 export type MappedInvestimento = Record<string, unknown>
 
+/**
+ * Portal Base/SNS mete HTML (ex. `<br/>`) em tipos de contrato.
+ * Na UI leigos lêem "br" como Brasil — limpar sempre na importação.
+ */
+function plainOfficialText(value: unknown): string {
+  return String(value ?? '')
+    .replace(/<br\s*\/?>/gi, ' · ')
+    .replace(/<\/p>/gi, ' · ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s*·\s*/g, ' · ')
+    .replace(/\s+/g, ' ')
+    .replace(/(?: · ){2,}/g, ' · ')
+    .replace(/^ · | · $/g, '')
+    .trim()
+}
+
 /** Normaliza texto para chave de identidade (minúsculas, sem acentos, espaços colapsados). */
 function normKey(s: unknown): string {
-  return String(s ?? '')
+  return plainOfficialText(s)
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/<[^>]+>/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }
@@ -73,11 +95,11 @@ export async function fetchBaseContratos(limit = 80): Promise<{
   const investimentos: MappedInvestimento[] = []
 
   for (const row of rows) {
-    const objeto = String(row.objeto_do_contrato || row.objecto || 'Contrato público')
-    const entidade = String(
+    const objeto = plainOfficialText(row.objeto_do_contrato || row.objecto || 'Contrato público')
+    const entidade = plainOfficialText(
       row.entidades_adjudicantes_normalizado || row.entidade_adjudicante || '',
     )
-    const adjudicataria = String(row.entidades_adjudicatarias_normalizado || '')
+    const adjudicataria = plainOfficialText(row.entidades_adjudicatarias_normalizado || '')
     const montante = row.preco_contratual != null ? Number(row.preco_contratual) : null
     const dataPub = row.data_de_publicacao
       ? String(row.data_de_publicacao).slice(0, 10)
@@ -85,9 +107,9 @@ export async function fetchBaseContratos(limit = 80): Promise<{
     const dataCeleb = row.data_de_celebracao_do_contrato
       ? String(row.data_de_celebracao_do_contrato).slice(0, 10)
       : null
-    const tipoProc = String(row.tipo_de_procedimento || '')
-    const tiposContrato = String(row.tipos_de_contrato || '').replace(/<br\s*\/?>/gi, ' · ')
-    const cpvs = String(row.cpvs || '')
+    const tipoProc = plainOfficialText(row.tipo_de_procedimento || '')
+    const tiposContrato = plainOfficialText(row.tipos_de_contrato || '')
+    const cpvs = plainOfficialText(row.cpvs || '')
     const nifAdj = String(row.nifs_dos_adjudicantes || '')
     const nifAdjudicataria = String(row.nifs_das_adjudicatarias || '')
 
