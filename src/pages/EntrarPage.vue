@@ -200,10 +200,24 @@ onMounted(async () => {
   cooldownTimer = setInterval(() => {
     nowTick.value = Date.now()
   }, 1000)
+  // Erro vindo do callback do magic link (?error= ou auth.error)
+  if (typeof route.query.error === 'string' && route.query.error) {
+    formError.value = route.query.error
+  } else if (auth.error && !auth.isLoggedIn) {
+    formError.value = auth.error
+  }
   if (auth.isLoggedIn) {
     goAfterLogin()
   }
 })
+
+// Magic link: a sessão pode chegar depois do mount (async)
+watch(
+  () => auth.isLoggedIn,
+  (v) => {
+    if (v) goAfterLogin()
+  },
+)
 
 onUnmounted(() => {
   if (cooldownTimer) clearInterval(cooldownTimer)

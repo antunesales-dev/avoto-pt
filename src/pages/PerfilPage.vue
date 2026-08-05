@@ -50,7 +50,25 @@
               :disabled="!canRequest || savingNotif"
               @click="onEnableNotif"
             >
-              Activar notificações
+              Activar no browser
+            </button>
+            <button
+              v-if="anyPrefOn"
+              type="button"
+              class="btn btn--outline btn--sm"
+              :disabled="savingNotif"
+              @click="onDisableAllNotifs"
+            >
+              Desactivar todas
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn btn--ghost btn--sm"
+              :disabled="savingNotif"
+              @click="onEnableAllNotifs"
+            >
+              Activar todas as preferências
             </button>
           </div>
 
@@ -72,6 +90,10 @@
               <span>Actualizações de despesa pública</span>
             </label>
           </div>
+          <p v-if="!anyPrefOn" class="muted notif-off-msg">
+            Preferências desactivadas — a A Voto não mostra avisos destes temas. A permissão do
+            browser (se estiver activa) só se remove nas definições do browser/sistema.
+          </p>
           <p class="muted" style="margin-top: 0.75rem; font-size: 0.82rem">
             Com a app aberta ou instalada, as notificações chegam em tempo quase real. Push com a
             app totalmente fechada (Web Push / VAPID) activa-se numa fase seguinte.
@@ -214,6 +236,13 @@ const initial = computed(() => (auth.email || 'A').charAt(0).toUpperCase())
 const canRequest = computed(
   () => notificationSupport() && permission.value !== 'denied' && permission.value !== 'unsupported',
 )
+const anyPrefOn = computed(
+  () =>
+    prefs.notify_digest ||
+    prefs.notify_iniciativas ||
+    prefs.notify_investimentos ||
+    prefs.notify_despesa,
+)
 const permLabel = computed(() => {
   if (permission.value === 'unsupported') return 'não suportado'
   if (permission.value === 'granted') return 'activas'
@@ -333,6 +362,48 @@ async function onSavePrefs() {
   }
 }
 
+async function onDisableAllNotifs() {
+  if (!auth.user?.id || savingNotif.value) return
+  prefs.notify_digest = false
+  prefs.notify_iniciativas = false
+  prefs.notify_investimentos = false
+  prefs.notify_despesa = false
+  savingNotif.value = true
+  try {
+    await saveNotificationPrefs(auth.user.id, prefs)
+    $q.notify({
+      type: 'positive',
+      message: 'Todas as notificações da A Voto foram desactivadas.',
+      position: 'top',
+    })
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro ao guardar.', position: 'top' })
+  } finally {
+    savingNotif.value = false
+  }
+}
+
+async function onEnableAllNotifs() {
+  if (!auth.user?.id || savingNotif.value) return
+  prefs.notify_digest = true
+  prefs.notify_iniciativas = true
+  prefs.notify_investimentos = true
+  prefs.notify_despesa = true
+  savingNotif.value = true
+  try {
+    await saveNotificationPrefs(auth.user.id, prefs)
+    $q.notify({
+      type: 'positive',
+      message: 'Preferências de notificação activadas.',
+      position: 'top',
+    })
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro ao guardar.', position: 'top' })
+  } finally {
+    savingNotif.value = false
+  }
+}
+
 onMounted(async () => {
   partido.value = auth.profile?.partido_preferencia || ''
   historico.value = await auth.listMeusVotos()
@@ -367,6 +438,14 @@ onMounted(async () => {
 .notif-status {
   font-size: 0.9rem;
   color: var(--pt-navy);
+}
+.notif-off-msg {
+  margin: 0.65rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  padding: 0.55rem 0.65rem;
+  background: #f5f5f4;
+  border-left: 3px solid var(--pt-line);
 }
 .toggle-list {
   display: flex;
