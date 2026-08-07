@@ -48,10 +48,11 @@ export const navMaisGroups = [
 /** Lista plana (mobile, active-check, exports legados) */
 export const navMais = navMaisGroups.flatMap((g) => g.items)
 
-/** Rodapé legal (RGPD) — mesma ordem A–Z do grupo legal */
+/** Rodapé: legal + financiamento (transparência) */
 export const navLegal = [
   { to: '/cookies', label: 'Cookies' },
   { to: '/direitos', label: 'Direitos RGPD' },
+  { to: '/financiamento', label: 'Financiamento' },
   { to: '/privacidade', label: 'Privacidade' },
   { to: '/termos', label: 'Termos de uso' },
 ]
