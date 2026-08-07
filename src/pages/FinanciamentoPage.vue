@@ -45,22 +45,29 @@
       <div class="av-card-pad cta">
         <h2 class="section-title">Apoiar</h2>
         <p class="muted" style="margin-top: -0.25rem">
-          Podes contribuir de forma segura (por exemplo cartão ou MB WAY, conforme o que o
-          pagamento oferecer). O pagamento abre noutro ecrã; a A Voto não pede nem mostra o teu
-          IBAN ou telemóvel.
+          Contribui de forma segura (cartão ou MB WAY, quando disponível). O pagamento abre noutro
+          ecrã; não pedimos nem mostramos o teu IBAN ou telemóvel.
         </p>
         <a
           v-if="finance.paymentLink"
-          class="btn btn--primary"
+          class="btn btn--primary btn--lg"
           :href="donateHref"
           target="_blank"
           rel="noopener noreferrer"
         >
           Quero apoiar
         </a>
-        <p v-else class="muted">
-          O botão de pagamento ainda não está activo. Em breve poderás doar por aqui; até lá, as
-          contas públicas (quando houver movimentos) ficam nesta página.
+        <button
+          v-else
+          type="button"
+          class="btn btn--primary btn--lg"
+          disabled
+          title="Pagamento a ser activado em breve"
+        >
+          Quero apoiar
+        </button>
+        <p v-if="!finance.paymentLink" class="muted sm" style="margin: 0">
+          Pagamento em activação — em breve este botão abre o ecrã de doação.
         </p>
         <label v-if="auth.isLoggedIn && auth.cid && finance.paymentLink" class="toggle publish-cid">
           <input v-model="publishCid" type="checkbox" />
@@ -211,9 +218,7 @@ onMounted(() => {
   display: grid;
   gap: 0.75rem;
   grid-template-columns: 1fr 1fr;
-  @media (min-width: 700px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  max-width: 28rem;
 }
 .stat-mini__l {
   font-size: 0.72rem;
