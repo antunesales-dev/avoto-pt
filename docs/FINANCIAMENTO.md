@@ -20,24 +20,28 @@
 ## O que fazes no Stripe (uma vez)
 
 1. Conta Stripe (PT) + activar **MB WAY** (Payment methods).  
-2. **Payment Link** (montante livre ou fixos) → copiar URL.  
-3. GitHub secret / `.env`: `VITE_STRIPE_PAYMENT_LINK_URL=https://buy.stripe.com/...`  
-4. Webhook endpoint:  
+2. **Payment Link** (montante livre ou fixos) → copiar URL `https://buy.stripe.com/...`.  
+3. **Activar o botão na app** (escolhe um):
+   - **SQL** (imediato, sem rebuild):
+     ```sql
+     update public.site_settings
+     set stripe_payment_link_url = 'https://buy.stripe.com/SEU_LINK',
+         updated_at = now()
+     where id = 1;
+     ```
+   - ou secret de build `VITE_STRIPE_PAYMENT_LINK_URL` (fallback).  
+4. Webhook:  
    `https://qevavihconurfgmayzze.supabase.co/functions/v1/stripe-webhook`  
    Evento: `checkout.session.completed`  
 5. `supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_...`  
-6. `supabase functions deploy stripe-webhook`
+6. `supabase functions deploy stripe-webhook`  
 
-## Saídas (ops)
+**Doar não exige login.** Conta só serve se quiseres mostrar o CID na lista.
 
-Inserir com service role / SQL editor (exemplos):
+## Saídas
 
-```sql
-insert into public.project_outflows (amount_eur, spent_on, kind, label)
-values
-  (12.00, current_date, 'infra', 'Domínio avoto.pt (anual, rateado)'),
-  (50.00, current_date, 'maintainer', 'Trabalho de manutenção — Agosto');
-```
+Removidas da UI por agora. A tabela `project_outflows` fica na BD se no futuro quiseres
+publicar gastos; não é obrigatória.
 
 ## Fiscalidade
 

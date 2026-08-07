@@ -45,11 +45,11 @@
       <div class="av-card-pad cta">
         <h2 class="section-title">Apoiar</h2>
         <p class="muted" style="margin-top: -0.25rem">
-          Contribui de forma segura (cartão ou MB WAY, quando disponível). O pagamento abre noutro
-          ecrã; não pedimos nem mostramos o teu IBAN ou telemóvel.
+          Qualquer pessoa pode apoiar — não é preciso ter conta. O pagamento abre noutro ecrã
+          (cartão ou MB WAY, quando disponível). Não pedimos nem mostramos o teu IBAN ou telemóvel.
         </p>
         <a
-          v-if="finance.paymentLink"
+          v-if="finance.canDonate"
           class="btn btn--primary btn--lg"
           :href="donateHref"
           target="_blank"
@@ -62,18 +62,17 @@
           type="button"
           class="btn btn--primary btn--lg"
           disabled
-          title="Pagamento a ser activado em breve"
         >
           Quero apoiar
         </button>
-        <p v-if="!finance.paymentLink" class="muted sm" style="margin: 0">
-          Pagamento em activação — em breve este botão abre o ecrã de doação.
+        <p v-if="!finance.canDonate && !finance.loading" class="muted sm" style="margin: 0">
+          O pagamento ainda está a ser preparado. Volta em breve.
         </p>
-        <label v-if="auth.isLoggedIn && auth.cid && finance.paymentLink" class="toggle publish-cid">
+        <label v-if="auth.isLoggedIn && auth.cid && finance.canDonate" class="toggle publish-cid">
           <input v-model="publishCid" type="checkbox" />
           <span>
-            Mostrar o meu ID de cidadão (<strong>{{ auth.cid }}</strong>) na lista pública de
-            doações (em vez de “Anónimo”)
+            Mostrar o meu ID de cidadão (<strong>{{ auth.cid }}</strong>) na lista de doações
+            (opcional; por omissão fica anónimo)
           </span>
         </label>
       </div>
@@ -193,6 +192,14 @@ onMounted(() => {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
+}
+.btn--lg {
+  font-size: 1rem;
+  padding: 0.7rem 1.35rem;
+}
+.btn--primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 .cid-hint {
   margin: 0;
