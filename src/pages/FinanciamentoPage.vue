@@ -2,17 +2,16 @@
   <div class="page-shell">
     <h1 class="page-title">Financiamento</h1>
     <p class="page-subtitle">
-      A A Voto é independente e open source. Doações pagam
-      <strong>infraestrutura</strong> (domínio, base de dados, email…) e o
-      <strong>trabalho de manutenção</strong> (código, ops, suporte) — de forma
-      <strong>pública e legível</strong>. Ninguém compra ranking, votos ou enviesamento.
+      A A Voto é independente. As doações servem para
+      <strong>manter o site a funcionar</strong> e para
+      <strong>pagar o trabalho</strong> de quem o desenvolve e cuida — tudo registado em público.
+      Doar <strong>não compra</strong> influência política nem privilégios.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>O que vês no ledger:</strong> valor, data e etiqueta
-      (<code>CID-…</code> se o doador quiser, ou <strong>Anónimo</strong>). Nunca email, IBAN nem
-      telefone. Pagamentos via <strong>Stripe</strong> (incl. MB WAY no checkout) — os teus dados
-      bancários não estão nesta página.
+      Na lista de doações só aparece o <strong>valor</strong>, a <strong>data</strong> e se foi
+      <strong>anónimo</strong> ou com o teu identificador de cidadão (se escolheres). Nunca
+      mostramos email nem dados bancários.
     </div>
 
     <!-- Modelo -->
@@ -21,21 +20,21 @@
         <h2 class="section-title">Como o dinheiro é usado</h2>
         <ul class="model-list">
           <li>
-            <strong>Infra</strong> — custos de correr a plataforma (Supabase, domínio, SMTP, etc.).
+            <strong>Custos do site</strong> — domínio, servidores, envio de emails e serviços
+            necessários para a plataforma existir.
           </li>
           <li>
-            <strong>Maintainer</strong> — remuneração do trabalho de quem desenvolve e opera o
-            projecto (não é “patrocínio político”).
+            <strong>Trabalho de manutenção</strong> — tempo de quem programa, actualiza dados e
+            resolve problemas (não é patrocínio de partidos).
           </li>
         </ul>
         <p class="muted">
-          Doações não dão direito a decisões editoriais, prioridade em features, nem influência
-          sobre o tratamento de partidos ou dados oficiais. Código:
+          O código é aberto:
           <a
             href="https://github.com/antunesales-dev/avoto-pt"
             target="_blank"
             rel="noopener noreferrer"
-            >repositório open source ↗</a
+            >ver no GitHub ↗</a
           >.
         </p>
       </div>
@@ -46,8 +45,9 @@
       <div class="av-card-pad cta">
         <h2 class="section-title">Apoiar</h2>
         <p class="muted" style="margin-top: -0.25rem">
-          Stripe Checkout — cartão e, se estiver activo na tua conta Stripe,
-          <strong>MB WAY</strong>. Não publicamos o teu IBAN nem telefone.
+          Podes contribuir de forma segura (por exemplo cartão ou MB WAY, conforme o que o
+          pagamento oferecer). O pagamento abre noutro ecrã; a A Voto não pede nem mostra o teu
+          IBAN ou telemóvel.
         </p>
         <a
           v-if="finance.paymentLink"
@@ -56,20 +56,18 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          Doar com Stripe
+          Quero apoiar
         </a>
         <p v-else class="muted">
-          Link de pagamento ainda não configurado (<code>VITE_STRIPE_PAYMENT_LINK_URL</code>). Até
-          lá, o ledger e o modelo já são públicos.
-        </p>
-        <p v-if="auth.isLoggedIn && auth.cid" class="cid-hint">
-          Sessão: <strong>{{ auth.cid }}</strong> — se o Payment Link tiver o metadata
-          <code>display_tag</code> com este CID (ou o acrescentares no link abaixo), o ledger pode
-          mostrar a tag em vez de Anónimo.
+          O botão de pagamento ainda não está activo. Em breve poderás doar por aqui; até lá, as
+          contas públicas (quando houver movimentos) ficam nesta página.
         </p>
         <label v-if="auth.isLoggedIn && auth.cid && finance.paymentLink" class="toggle publish-cid">
           <input v-model="publishCid" type="checkbox" />
-          <span>Tentar publicar o meu CID no ledger (via parâmetro do link Stripe)</span>
+          <span>
+            Mostrar o meu ID de cidadão (<strong>{{ auth.cid }}</strong>) na lista pública de
+            doações (em vez de “Anónimo”)
+          </span>
         </label>
       </div>
     </section>
