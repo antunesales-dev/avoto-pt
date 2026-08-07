@@ -4,18 +4,18 @@
 
 | Requisito | Como |
 |-----------|------|
-| Pagar infra + trabalho do maintainer | Saídas públicas `infra` / `maintainer` |
-| Não parecer “comprado” | Ledger público; sem privilégios a doadores |
+| Pagar infra + trabalho do maintainer | Modelo na página; saídas detalhadas **não** na UI (por agora) |
+| Não parecer “comprado” | Ledger público de **doações**; sem privilégios a doadores |
 | Sem expor IBAN/telefone | **Stripe** Payment Link (+ MB WAY se activo na conta) |
 | Ledger | Valor + data + tag (**Anónimo** ou **CID**) — nunca email |
 
 ## Plano técnico (implementado)
 
-1. **BD** — `donations` (privado + RPC pública), `project_outflows` (select público).  
-2. **UI** — `/financiamento` (modelo, CTA Stripe, resumo, tabelas).  
+1. **BD** — `donations` + RPC pública; tabela `project_outflows` existe mas **não** é usada na UI.  
+2. **UI** — `/financiamento` (modelo, CTA, total + lista de doações).  
 3. **Stripe** — Payment Link no env `VITE_STRIPE_PAYMENT_LINK_URL`.  
 4. **Webhook** — edge `stripe-webhook` → `record_donation` em `checkout.session.completed`.  
-5. **CID opcional** — link com `client_reference_id=CID-…` se o utilizador marcar a opção.
+5. **CID opcional** — `client_reference_id=CID-…` se o utilizador marcar a opção.
 
 ## O que fazes no Stripe (uma vez)
 

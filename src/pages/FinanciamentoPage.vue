@@ -72,97 +72,50 @@
       </div>
     </section>
 
-    <!-- Resumo -->
-    <section class="av-card" style="margin-bottom: 1.25rem">
-      <div class="av-card-pad">
-        <h2 class="section-title">Resumo</h2>
-        <p v-if="finance.loading" class="muted">A carregar…</p>
-        <p v-else-if="finance.error" class="err">{{ finance.error }}</p>
-        <div v-else class="stats-grid">
-          <div class="stat-mini">
-            <div class="stat-mini__l">Entradas (doações)</div>
-            <div class="stat-mini__v font-display">{{ formatMoney(r.total_in) }}</div>
-          </div>
-          <div class="stat-mini">
-            <div class="stat-mini__l">Saídas · infra</div>
-            <div class="stat-mini__v font-display">{{ formatMoney(r.total_out_infra) }}</div>
-          </div>
-          <div class="stat-mini">
-            <div class="stat-mini__l">Saídas · maintainer</div>
-            <div class="stat-mini__v font-display">{{ formatMoney(r.total_out_maintainer) }}</div>
-          </div>
-          <div class="stat-mini">
-            <div class="stat-mini__l">Saldo</div>
-            <div class="stat-mini__v font-display">{{ formatMoney(r.balance) }}</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Ledger in -->
-    <section class="av-card" style="margin-bottom: 1.25rem">
-      <div class="av-card-pad">
-        <h2 class="section-title">Doações (público)</h2>
-        <p class="muted sm">Valor · data · etiqueta. Sem dados pessoais de contacto.</p>
-        <div v-if="!finance.donations.length" class="empty">
-          Ainda não há doações registadas no ledger.
-        </div>
-        <div v-else class="av-table-wrap">
-          <table class="av-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Etiqueta</th>
-                <th>Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="d in finance.donations" :key="d.id">
-                <td>{{ formatDate(d.donated_on) }}</td>
-                <td>
-                  <span class="tag">{{ d.display_tag || 'Anónimo' }}</span>
-                </td>
-                <td class="num">{{ formatMoney(d.amount_eur) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Ledger out -->
+    <!-- Resumo + doações -->
     <section class="av-card">
       <div class="av-card-pad">
-        <h2 class="section-title">Saídas (público)</h2>
-        <p class="muted sm">Infra vs trabalho do maintainer — para não haver caixa negra.</p>
-        <div v-if="!finance.outflows.length" class="empty">
-          Ainda não há saídas registadas (quando houver custos ou retirada de maintainer, entram
-          aqui).
-        </div>
-        <div v-else class="av-table-wrap">
-          <table class="av-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Tipo</th>
-                <th>Descrição</th>
-                <th>Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="o in finance.outflows" :key="o.id">
-                <td>{{ formatDate(o.spent_on) }}</td>
-                <td>
-                  <span class="badge" :class="o.kind === 'maintainer' ? 'badge--gold' : 'badge--navy'">
-                    {{ o.kind === 'maintainer' ? 'Maintainer' : 'Infra' }}
-                  </span>
-                </td>
-                <td>{{ o.label }}</td>
-                <td class="num">{{ formatMoney(o.amount_eur) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2 class="section-title">Doações</h2>
+        <p v-if="finance.loading" class="muted">A carregar…</p>
+        <p v-else-if="finance.error" class="err">{{ finance.error }}</p>
+        <template v-else>
+          <div class="stats-grid">
+            <div class="stat-mini">
+              <div class="stat-mini__l">Total recebido</div>
+              <div class="stat-mini__v font-display">{{ formatMoney(r.total_in) }}</div>
+            </div>
+            <div class="stat-mini">
+              <div class="stat-mini__l">N.º de doações</div>
+              <div class="stat-mini__v font-display">{{ r.n_donations }}</div>
+            </div>
+          </div>
+          <p class="muted sm" style="margin-top: 1rem">
+            Lista pública: quanto, quando e se foi anónimo ou com ID de cidadão.
+          </p>
+          <div v-if="!finance.donations.length" class="empty">
+            Ainda não há doações registadas.
+          </div>
+          <div v-else class="av-table-wrap">
+            <table class="av-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Quem</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="d in finance.donations" :key="d.id">
+                  <td>{{ formatDate(d.donated_on) }}</td>
+                  <td>
+                    <span class="tag">{{ d.display_tag || 'Anónimo' }}</span>
+                  </td>
+                  <td class="num">{{ formatMoney(d.amount_eur) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
       </div>
     </section>
   </div>
