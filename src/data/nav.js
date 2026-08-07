@@ -27,6 +27,7 @@ export const navMaisGroups = [
     label: 'A plataforma',
     items: [
       { to: '/como-funciona', label: 'Como funciona', icon: 'help_outline' },
+      { to: '/financiamento', label: 'Financiamento', icon: 'volunteer_activism' },
       { to: '/dados', label: 'Fontes de dados', icon: 'storage' },
       { to: '/porque', label: 'O porquê', icon: 'menu_book' },
       { to: '/sobre', label: 'Sobre', icon: 'info_outline' },

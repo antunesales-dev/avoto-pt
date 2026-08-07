@@ -76,6 +76,12 @@ const routes = [
         meta: { title: 'Fontes de dados' },
       },
       {
+        path: 'financiamento',
+        name: 'financiamento',
+        component: () => import('@/pages/FinanciamentoPage.vue'),
+        meta: { title: 'Financiamento' },
+      },
+      {
         path: 'porque',
         name: 'porque',
         component: () => import('@/pages/PorquePage.vue'),
