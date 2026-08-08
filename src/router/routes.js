@@ -31,13 +31,19 @@ const routes = [
         path: 'digest',
         name: 'digest',
         component: () => import('@/pages/DigestPage.vue'),
-        meta: { title: 'Digest diário' },
+        meta: { title: 'Resumo do dia' },
       },
       {
         path: 'despesa',
         name: 'despesa',
         component: () => import('@/pages/DespesaPage.vue'),
         meta: { title: 'Despesa pública' },
+      },
+      {
+        path: 'despesa/:id',
+        name: 'despesa-detalhe',
+        component: () => import('@/pages/DespesaDetailPage.vue'),
+        meta: { title: 'Despesa' },
       },
       {
         path: 'investimentos',
@@ -70,6 +76,12 @@ const routes = [
         meta: { title: 'Fontes de dados' },
       },
       {
+        path: 'financiamento',
+        name: 'financiamento',
+        component: () => import('@/pages/FinanciamentoPage.vue'),
+        meta: { title: 'Financiamento' },
+      },
+      {
         path: 'porque',
         name: 'porque',
         component: () => import('@/pages/PorquePage.vue'),
@@ -88,10 +100,34 @@ const routes = [
         meta: { title: 'Privacidade' },
       },
       {
+        path: 'termos',
+        name: 'termos',
+        component: () => import('@/pages/TermosPage.vue'),
+        meta: { title: 'Termos de uso' },
+      },
+      {
+        path: 'cookies',
+        name: 'cookies',
+        component: () => import('@/pages/CookiesPage.vue'),
+        meta: { title: 'Cookies' },
+      },
+      {
+        path: 'direitos',
+        name: 'direitos',
+        component: () => import('@/pages/DireitosPage.vue'),
+        meta: { title: 'Direitos RGPD' },
+      },
+      {
         path: 'perfil',
         name: 'perfil',
         component: () => import('@/pages/PerfilPage.vue'),
         meta: { title: 'Perfil', requiresAuth: true },
+      },
+      {
+        path: 'auth/callback',
+        name: 'auth-callback',
+        component: () => import('@/pages/AuthCallbackPage.vue'),
+        meta: { title: 'Validar link' },
       },
       {
         path: 'entrar',

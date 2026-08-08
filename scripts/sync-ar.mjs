@@ -29,8 +29,8 @@ const SIGLA_TO_ID = {
   // JPP e outros: ignorados se não temos cor/UI
 }
 
-/** Partidos com UI na A Voto — para unânimes */
-const PARTIDOS_UI = ['ps', 'psd', 'chega', 'il', 'be', 'pcp', 'livre', 'pan', 'cds']
+/** Partidos com UI na A Voto — para unânimes (ids; UI lista por sigla alfabética) */
+const PARTIDOS_UI = ['be', 'cds', 'chega', 'il', 'livre', 'pan', 'pcp', 'ps', 'psd']
 
 const TEMA_RULES = [
   [/sa[uú]de|hospital|sns|medicament|m[eé]dic/i, 'Saúde'],

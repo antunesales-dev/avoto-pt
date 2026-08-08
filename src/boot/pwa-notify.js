@@ -6,7 +6,7 @@ import { fetchNotificationPrefs, showLocalNotification } from '@/lib/notificatio
 
 /**
  * Notificações locais (tab / PWA instalada) via Realtime:
- * - digests diários
+ * - resumo do dia (daily digests)
  * - novas iniciativas (leis / votações)
  * - novos investimentos
  *
@@ -58,8 +58,8 @@ export default defineBoot(() => {
       async (payload) => {
         const d = payload.new
         await maybeNotify('digest', {
-          title: d?.title || 'Novo digest A Voto',
-          body: d?.summary || 'Há actividade parlamentar registada.',
+          title: d?.title || 'Resumo do dia · A Voto',
+          body: d?.summary || 'Há um novo resumo da actividade pública (Parlamento, despesa, investimentos).',
           url: '/digest',
           tag: `digest-${d?.id || Date.now()}`,
         })

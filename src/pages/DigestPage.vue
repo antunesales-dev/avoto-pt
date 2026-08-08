@@ -1,23 +1,56 @@
 <template>
   <div class="page-shell">
-    <h1 class="page-title">Digest diário</h1>
+    <h1 class="page-title">Resumo do dia</h1>
     <p class="page-subtitle">
-      Resumo factual do dia: <strong>votações</strong>, <strong>despesa</strong> e
-      <strong>investimentos</strong>. Só dados da plataforma (sem AI).
+      <strong>Boletim diário</strong> com o que tem
+      <strong>data oficial nesse dia</strong>: votações na AR (<em>data de votação</em>) e
+      contratos públicos (<em>data de publicação</em> no Portal Base). Não é “tudo o que o
+      sistema sincronizou hoje”. Não substitui as listas completas de
+      <router-link to="/iniciativas">Iniciativas</router-link>,
+      <router-link to="/despesa">Despesa</router-link>
+      ou
+      <router-link to="/investimentos">Investimentos</router-link>.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Gerado a partir das tabelas-fonte:
-      <code>ar-sync</code> → <code>despesa-sync</code> → <code>daily-digest</code>.
+      Factos oficiais e contagens da A Voto — não é notícias nem opinião. Sem inteligência
+      artificial a inventar texto. Contratos ≥ 100&nbsp;000&nbsp;€ do mesmo dia também estão em
+      Investimentos para voto; o boletim lista-os uma vez, em Despesa.
     </div>
+
+    <DateRangeFilter
+      v-model="periodo"
+      label="Dia do boletim"
+      :options="periodoOpts"
+      :count="filtrados.length"
+      style="margin-bottom: 0.75rem"
+    />
+
+    <label class="toggle empty-toggle">
+      <input v-model="showEmptyDays" type="checkbox" />
+      <span>
+        Mostrar dias sem actividade
+        <template v-if="nEmptyHidden > 0 && !showEmptyDays">
+          <span class="empty-toggle__n">({{ nEmptyHidden }} oculto{{ nEmptyHidden === 1 ? '' : 's' }})</span>
+        </template>
+      </span>
+    </label>
 
     <p v-if="finance.loading" class="muted">A carregar…</p>
     <p v-else-if="!finance.digests.length" class="muted">
-      Ainda não há digests. O job diário preenche esta lista.
+      Ainda não há resumos. Quando o sistema sincroniza os dados oficiais, aparece aqui um
+      boletim por dia.
+    </p>
+    <p v-else-if="!filtrados.length && !showEmptyDays && nEmptyInPeriod > 0" class="muted">
+      Neste período ({{ dateRangeLabel(periodo) }}) só há dias sem votações nem despesas com
+      data oficial. Marca «Mostrar dias sem actividade» para os ver, ou alarga o período.
+    </p>
+    <p v-else-if="!filtrados.length" class="muted">
+      Nenhum resumo neste período ({{ dateRangeLabel(periodo) }}).
     </p>
 
     <ListPager
-      v-if="!finance.loading && finance.digests.length"
+      v-if="!finance.loading && filtrados.length"
       :page="page"
       :page-size="pageSize"
       :total="total"
@@ -26,7 +59,7 @@
       :range-to="rangeTo"
       :page-window="pageWindow"
       :sizes="sizes"
-      unit="digests"
+      unit="resumos"
       @go="goPage"
       @update:page-size="setPageSize"
     />
@@ -44,13 +77,13 @@
           </div>
           <p class="digest__summary">{{ d.summary }}</p>
           <p class="digest__meta">
-            <template v-if="d.generated_at">Gerado {{ formatDate(d.generated_at) }} · </template>
+            <template v-if="d.generated_at">Compilado em {{ formatDate(d.generated_at) }} · </template>
             {{ sectionCountsLabel(d) }}
           </p>
 
           <!-- Parlamento -->
           <section v-if="sectionItems(d, 'iniciativas').length" class="digest-section">
-            <h3 class="digest-section__title">Parlamento · iniciativas</h3>
+            <h3 class="digest-section__title">No Parlamento — leis e votações</h3>
             <div
               v-for="(it, idx) in sectionItems(d, 'iniciativas').slice(0, sectionLimit)"
               :key="it.iniciativa_id || idx"
@@ -78,7 +111,7 @@
                 {{ truncate(it.descricao_oficial, 320) }}
               </p>
               <div class="digest-item__block">
-                <h5 class="digest-item__h">Partidos na AR</h5>
+                <h5 class="digest-item__h">O que cada partido votou (A–Z por sigla)</h5>
                 <div v-if="partyEntries(it).length" class="party-list">
                   <PartyVoteBadge
                     v-for="row in partyEntries(it)"
@@ -87,10 +120,10 @@
                     :voto="row.voto"
                   />
                 </div>
-                <p v-else class="muted sm">Sem registo de votos por partido.</p>
+                <p v-else class="muted sm">Sem registo de votos por partido neste item.</p>
               </div>
               <div class="digest-item__block">
-                <h5 class="digest-item__h">Cidadãos (A Voto)</h5>
+                <h5 class="digest-item__h">O que os cidadãos votaram na A Voto</h5>
                 <VoteBar :votos="cidadaosVotos(it)" />
               </div>
               <router-link
@@ -107,9 +140,16 @@
             </p>
           </section>
 
-          <!-- Despesa -->
+          <!-- Despesa (única secção de dinheiro — evita repetir o mesmo contrato em “investimentos”) -->
           <section v-if="sectionItems(d, 'despesas').length" class="digest-section">
-            <h3 class="digest-section__title">Despesa pública</h3>
+            <h3 class="digest-section__title">Despesa pública desse dia</h3>
+            <p class="muted sm" style="margin: -0.25rem 0 0.75rem">
+              Só contratos com <strong>data de publicação = este dia</strong> (Portal Base).
+              Os de valor elevado (≥ 100&nbsp;000&nbsp;€) também estão em
+              <router-link to="/investimentos">Investimentos</router-link>
+              para voto — não os listamos duas vezes aqui. Catálogo completo:
+              <router-link to="/despesa">Despesa</router-link>.
+            </p>
             <div
               v-for="(it, idx) in sectionItems(d, 'despesas').slice(0, sectionLimit)"
               :key="it.despesa_id || idx"
@@ -132,7 +172,16 @@
               <p v-if="it.descricao" class="digest-item__body">
                 {{ truncate(it.descricao, 240) }}
               </p>
-              <router-link to="/despesa" class="btn btn--ghost btn--sm">Ver despesa</router-link>
+              <router-link
+                v-if="it.despesa_id"
+                :to="`/despesa/${it.despesa_id}`"
+                class="btn btn--ghost btn--sm"
+              >
+                Ver detalhe
+              </router-link>
+              <router-link v-else to="/despesa" class="btn btn--ghost btn--sm">
+                Ver despesa
+              </router-link>
             </div>
             <p v-if="sectionItems(d, 'despesas').length > sectionLimit" class="muted sm">
               + {{ sectionItems(d, 'despesas').length - sectionLimit }} — ver
@@ -140,49 +189,13 @@
             </p>
           </section>
 
-          <!-- Investimentos -->
-          <section v-if="sectionItems(d, 'investimentos').length" class="digest-section">
-            <h3 class="digest-section__title">Investimentos</h3>
-            <div
-              v-for="(it, idx) in sectionItems(d, 'investimentos').slice(0, sectionLimit)"
-              :key="it.investimento_id || idx"
-              class="digest-item"
-            >
-              <div class="digest-item__badges">
-                <span v-if="it.sector" class="badge badge--muted">{{ it.sector }}</span>
-                <span v-if="it.montante_eur != null" class="badge badge--gold">
-                  {{ formatMoney(it.montante_eur) }}
-                </span>
-                <span v-if="it.decisao_oficial" class="badge badge--navy">
-                  {{ it.decisao_oficial }}
-                </span>
-              </div>
-              <h4 class="digest-item__titulo">{{ it.titulo }}</h4>
-              <p v-if="it.entidade" class="digest-item__line">{{ it.entidade }}</p>
-              <div v-if="it.votos_cidadaos" class="digest-item__block">
-                <h5 class="digest-item__h">Cidadãos</h5>
-                <VoteBar :votos="cidadaosVotos(it)" />
-              </div>
-              <router-link
-                v-if="it.investimento_id"
-                :to="`/investimentos/${it.investimento_id}`"
-                class="btn btn--ghost btn--sm"
-              >
-                Ver investimento
-              </router-link>
-            </div>
-            <p v-if="sectionItems(d, 'investimentos').length > sectionLimit" class="muted sm">
-              + {{ sectionItems(d, 'investimentos').length - sectionLimit }} — ver
-              <router-link to="/investimentos">Investimentos</router-link>.
-            </p>
-          </section>
+          <!--
+            Não listamos “investimentos” aqui: são o mesmo Portal Base (≥100k €),
+            já cobertos em Despesa + página Investimentos (voto). Evita triplicar.
+          -->
 
           <p
-            v-if="
-              !sectionItems(d, 'iniciativas').length &&
-              !sectionItems(d, 'despesas').length &&
-              !sectionItems(d, 'investimentos').length
-            "
+            v-if="!sectionItems(d, 'iniciativas').length && !sectionItems(d, 'despesas').length"
             class="muted sm"
           >
             Sem itens neste dia.
@@ -215,24 +228,77 @@
       :page-window="pageWindow"
       :sizes="sizes"
       :show-size="false"
-      unit="digests"
+      unit="resumos"
       @go="goPage"
     />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
 import { estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
+import { dateRangeLabel, matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
-const digestsList = computed(() => finance.digests)
+const periodo = ref('todos')
+/** Por defeito esconde boletins sem leis/despesas (datas oficiais vazias). */
+const showEmptyDays = ref(false)
 const sectionLimit = 6
+
+/** Tem pelo menos 1 votação AR ou 1 despesa com data oficial desse dia. */
+function digestHasActivity(d) {
+  const items = d?.items
+  if (items?.sections) {
+    const nIni =
+      items.sections.iniciativas?.count ?? items.sections.iniciativas?.items?.length ?? 0
+    const nDes =
+      items.sections.despesas?.count ?? items.sections.despesas?.items?.length ?? 0
+    if (Number(nIni) > 0 || Number(nDes) > 0) return true
+  }
+  if (Array.isArray(items) && items.length > 0) return true
+  if (Array.isArray(items?.legacy_items) && items.legacy_items.length > 0) return true
+  // fallback título gerado pelo RPC
+  if (typeof d?.title === 'string' && /sem actividade|sem atividade/i.test(d.title)) {
+    return false
+  }
+  return false
+}
+
+/** Base para chips de período e lista: com ou sem dias vazios. */
+const digestsForList = computed(() => {
+  const all = finance.digests || []
+  if (showEmptyDays.value) return all
+  return all.filter(digestHasActivity)
+})
+
+const periodoOpts = computed(() =>
+  optionsForContext(
+    'digest',
+    digestsForList.value.map((d) => d.digest_date),
+  ),
+)
+
+const filtrados = computed(() =>
+  digestsForList.value.filter((d) => matchesDateRange(d.digest_date, periodo.value)),
+)
+
+/** Quantos vazios existem no total (para o contador do toggle). */
+const nEmptyHidden = computed(() =>
+  (finance.digests || []).filter((d) => !digestHasActivity(d)).length,
+)
+
+/** Vazios só no período de datas escolhido (mensagem quando a lista fica vazia). */
+const nEmptyInPeriod = computed(() =>
+  (finance.digests || []).filter(
+    (d) => !digestHasActivity(d) && matchesDateRange(d.digest_date, periodo.value),
+  ).length,
+)
 
 const {
   page,
@@ -245,11 +311,14 @@ const {
   pageItems,
   pageWindow,
   goPage,
-} = usePagination(digestsList, { defaultSize: 5, sizes: [5, 10, 20] })
+  resetPage,
+} = usePagination(filtrados, { defaultSize: 5, sizes: [5, 10, 20] })
 
 function setPageSize(n) {
   pageSize.value = n
 }
+
+watch([periodo, showEmptyDays], () => resetPage())
 
 function estadoLabel(estado) {
   return estadosLabel[estado] || estado || '—'
@@ -292,8 +361,8 @@ function sectionCountsLabel(d) {
   if (items?.sections) {
     const a = items.sections.iniciativas?.count ?? 0
     const b = items.sections.despesas?.count ?? 0
-    const c = items.sections.investimentos?.count ?? 0
-    return `${a} iniciativa(s) · ${b} despesa(s) · ${c} investimento(s)`
+    // investimentos = subconjunto de despesa (não contar à parte no boletim)
+    return `${a} lei(s)/votação(ões) · ${b} despesa(s)`
   }
   const n = Array.isArray(items) ? items.length : Array.isArray(items?.legacy_items) ? items.legacy_items.length : 0
   return `${n} item(ns)`
@@ -323,7 +392,12 @@ function partyEntries(it) {
       voto,
     })
   }
-  return rows
+  // Extra / desconhecidos: alfabético por sigla no fim da lista canónica
+  return rows.sort((a, b) =>
+    (a.partido?.sigla || a.id).localeCompare(b.partido?.sigla || b.id, 'pt', {
+      sensitivity: 'base',
+    }),
+  )
 }
 
 onMounted(() => {
@@ -339,6 +413,26 @@ onMounted(() => {
     font-size: 0.85rem;
     font-weight: 500;
   }
+}
+.empty-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 1.15rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--pt-ink);
+  cursor: pointer;
+  line-height: 1.35;
+  input {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+  }
+}
+.empty-toggle__n {
+  color: var(--pt-muted);
+  font-weight: 500;
+  font-size: 0.88em;
 }
 .digest-list {
   display: flex;

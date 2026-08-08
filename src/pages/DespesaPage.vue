@@ -2,14 +2,20 @@
   <div class="page-shell">
     <h1 class="page-title">Despesa pública</h1>
     <p class="page-subtitle">
-      Transparência de <strong>spending</strong> do Estado: contratos, linhas orçamentais e
-      investimentos registados a partir de fontes oficiais (Base.gov.pt, dados.gov.pt, DGO). A A
-      Voto não interpreta nem recomenda — mostra montantes e ligações oficiais.
+      <strong>Catálogo de consulta</strong> de contratos e despesa do Estado (Portal Base e
+      fontes oficiais). Aqui <strong>não se vota</strong> — só se vê montantes, entidades e
+      ligações oficiais.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Dados sincronizados de fontes oficiais (<code>despesa-sync</code>). Cada linha indica a
-      origem.
+      <strong>Data = publicação oficial</strong> no Portal Base (não a data em que a A Voto
+      sincronizou). Contratos ≥&nbsp;100&nbsp;000&nbsp;€ estão também em
+      <router-link to="/investimentos">Investimentos</router-link>
+      (voto cidadão). O
+      <router-link to="/digest">Resumo do dia</router-link>
+      só lista contratos com publicação
+      <em>nesse</em> dia. Estado das importações:
+      <router-link to="/dados">Fontes de dados</router-link>.
     </div>
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
@@ -35,6 +41,13 @@
         {{ t.label }}
       </button>
     </div>
+    <DateRangeFilter
+      v-model="periodo"
+      label="Data de publicação"
+      :options="periodoOpts"
+      :count="filtradas.length"
+      style="margin-bottom: 1rem"
+    />
 
     <ListPager
       :page="page"
@@ -50,36 +63,62 @@
       @update:page-size="setPageSize"
     />
 
-    <div class="av-table-wrap">
-      <table class="av-table">
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Entidade</th>
-            <th>Tipo</th>
-            <th>Montante</th>
-            <th>Data</th>
-            <th>Fonte</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="d in pageItems" :key="d.id">
-            <td class="wrap">
-              <strong>{{ d.titulo }}</strong>
-              <div class="sub">{{ d.categoria }}</div>
-            </td>
-            <td class="wrap">{{ d.entidade }}</td>
-            <td><span class="badge badge--muted">{{ tipoLabel(d.tipo) }}</span></td>
-            <td>{{ formatMoney(d.montante_eur) }}</td>
-            <td>{{ formatDate(d.data_publicacao) }}</td>
-            <td>
-              <span class="badge" :class="sourceBadgeClass(d.source)">
-                {{ sourceLabel(d.source) }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <p v-if="finance.loading" class="muted">A carregar contratos…</p>
+    <div v-else-if="!finance.despesas.length" class="av-card av-card-pad empty-box">
+      <p>
+        Ainda <strong>não há despesas importadas</strong> nesta base. Quando o job
+        <code>despesa-sync</code> correr com sucesso, aparecem aqui com fonte e data de
+        publicação oficiais.
+      </p>
+      <router-link to="/dados" class="btn btn--ghost btn--sm">Ver estado das importações</router-link>
+    </div>
+    <div v-else-if="!filtradas.length" class="av-card av-card-pad empty-box">
+      <p>
+        Nenhum registo com o filtro actual (tipo / período). Os contratos existem na base
+        ({{ formatNumber(finance.despesas.length) }}) — alargue o período ou escolha “Todos”.
+      </p>
+    </div>
+    <div v-else class="init-grid">
+      <router-link
+        v-for="d in pageItems"
+        :key="d.id"
+        :to="`/despesa/${d.id}`"
+        class="av-card link-card des-card"
+      >
+        <div class="flag-stripe" aria-hidden="true">
+          <span class="flag-stripe__green" />
+          <span class="flag-stripe__red" />
+        </div>
+        <div class="av-card-pad">
+          <div class="meta">
+            <span class="badge badge--muted">{{ tipoLabel(d.tipo) }}</span>
+            <span v-if="d.categoria" class="badge badge--navy">{{ d.categoria }}</span>
+            <span class="badge" :class="sourceBadgeClass(d.source)">
+              {{ sourceLabel(d.source) }}
+            </span>
+          </div>
+          <h2 class="des-card__title link-card__title">{{ d.titulo }}</h2>
+          <p class="des-card__money font-display">{{ formatMoney(d.montante_eur) }}</p>
+          <p class="des-card__ent">{{ d.entidade || '—' }}</p>
+          <p class="des-card__src">
+            Publicação: {{ formatDate(d.data_publicacao) }}
+            · Fonte: {{ sourceLabel(d.source) }}
+            <template v-if="primarySourceUrl(d)">
+              ·
+              <a
+                :href="primarySourceUrl(d)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="des-card__ext"
+                @click.stop
+              >
+                portal oficial ↗
+              </a>
+            </template>
+          </p>
+          <div class="des-card__foot">Ver detalhe →</div>
+        </div>
+      </router-link>
     </div>
 
     <ListPager
@@ -110,14 +149,26 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
+import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
-import { sourceBadgeClass, sourceLabel } from '@/lib/sources'
+import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
+import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
 const tipo = ref('todos')
+const periodo = ref('todos')
+
+function dataRefDespesa(d) {
+  return d.data_publicacao || d.data_inicio || null
+}
+
+function primarySourceUrl(d) {
+  const links = resolveSourceLinks(d)
+  return links[0]?.url || null
+}
 
 const tipos = [
   { id: 'todos', label: 'Todos' },
@@ -127,10 +178,21 @@ const tipos = [
   { id: 'outro', label: 'Outro' },
 ]
 
-const filtradas = computed(() => {
+const baseFiltradas = computed(() => {
   if (tipo.value === 'todos') return finance.despesas
   return finance.despesas.filter((d) => d.tipo === tipo.value)
 })
+
+const periodoOpts = computed(() =>
+  optionsForContext(
+    'despesa',
+    baseFiltradas.value.map((d) => dataRefDespesa(d)),
+  ),
+)
+
+const filtradas = computed(() =>
+  baseFiltradas.value.filter((d) => matchesDateRange(dataRefDespesa(d), periodo.value)),
+)
 
 const totalMontante = computed(() =>
   filtradas.value.reduce((s, d) => s + (Number(d.montante_eur) || 0), 0),
@@ -148,7 +210,7 @@ const {
   pageWindow,
   goPage,
   resetPage,
-} = usePagination(filtradas, { defaultSize: 20, sizes: [10, 20, 50] })
+} = usePagination(filtradas, { defaultSize: 12, sizes: [12, 24, 48] })
 
 function setPageSize(n) {
   pageSize.value = n
@@ -167,7 +229,7 @@ function formatMoney(n) {
   }).format(Number(n))
 }
 
-watch(tipo, () => resetPage())
+watch([tipo, periodo], () => resetPage())
 onMounted(() => finance.loadDespesas().catch(console.error))
 </script>
 
@@ -189,15 +251,6 @@ onMounted(() => finance.loadDespesas().catch(console.error))
   margin-top: 0.25rem;
   color: var(--pt-navy);
 }
-.wrap {
-  white-space: normal;
-  max-width: 18rem;
-}
-.sub {
-  font-size: 0.8rem;
-  color: var(--pt-muted);
-  font-weight: 500;
-}
 .foot {
   margin-top: 1rem;
   font-size: 0.88rem;
@@ -205,5 +258,72 @@ onMounted(() => finance.loadDespesas().catch(console.error))
   a {
     font-weight: 700;
   }
+}
+.muted {
+  color: var(--pt-muted);
+  font-weight: 600;
+}
+.empty-box {
+  p {
+    margin: 0 0 0.65rem;
+    line-height: 1.45;
+    color: var(--pt-ink);
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+}
+.init-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+.des-card__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 0 0 0.35rem;
+  color: var(--pt-navy);
+  line-height: 1.3;
+}
+.des-card__money {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--pt-navy);
+  margin: 0 0 0.25rem;
+}
+.des-card__ent {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--pt-muted);
+}
+.des-card__src {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pt-muted);
+}
+.des-card__ext {
+  color: var(--pt-green-dark);
+  font-weight: 700;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.des-card__foot {
+  margin-top: 0.75rem;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--pt-green-dark);
 }
 </style>

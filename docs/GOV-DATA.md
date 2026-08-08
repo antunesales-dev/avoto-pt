@@ -7,9 +7,11 @@ Plataforma **independente**. Usa **apenas** portais oficiais do Estado / AR.
 | Pilar | O quê | Tabelas | Voto cidadão |
 |-------|--------|---------|--------------|
 | **Parlamento** | Iniciativas e votações AR | `iniciativas`, contagens | A favor / Contra / Abstenção |
-| **Digest diário** | O que foi a voto e **como** (partidos + cidadãos) | `daily_digests` | (agrega votos existentes) |
-| **Despesa** | Contratos, linhas OE, spending | `despesas_publicas` | leitura + transparência |
-| **Investimentos** | Grandes investimentos | `investimentos` | Aprovar / Rejeitar / Abster + vs decisão oficial |
+| **Resumo do dia** | Boletim diário (leis + despesa do dia) | `daily_digests` | só agrega; não é 3.ª lista completa |
+| **Despesa** | Catálogo completo de contratos / spending | `despesas_publicas` | só consulta |
+| **Investimentos** | **Subconjunto** da despesa (≥ 100k €) para voto | `investimentos` (mesmo Base, `despesa_id`) | Aprovar / Rejeitar / Abster |
+
+**Importante:** despesa e investimentos **não são duas fontes**. O sync Base grava tudo em despesa e copia os contratos ≥ 100k € para investimentos (voto). O resumo do dia **não** deve listar os dois como se fossem conteúdos distintos.
 
 ## Fontes oficiais (permitidas)
 
@@ -37,11 +39,53 @@ Detalhe: [`docs/AR-IMPORT.md`](./AR-IMPORT.md).
 - Não pretende ser amostra representativa da população.
 - Não recomenda partidos nem “vencedores”.
 - Despesa e investimentos: **transparência e comparação**, não “controlo do governo”.
+- **Voto de partidos:** sentido por grupo parlamentar (favor / contra / abstenção), sem peso por nº de deputados.
+- **Mudança de governo / legislatura:** cada iniciativa guarda o resultado da votação histórica da AR; o sync actualiza dados oficiais novos. Partidos novos = mapear sigla no import + metadados de UI (cor/sigla).
+
+## Ordem dos partidos (anti-enviesamento) — documentar ao utilizador
+
+**Regra canónica (UI e código):** listas e badges de partidos em
+**ordem alfabética da sigla** (`localeCompare` pt-PT):  
+BE → CDS-PP → CHEGA → IL → LIVRE → PAN → PCP → PS → PSD.
+
+| Contexto | Ordem / peso |
+|----------|----------------|
+| Listas, badges, matriz Comparação, resumo do dia | **Alfabética por sigla** |
+| Alinhamento % com cidadãos | Por métrica (empate → A–Z) |
+| **Peso no hemiciclo** (detalhe da iniciativa) | Assentos × sentido de voto (favor/contra/abstenção); tabela A–Z |
+
+**Ordem A–Z** evita enviesar a leitura. **Peso** = aritmética legislativa (bancadas), não
+recomendação de voto. Composição em `src/data/composicaoAr.js` (actualizar após eleições).
+
+**Onde o utilizador lê isto na app:**  
+`/como-funciona` (secção dedicada), `/comparacao` (aviso + legendas), detalhe de iniciativa,
+`/dados`, subtítulo de `/iniciativas`.
+
+**Código:** `src/data/partidos.js` (`partidos` já sorted; `comparePartidosAlfa` / `sortPartidosAlfa`).  
+Fonte de verdade dos votos = Dados Abertos da AR (`resultado_partidos` por iniciativa) — as
+cores/siglas em `partidos.js` são só apresentação.
 
 ## Digest (agora vs depois)
 
 | Agora | Depois (opcional) |
 |-------|-------------------|
-| Multi-secção: iniciativas + despesas + investimentos | AI só para **rephrasing** informal por item |
+| Multi-secção: iniciativas + despesas (+ investimentos no JSON, não no título) | AI só para **rephrasing** informal por item |
 | Título/summary = **templates** pt-PT | Factos mandam; AI não inventa |
-| UI `/digest` por secção | Mesma estrutura de `items.sections` |
+| UI `/digest` por secção (despesa uma vez; inv ≥100k na página própria) | Mesma estrutura de `items.sections` |
+
+### Critério de data (obrigatório)
+
+O resumo do dia **não** usa `last_synced_at` (data do cron). Só datas oficiais:
+
+| Secção | Campo |
+|--------|--------|
+| Parlamento | `iniciativas.data_votacao` |
+| Despesa | `despesas_publicas.data_publicacao` |
+| Investimentos (JSON) | `investimentos.data_referencia` |
+
+Assim, sincronizar 400 contratos antigos num dia **não** enche o boletim desse dia.
+
+### Identidade de contratos
+
+IDs Base = `base-` + SHA-256 estável dos campos oficiais (NIF, datas, preço, objecto).
+Upsert por `id` / `source_id` evita re-registar o mesmo contrato em cada sync.

@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { computed, ref } from 'vue'
+import { consumeAuthCallbackFromUrl } from '@/lib/authCallback'
 import { getDeviceId } from '@/lib/deviceId'
 import { supabase } from '@/lib/supabase'
 import { emailSchema, loginSchema, passwordSchema, registoSchema } from '@/lib/schemas'
@@ -13,6 +14,69 @@ function appBaseUrl() {
   if (typeof window === 'undefined') return ''
   const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
   return `${window.location.origin}${base}`
+}
+
+/** Destino do magic link / confirmação de email (SPA + GH Pages). */
+export function authCallbackUrl(nextPath = '') {
+  const base = appBaseUrl()
+  const path = `${base}/auth/callback`
+  if (!nextPath) return path
+  const n = nextPath.startsWith('/') ? nextPath : `/${nextPath}`
+  return `${path}?next=${encodeURIComponent(n)}`
+}
+
+let initPromise = null
+
+/**
+ * Extrai { error, message } do corpo da edge function.
+ * O client Supabase devolve "Edge Function returned a non-2xx status code"
+ * e esconde o JSON — sem isto o utilizador só vê lixo técnico.
+ */
+async function parseFunctionsError(fnErr, data) {
+  // Às vezes o body vem em data mesmo com error
+  if (data && typeof data === 'object' && (data.message || data.error)) {
+    return {
+      code: data.error || 'EDGE_ERROR',
+      message: data.message || data.error || String(fnErr?.message || 'Erro no serviço.'),
+    }
+  }
+  const ctx = fnErr?.context
+  if (ctx) {
+    try {
+      // Response (fetch) ou clone
+      if (typeof ctx.json === 'function') {
+        const j = await ctx.clone?.().json?.() ?? (await ctx.json())
+        if (j && (j.message || j.error)) {
+          return {
+            code: j.error || 'EDGE_ERROR',
+            message: j.message || j.error,
+          }
+        }
+      }
+      if (typeof ctx.text === 'function') {
+        const t = await ctx.clone?.().text?.() ?? (await ctx.text())
+        try {
+          const j = JSON.parse(t)
+          if (j?.message || j?.error) {
+            return { code: j.error || 'EDGE_ERROR', message: j.message || j.error }
+          }
+        } catch {
+          if (t) return { code: 'EDGE_ERROR', message: t.slice(0, 280) }
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  const raw = fnErr?.message || String(fnErr || 'Erro no serviço.')
+  if (/non-2xx|FunctionsHttpError|429/i.test(raw)) {
+    return {
+      code: 'EDGE_HTTP',
+      message:
+        'Não foi possível contactar o serviço de login. Se acabou de pedir vários códigos, espere alguns minutos e tente de novo.',
+    }
+  }
+  return { code: 'EDGE_ERROR', message: raw }
 }
 
 async function linkDeviceAfterLogin() {
@@ -45,7 +109,20 @@ export const useAuthStore = defineStore('auth', () => {
       return null
     }
     const { data, error: err } = await supabase.rpc('get_my_profile')
-    if (err) throw err
+    if (err) {
+      // 403/JWT expirado: não rebentar a app; limpar perfil e deixar sessão ser renovada
+      const msg = err.message || String(err)
+      if (
+        err.code === '42501' ||
+        err.status === 403 ||
+        /403|permission denied|JWT|not authorized|PGRST301/i.test(msg)
+      ) {
+        console.warn('get_my_profile', msg)
+        profile.value = null
+        return null
+      }
+      throw err
+    }
     // rpc returns setof → array
     const row = Array.isArray(data) ? data[0] : data
     profile.value = row
@@ -61,46 +138,61 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function init() {
-    loading.value = true
-    error.value = null
-    try {
-      const { data, error: err } = await supabase.auth.getSession()
-      if (err) throw err
-      session.value = data.session
-      if (data.session?.user) {
-        await fetchProfile()
-        await linkDeviceAfterLogin()
-      } else {
-        profile.value = null
-      }
-
-      supabase.auth.onAuthStateChange(async (event, next) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          passwordRecovery.value = true
+    if (initPromise) return initPromise
+    initPromise = (async () => {
+      loading.value = true
+      error.value = null
+      try {
+        // 1) Magic link / PKCE / hash tokens na URL (antes de getSession “vazio”)
+        const cb = await consumeAuthCallbackFromUrl()
+        if (cb.error) {
+          error.value = cb.error
         }
-        session.value = next
-        if (next?.user) {
-          try {
+        if (cb.session?.user) {
+          session.value = cb.session
+          await fetchProfile()
+          await linkDeviceAfterLogin()
+        } else {
+          const { data, error: err } = await supabase.auth.getSession()
+          if (err) throw err
+          session.value = data.session
+          if (data.session?.user) {
             await fetchProfile()
-            if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-              await linkDeviceAfterLogin()
-            }
-          } catch (e) {
-            console.error(e)
+            await linkDeviceAfterLogin()
+          } else {
             profile.value = null
           }
-        } else {
-          profile.value = null
         }
-      })
-    } catch (e) {
-      error.value = e.message || String(e)
-      session.value = null
-      profile.value = null
-    } finally {
-      ready.value = true
-      loading.value = false
-    }
+
+        supabase.auth.onAuthStateChange(async (event, next) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            passwordRecovery.value = true
+          }
+          session.value = next
+          if (next?.user) {
+            try {
+              await fetchProfile()
+              if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+                await linkDeviceAfterLogin()
+              }
+            } catch (e) {
+              console.error(e)
+              profile.value = null
+            }
+          } else {
+            profile.value = null
+          }
+        })
+      } catch (e) {
+        error.value = e.message || String(e)
+        session.value = null
+        profile.value = null
+      } finally {
+        ready.value = true
+        loading.value = false
+      }
+    })()
+    return initPromise
   }
 
   async function registar({ email, password, passwordConfirm, partidoPreferencia }) {
@@ -141,7 +233,7 @@ export const useAuthStore = defineStore('auth', () => {
         email: parsed.data.email,
         password: parsed.data.password,
         options: {
-          emailRedirectTo: `${appBaseUrl()}/entrar`,
+          emailRedirectTo: authCallbackUrl('/perfil'),
         },
       })
       if (err) throw err
@@ -211,50 +303,49 @@ export const useAuthStore = defineStore('auth', () => {
           email: parsed.data,
           device_id: deviceId,
           turnstile_token: turnstileToken || '',
-          redirect_to: `${appBaseUrl()}/entrar`,
+          redirect_to: authCallbackUrl('/perfil'),
         },
       })
-      if (fnErr) {
-        const msg = fnErr.message || String(fnErr)
-        // FunctionsHttpError may include context
-        throw new Error(msg)
-      }
-      if (data?.error) {
-        const e = new Error(data.message || data.error)
-        e.code = data.error
-        throw e
+      if (fnErr || data?.error) {
+        const parsedErr = await parseFunctionsError(fnErr, data)
+        let msg = parsedErr.message
+        let code = parsedErr.code
+        // Ordem importa: EMAIL_RATE_LIMITED contém a substring RATE_LIMITED
+        if (code === 'EMAIL_RATE_LIMITED' || /EMAIL_RATE_LIMITED|fornecedor de email/i.test(`${code} ${msg}`)) {
+          code = 'EMAIL_RATE_LIMITED'
+          msg =
+            msg && /fornecedor|email|minutos/i.test(msg)
+              ? msg
+              : 'O serviço de email limitou envios. Espere cerca de 1 hora e tente de novo, ou use palavra-passe se já tiver.'
+        } else if (
+          code === 'RATE_LIMITED' ||
+          (code !== 'EMAIL_RATE_LIMITED' && /\bRATE_LIMITED\b|Demasiados pedidos/i.test(`${code} ${msg}`))
+        ) {
+          code = 'RATE_LIMITED'
+          msg =
+            'Demasiados pedidos neste dispositivo ou rede. Espere e tente de novo, ou use palavra-passe.'
+        } else if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(`${code} ${msg}`)) {
+          code = 'DEVICE_ACCOUNT_LIMIT'
+          msg =
+            'Limite de contas neste dispositivo. Entre com uma conta existente ou use outro dispositivo.'
+        } else if (/TURNSTILE|anti-bot|captcha/i.test(`${code} ${msg}`)) {
+          code = 'TURNSTILE_FAILED'
+          msg = 'Complete a verificação anti-bot e tente de novo.'
+        }
+        error.value = msg
+        const err = new Error(msg)
+        err.code = code
+        throw err
       }
       return { email: parsed.data, allowCreate: data?.allow_create !== false }
     } catch (e) {
-      // parse body from FunctionsHttpError if present
-      let msg = e.message || String(e)
-      try {
-        if (e?.context?.json) {
-          const j = await e.context.json()
-          if (j?.message) msg = j.message
-          if (j?.error) e.code = j.error
-        }
-      } catch {
-        /* ignore */
+      if (e?.code) {
+        error.value = e.message
+        throw e
       }
-      if (/RATE_LIMITED|429|rate/i.test(msg)) {
-        msg =
-          'Demasiados pedidos deste dispositivo ou rede. Espere cerca de uma hora e tente de novo.'
-        e.code = 'RATE_LIMITED'
-      }
-      if (/DEVICE_ACCOUNT_LIMIT|limite de contas/i.test(msg)) {
-        e.code = 'DEVICE_ACCOUNT_LIMIT'
-      }
-      if (/TURNSTILE|anti-bot|captcha/i.test(msg)) {
-        e.code = 'TURNSTILE_FAILED'
-        if (!/verifica/i.test(msg)) {
-          msg = 'Complete a verificação anti-bot e tente de novo.'
-        }
-      }
+      const msg = e.message || String(e)
       error.value = msg
-      const err = new Error(msg)
-      err.code = e.code
-      throw err
+      throw e
     } finally {
       loading.value = false
     }
@@ -301,11 +392,64 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     error.value = null
     try {
-      const { error: err } = await supabase.auth.signOut()
-      if (err) throw err
+      // Global primeiro; se falhar/rede, limpa sessão local na mesma
+      const global = supabase.auth.signOut({ scope: 'global' })
+      await Promise.race([
+        global,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('SIGNOUT_TIMEOUT')), 4000)),
+      ]).catch(async () => {
+        await supabase.auth.signOut({ scope: 'local' })
+      })
+    } catch (e) {
+      // Último recurso: limpar estado da app mesmo sem resposta do servidor
+      try {
+        await supabase.auth.signOut({ scope: 'local' })
+      } catch {
+        /* ignore */
+      }
+      error.value = e.message || String(e)
+    } finally {
       session.value = null
       profile.value = null
       passwordRecovery.value = false
+      loading.value = false
+    }
+  }
+
+  /**
+   * Apaga a conta (auth.users + cascata profiles/votos) via edge delete-my-account.
+   * Requer sessão válida. Depois limpa estado local.
+   */
+  async function apagarConta() {
+    if (!session.value?.access_token) {
+      const e = new Error('Não tem sessão activa.')
+      e.code = 'AUTH_REQUIRED'
+      throw e
+    }
+    loading.value = true
+    error.value = null
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke('delete-my-account', {
+        method: 'POST',
+        body: {},
+      })
+      if (fnErr) {
+        const msg = fnErr.message || String(fnErr)
+        // Edge não deployada / 404
+        if (/not found|404|Failed to send/i.test(msg)) {
+          const e = new Error(
+            'Serviço de apagar conta ainda não está activo no servidor. Contacte o suporte ou tente mais tarde.',
+          )
+          e.code = 'EDGE_MISSING'
+          throw e
+        }
+        throw new Error(msg)
+      }
+      if (data?.error) {
+        throw new Error(data.message || data.error)
+      }
+      await sair()
+      return true
     } catch (e) {
       error.value = e.message || String(e)
       throw e
@@ -324,7 +468,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { error: err } = await supabase.auth.resetPasswordForEmail(parsed.data, {
-        redirectTo: `${appBaseUrl()}/atualizar-password`,
+        redirectTo: authCallbackUrl('/atualizar-password'),
       })
       if (err) throw err
       return true
@@ -371,7 +515,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { error: err } = await supabase.auth.resend({
         type: 'signup',
         email: parsed.data,
-        options: { emailRedirectTo: `${appBaseUrl()}/entrar` },
+        options: { emailRedirectTo: authCallbackUrl('/perfil') },
       })
       if (err) throw err
       return true
@@ -503,6 +647,7 @@ export const useAuthStore = defineStore('auth', () => {
     enviarMagicLink,
     verificarOtp,
     sair,
+    apagarConta,
     pedirRecuperacao,
     atualizarPassword,
     reenviarConfirmacao,

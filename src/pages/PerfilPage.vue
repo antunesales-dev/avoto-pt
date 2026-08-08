@@ -1,14 +1,7 @@
 <template>
   <div class="page-shell">
-    <div class="row-between" style="margin-bottom: 0.5rem">
-      <div>
-        <h1 class="page-title">Perfil</h1>
-        <p class="page-subtitle" style="margin-bottom: 0">Área pessoal — só visível para si.</p>
-      </div>
-      <button type="button" class="btn btn--outline btn--sm" :disabled="auth.loading" @click="onSair">
-        Sair
-      </button>
-    </div>
+    <h1 class="page-title">Perfil</h1>
+    <p class="page-subtitle">Área pessoal — só visível para si.</p>
 
     <div class="profile-grid">
       <section class="av-card">
@@ -43,8 +36,9 @@
         <div class="av-card-pad">
           <h2 class="section-title">Notificações</h2>
           <p class="muted" style="margin-bottom: 0.75rem">
-            Avisos sobre digests, novas leis/votações e investimentos. Instale a app (PWA) no
-            telemóvel ou desktop para um atalho e melhor experiência.
+            Avisos sobre o resumo diário da actividade pública, novas leis/votações e
+            investimentos. Instale a app (PWA) no telemóvel ou desktop para um atalho e melhor
+            experiência.
           </p>
 
           <div class="notif-permission">
@@ -56,14 +50,32 @@
               :disabled="!canRequest || savingNotif"
               @click="onEnableNotif"
             >
-              Activar notificações
+              Activar no browser
+            </button>
+            <button
+              v-if="anyPrefOn"
+              type="button"
+              class="btn btn--outline btn--sm"
+              :disabled="savingNotif"
+              @click="onDisableAllNotifs"
+            >
+              Desactivar todas
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn btn--ghost btn--sm"
+              :disabled="savingNotif"
+              @click="onEnableAllNotifs"
+            >
+              Activar todas as preferências
             </button>
           </div>
 
           <div class="toggle-list">
             <label class="toggle">
               <input v-model="prefs.notify_digest" type="checkbox" @change="onSavePrefs" />
-              <span>Digest diário (resumo da actividade)</span>
+              <span>Resumo do dia (Parlamento, despesa e investimentos)</span>
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_iniciativas" type="checkbox" @change="onSavePrefs" />
@@ -78,6 +90,10 @@
               <span>Actualizações de despesa pública</span>
             </label>
           </div>
+          <p v-if="!anyPrefOn" class="muted notif-off-msg">
+            Preferências desactivadas — a A Voto não mostra avisos destes temas. A permissão do
+            browser (se estiver activa) só se remove nas definições do browser/sistema.
+          </p>
           <p class="muted" style="margin-top: 0.75rem; font-size: 0.82rem">
             Com a app aberta ou instalada, as notificações chegam em tempo quase real. Push com a
             app totalmente fechada (Web Push / VAPID) activa-se numa fase seguinte.
@@ -130,6 +146,34 @@
           </template>
         </div>
       </section>
+
+      <section class="av-card account-danger">
+        <div class="av-card-pad">
+          <h2 class="section-title">Sessão e conta</h2>
+          <p class="muted" style="margin-bottom: 0.85rem">
+            Um sítio só: terminar a sessão neste dispositivo, ou apagar a conta (RGPD — direito
+            ao apagamento). Apagar remove o login, o perfil e os votos associados.
+          </p>
+          <div class="account-actions">
+            <button
+              type="button"
+              class="btn btn--outline"
+              :disabled="isBusy"
+              @click="onSair"
+            >
+              {{ busy === 'sair' ? 'A sair…' : 'Sair da sessão' }}
+            </button>
+            <button
+              type="button"
+              class="btn btn--danger"
+              :disabled="isBusy"
+              @click="onApagarConta"
+            >
+              {{ busy === 'apagar' ? 'A apagar…' : 'Apagar a minha conta' }}
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -159,6 +203,10 @@ const $q = useQuasar()
 const historico = ref([])
 const partido = ref(auth.profile?.partido_preferencia || '')
 const savingNotif = ref(false)
+/** null | 'sair' | 'apagar' — nunca usar '' em :disabled (Vue trata string vazia como true) */
+const busy = ref(null)
+/** Boolean explícito: :disabled exige true/false, não strings. */
+const isBusy = computed(() => busy.value != null)
 const permission = ref(notificationPermission())
 const prefs = reactive({
   notify_digest: true,
@@ -188,6 +236,13 @@ const initial = computed(() => (auth.email || 'A').charAt(0).toUpperCase())
 const canRequest = computed(
   () => notificationSupport() && permission.value !== 'denied' && permission.value !== 'unsupported',
 )
+const anyPrefOn = computed(
+  () =>
+    prefs.notify_digest ||
+    prefs.notify_iniciativas ||
+    prefs.notify_investimentos ||
+    prefs.notify_despesa,
+)
 const permLabel = computed(() => {
   if (permission.value === 'unsupported') return 'não suportado'
   if (permission.value === 'granted') return 'activas'
@@ -206,8 +261,58 @@ function votoClass(v) {
 }
 
 async function onSair() {
-  await auth.sair()
-  router.push('/')
+  if (busy.value != null) return
+  busy.value = 'sair'
+  try {
+    await auth.sair()
+    $q.notify({ type: 'positive', message: 'Sessão terminada.', position: 'top' })
+    await router.replace('/')
+  } catch (e) {
+    // sair() limpa estado local mesmo com erro de rede
+    $q.notify({
+      type: 'warning',
+      message: e.message || 'Sessão limpa neste dispositivo.',
+      position: 'top',
+    })
+    await router.replace('/')
+  } finally {
+    busy.value = null
+  }
+}
+
+function onApagarConta() {
+  if (busy.value != null) return
+  $q.dialog({
+    title: 'Apagar a conta?',
+    message:
+      'Isto é <strong>definitivo</strong>. Remove o login, o perfil e os votos associados a esta conta. Não pode ser desfeito.',
+    html: true,
+    persistent: true,
+    ok: { label: 'Sim, apagar a conta', color: 'negative', unelevated: true },
+    cancel: { label: 'Cancelar', flat: true },
+  }).onOk(() => confirmarApagar())
+}
+
+async function confirmarApagar() {
+  busy.value = 'apagar'
+  try {
+    await auth.apagarConta()
+    $q.notify({
+      type: 'positive',
+      message: 'Conta apagada.',
+      position: 'top',
+    })
+    await router.replace('/')
+  } catch (e) {
+    $q.notify({
+      type: 'negative',
+      message: e.message || 'Não foi possível apagar a conta.',
+      position: 'top',
+      timeout: 6000,
+    })
+  } finally {
+    busy.value = null
+  }
 }
 
 async function savePartido() {
@@ -257,6 +362,48 @@ async function onSavePrefs() {
   }
 }
 
+async function onDisableAllNotifs() {
+  if (!auth.user?.id || savingNotif.value) return
+  prefs.notify_digest = false
+  prefs.notify_iniciativas = false
+  prefs.notify_investimentos = false
+  prefs.notify_despesa = false
+  savingNotif.value = true
+  try {
+    await saveNotificationPrefs(auth.user.id, prefs)
+    $q.notify({
+      type: 'positive',
+      message: 'Todas as notificações da A Voto foram desactivadas.',
+      position: 'top',
+    })
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro ao guardar.', position: 'top' })
+  } finally {
+    savingNotif.value = false
+  }
+}
+
+async function onEnableAllNotifs() {
+  if (!auth.user?.id || savingNotif.value) return
+  prefs.notify_digest = true
+  prefs.notify_iniciativas = true
+  prefs.notify_investimentos = true
+  prefs.notify_despesa = true
+  savingNotif.value = true
+  try {
+    await saveNotificationPrefs(auth.user.id, prefs)
+    $q.notify({
+      type: 'positive',
+      message: 'Preferências de notificação activadas.',
+      position: 'top',
+    })
+  } catch (e) {
+    $q.notify({ type: 'negative', message: e.message || 'Erro ao guardar.', position: 'top' })
+  } finally {
+    savingNotif.value = false
+  }
+}
+
 onMounted(async () => {
   partido.value = auth.profile?.partido_preferencia || ''
   historico.value = await auth.listMeusVotos()
@@ -291,6 +438,14 @@ onMounted(async () => {
 .notif-status {
   font-size: 0.9rem;
   color: var(--pt-navy);
+}
+.notif-off-msg {
+  margin: 0.65rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  padding: 0.55rem 0.65rem;
+  background: #f5f5f4;
+  border-left: 3px solid var(--pt-line);
 }
 .toggle-list {
   display: flex;
@@ -370,5 +525,58 @@ onMounted(async () => {
   overflow: hidden;
   white-space: normal;
   max-width: 28rem;
+}
+.account-danger {
+  border-color: #e8a0a8;
+}
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.account-actions {
+  .btn {
+    min-height: 2.5rem;
+  }
+  .btn--outline:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+    border-color: var(--pt-navy);
+    color: var(--pt-navy);
+    background: #fff;
+  }
+  .btn--danger:not(:disabled) {
+    opacity: 1;
+    cursor: pointer;
+    background: var(--pt-red);
+    border-color: var(--pt-red);
+    color: #fff;
+  }
+}
+.btn--danger {
+  appearance: none;
+  border: 1.5px solid var(--pt-red);
+  background: var(--pt-red);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.5rem 0.9rem;
+  border-radius: 2px;
+  cursor: pointer;
+  line-height: 1.2;
+
+  &:hover:not(:disabled) {
+    background: var(--pt-red-dark);
+    border-color: var(--pt-red-dark);
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+.account-actions .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 </style>

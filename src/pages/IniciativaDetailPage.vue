@@ -95,6 +95,13 @@
         <div class="av-card">
           <div class="av-card-pad">
             <h2 class="section-title">Voto dos partidos na AR</h2>
+            <p class="hint" style="margin-bottom: 0.75rem">
+              Sentido de voto do grupo parlamentar. Lista em
+              <strong>ordem alfabética por sigla</strong> (anti-enviesamento). O número a seguir à
+              sigla é a <strong>bancada</strong> (deputados) — peso no hemiciclo, não “quanto deve
+              o cidadão votar”. Ver
+              <router-link to="/como-funciona">Como funciona</router-link>.
+            </p>
             <p v-if="!hasPartidos" class="hint">
               O registo oficial desta iniciativa ainda não tem detalhe de voto por grupo
               parlamentar (ou a votação não ocorreu). Sem inventar dados.
@@ -105,6 +112,7 @@
                 :key="p.id"
                 :partido="p"
                 :voto="item.resultadoPartidos[p.id]"
+                :assentos="assentosDe(p.id)"
               />
             </div>
           </div>
@@ -112,9 +120,23 @@
       </section>
     </div>
 
+    <section v-if="hasPartidos" class="av-card" style="margin-top: 1rem">
+      <div class="av-card-pad">
+        <PartyWeightPanel
+          :resultado-partidos="item.resultadoPartidos"
+          :legislatura="item.legislatura"
+          :estado="item.estado"
+        />
+      </div>
+    </section>
+
     <section class="av-card" style="margin-top: 1rem">
       <div class="av-card-pad">
         <h2 class="section-title">Alinhamento cidadãos ↔ partidos</h2>
+        <p class="hint" style="margin: -0.35rem 0 0.85rem">
+          Com votos de cidadãos: ordenado por % de alinhamento (métrica). Sem votos ou em empate:
+          <strong>ordem alfabética por sigla</strong>.
+        </p>
         <div class="av-table-wrap">
           <table class="av-table">
             <thead>
@@ -163,6 +185,8 @@ import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import VoteBar from '@/components/VoteBar.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
+import PartyWeightPanel from '@/components/PartyWeightPanel.vue'
+import { assentosPartido } from '@/data/composicaoAr'
 import {
   partidos,
   estadosLabel,
@@ -234,8 +258,13 @@ const hasPartidos = computed(() => {
 const partidosComVoto = computed(() => {
   if (!item.value) return []
   const m = item.value.resultadoPartidos || {}
+  // partidos[] já é alfabético por sigla — só filtramos quem votou
   return partidos.filter((p) => m[p.id] && m[p.id] !== 'nao_participou')
 })
+
+function assentosDe(partidoId) {
+  return assentosPartido(partidoId, item.value?.legislatura)
+}
 
 const alinhamentos = computed(() => {
   if (!item.value || !hasPartidos.value) return []
@@ -247,7 +276,18 @@ const alinhamentos = computed(() => {
       voto: item.value.resultadoPartidos[p.id],
       alinhamento: alinhamentoCidadaosPartido(item.value, p.id),
     }))
-    .sort((a, b) => (b.alinhamento ?? -1) - (a.alinhamento ?? -1))
+    // Com cidadãos a votar: ordenar por % alinhamento; senão / empate → alfabético
+    .sort((a, b) => {
+      const aa = a.alinhamento
+      const bb = b.alinhamento
+      if (aa == null && bb == null) {
+        return a.sigla.localeCompare(b.sigla, 'pt', { sensitivity: 'base' })
+      }
+      if (aa == null) return 1
+      if (bb == null) return -1
+      if (bb !== aa) return bb - aa
+      return a.sigla.localeCompare(b.sigla, 'pt', { sensitivity: 'base' })
+    })
 })
 
 function pedirConfirmacao(voto) {

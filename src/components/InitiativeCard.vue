@@ -56,7 +56,7 @@ const estadoClass = computed(() => {
   return map[props.item.estado] || 'badge--muted'
 })
 
-/** Mini lista de partidos com voto AR */
+/** Mini lista de partidos com voto AR — ordem alfabética por sigla (sem enviesar) */
 const partyRows = computed(() => {
   const map = props.item.resultadoPartidos || {}
   return partidos
@@ -113,26 +113,35 @@ const partyRows = computed(() => {
   align-items: center;
   gap: 0.25rem;
   font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  border: 1px solid var(--pt-border);
+  font-weight: 800;
+  padding: 0.2rem 0.42rem;
+  border-radius: 2px;
+  border: 1.5px solid var(--pt-border);
+  border-left-width: 3px;
   color: var(--pt-navy);
   &__dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   }
   &--favor {
-    background: rgba(4, 106, 56, 0.08);
-    border-color: rgba(4, 106, 56, 0.25);
+    background: #e8f5ee;
+    border-color: #7abf96;
+    border-left-color: var(--pt-green);
+    color: var(--pt-green-dark);
   }
   &--contra {
-    background: rgba(200, 16, 46, 0.08);
-    border-color: rgba(200, 16, 46, 0.25);
+    background: #fdeceb;
+    border-color: #e8a0a8;
+    border-left-color: var(--pt-red);
+    color: var(--pt-red-dark);
   }
   &--abstencao {
-    background: rgba(0, 0, 0, 0.04);
+    background: #fbf3d5;
+    border-color: #e0c86a;
+    border-left-color: #b8860b;
+    color: #6b5500;
   }
 }
 .init-card__no-party {

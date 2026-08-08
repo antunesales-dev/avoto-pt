@@ -10,7 +10,7 @@
       </p>
       <div class="hero__actions">
         <router-link to="/iniciativas" class="btn btn--primary">Iniciativas</router-link>
-        <router-link to="/digest" class="btn btn--outline">Digest</router-link>
+        <router-link to="/digest" class="btn btn--outline">Resumo do dia</router-link>
         <router-link to="/despesa" class="btn btn--outline">Despesa</router-link>
         <router-link to="/investimentos" class="btn btn--outline">Investimentos</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/registo" class="btn btn--ghost">Criar conta</router-link>
@@ -20,7 +20,11 @@
     <section>
       <h2 class="section-title">Dados oficiais na plataforma</h2>
       <p class="section-hint">
-        Conteúdo sincronizado de fontes do Estado / AR — não é contagem de utilizadores.
+        Conteúdo de fontes oficiais. Investimentos = contratos grandes (≥100&nbsp;000&nbsp;€)
+        onde se pode votar; Despesa = catálogo completo (só consulta); Resumos = boletim
+        por <strong>data oficial</strong> (não por data de sync). Origem e últimas
+        importações:
+        <router-link to="/dados">Fontes de dados</router-link>.
       </p>
       <div class="stats-grid">
         <StatCard
@@ -29,7 +33,7 @@
           icon="gavel"
         />
         <StatCard
-          label="Digests diários"
+          label="Resumos do dia"
           :value="formatNumber(m.digests)"
           icon="today"
           accent="var(--pt-navy)"
@@ -64,9 +68,9 @@
         </template>
         <template v-else>
           <p class="part-box__empty">
-            Ainda <strong>não há votos de cidadãos</strong> na plataforma. Os números de
-            iniciativas e despesa vêm dos portais oficiais; a comparação com a vontade dos
-            registados começa quando alguém entra e vota.
+            Ainda <strong>não há votos nem contas de cidadãos</strong> com participação. Os
+            números de iniciativas e despesa vêm dos portais oficiais; a comparação com a
+            vontade dos registados começa quando alguém entra e vota.
           </p>
           <router-link
             v-if="!auth.isLoggedIn"

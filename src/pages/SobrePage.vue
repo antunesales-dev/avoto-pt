@@ -29,9 +29,8 @@
           partidos.
         </p>
         <p>
-          A origem pessoal deste projecto está em
-          <router-link to="/porque">O porquê</router-link> — a história de Tiago Sales e o que o
-          levou a criar a A Voto.
+          Motivo de existir e limites do projecto:
+          <router-link to="/porque">O porquê</router-link>.
         </p>
         <h3>Princípios não negociáveis</h3>
         <ul>

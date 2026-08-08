@@ -63,7 +63,7 @@ const ariaLabel = computed(
       background: var(--pt-red);
     }
     &.abst {
-      background: #a8a29e;
+      background: #c9a227; /* abstenção — ouro, não cinza */
     }
   }
 }

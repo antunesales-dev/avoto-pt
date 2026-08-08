@@ -22,6 +22,33 @@
 
     <section class="av-card" style="margin-top: 1.25rem">
       <div class="av-card-pad prose">
+        <h2 class="section-title">Ordem e peso dos partidos</h2>
+        <p>
+          Em listas e badges, os partidos aparecem por
+          <strong>ordem alfabética da sigla</strong> (BE, CDS-PP, CHEGA… PSD), em português — para
+          não parecer que “favorecemos” o maior partido ou o governo.
+        </p>
+        <ul>
+          <li>
+            <strong>Ordem alfabética</strong> = anti-enviesamento na apresentação. Em empate de
+            métricas (ex. % de alinhamento com cidadãos), também se usa A–Z.
+          </li>
+          <li>
+            <strong>Peso no hemiciclo</strong> = número de deputados da bancada. Isso é outra
+            camada: ajuda a perceber a <em>aritmética</em> de uma votação (quantos lugares a favor,
+            contra ou em abstenção). Abster-se pode decidir se há maioria. Não é conselho de voto
+            nem ranking político.
+          </li>
+          <li>
+            A estimativa assume voto coeso do grupo (como o registo oficial costuma registar o
+            sentido da bancada). Não substitui a contagem nominal de cada votação na AR.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="av-card" style="margin-top: 1.25rem">
+      <div class="av-card-pad prose">
         <h2 class="section-title">O que pode e não pode esperar</h2>
         <h3>É</h3>
         <ul>
@@ -33,7 +60,7 @@
         <ul>
           <li>Democracia directa nem voto vinculativo.</li>
           <li>Sondagem oficial ou representativa de Portugal.</li>
-          <li>Um sítio de recomendações políticas ou de “vencedores”.</li>
+          <li>Um site de recomendações políticas ou de “vencedores”.</li>
         </ul>
         <div class="notice" style="margin-top: 1rem">
           Conta com email, ID permanente (CID-…), um voto por iniciativa com confirmação e sem
@@ -57,6 +84,10 @@ const passos = [
   {
     t: 'Vê a comparação',
     d: 'Imediatamente: agregados dos cidadãos, voto de cada partido na AR, alinhamento e métricas de participação.',
+  },
+  {
+    t: 'Consulta o resumo do dia',
+    d: 'Um boletim diário com leis/votações, despesa e investimentos — o que a plataforma reuniu a partir de fontes oficiais, sem notícias nem opinião.',
   },
   {
     t: 'Usa a informação como quiser',

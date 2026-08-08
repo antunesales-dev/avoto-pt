@@ -1,5 +1,6 @@
 <template>
-  <q-layout view="hHh lpR fFf" class="av-layout">
+  <div class="av-root">
+  <q-layout view="hHh Lpr lFf" class="av-layout">
     <q-header class="av-header">
       <div class="flag-stripe" aria-hidden="true">
         <span class="flag-stripe__green" />
@@ -24,30 +25,17 @@
         <div class="app-bar__actions">
           <div v-if="$q.screen.gt.sm" class="mais">
             <button
+              ref="maisBtnEl"
               type="button"
               class="nav-link mais__btn"
               :class="{ 'is-active': maisOpen || isSecondaryActive }"
               aria-haspopup="menu"
               :aria-expanded="maisOpen"
-              @click="maisOpen = !maisOpen"
+              @click="toggleMais"
             >
               Mais
               <q-icon :name="maisOpen ? 'expand_less' : 'expand_more'" size="18px" />
             </button>
-            <div v-if="maisOpen" class="mais__menu" role="menu">
-              <router-link
-                v-for="item in navMais"
-                :key="item.to"
-                :to="item.to"
-                class="mais__item"
-                role="menuitem"
-                :class="{ 'is-active': isActive(item) }"
-                @click="maisOpen = false"
-              >
-                <q-icon :name="item.icon" size="18px" />
-                {{ item.label }}
-              </router-link>
-            </div>
           </div>
 
           <template v-if="auth.ready">
@@ -86,7 +74,7 @@
         aria-label="Menu"
       >
         <router-link
-          v-for="item in navMobile"
+          v-for="item in navPrincipal"
           :key="item.to"
           :to="item.to"
           class="mobile-menu__link"
@@ -96,6 +84,20 @@
           <q-icon :name="item.icon" size="20px" />
           {{ item.label }}
         </router-link>
+        <template v-for="group in navMaisGroups" :key="group.id">
+          <div class="mobile-menu__group-label">{{ group.label }}</div>
+          <router-link
+            v-for="item in group.items"
+            :key="item.to"
+            :to="item.to"
+            class="mobile-menu__link"
+            :class="{ 'is-active': isActive(item) }"
+            @click="mobileOpen = false"
+          >
+            <q-icon :name="item.icon" size="20px" />
+            {{ item.label }}
+          </router-link>
+        </template>
         <router-link
           v-if="!auth.isLoggedIn"
           to="/registo"
@@ -108,10 +110,46 @@
       </nav>
     </q-header>
 
-    <div v-if="maisOpen" class="mais-backdrop" @click="maisOpen = false" />
+    <!-- Teleport: evita clip do q-header e backdrop a tapar o menu -->
+    <Teleport to="body">
+      <div
+        v-if="maisOpen"
+        class="mais-backdrop"
+        aria-hidden="true"
+        @click="maisOpen = false"
+      />
+      <div
+        v-if="maisOpen"
+        class="mais__menu"
+        role="menu"
+        :style="maisMenuStyle"
+      >
+        <div
+          v-for="(group, gi) in maisGroups"
+          :key="group.id"
+          class="mais__group"
+          :class="{ 'mais__group--first': gi === 0 }"
+        >
+          <div class="mais__group-label">{{ group.label }}</div>
+          <router-link
+            v-for="item in group.items"
+            :key="item.to"
+            :to="item.to"
+            class="mais__item"
+            role="menuitem"
+            :class="{ 'is-active': isActive(item) }"
+            @click="maisOpen = false"
+          >
+            <q-icon :name="item.icon" size="18px" />
+            {{ item.label }}
+          </router-link>
+        </div>
+      </div>
+    </Teleport>
 
     <q-page-container>
-      <q-page class="av-page">
+      <!-- minHeight auto: o Quasar por defeito força ~100vh e “cola” coisas ao ecrã -->
+      <q-page class="av-page" :style-fn="pageStyleFn">
         <div v-if="!auth.ready || data.loading" class="boot-state">A carregar…</div>
         <div v-else-if="data.error" class="boot-state boot-state--err">
           <p>Não foi possível carregar os dados.</p>
@@ -122,6 +160,22 @@
       </q-page>
     </q-page-container>
   </q-layout>
+
+  <!-- Fora do q-layout: último bloco do documento, só no fim do scroll -->
+  <footer class="av-footer">
+    <div class="av-footer__inner">
+      <p class="av-footer__brand">
+        <strong>A Voto</strong> — Bancada Cidadã · independente · open source · RGPD
+      </p>
+      <nav class="av-footer__legal" aria-label="Informação legal">
+        <router-link v-for="l in navLegal" :key="l.to" :to="l.to">{{ l.label }}</router-link>
+      </nav>
+      <p class="av-footer__note">
+        Não é site oficial do Estado. Votos na plataforma não são vinculativos.
+      </p>
+    </div>
+  </footer>
+  </div>
 </template>
 
 <script setup>
@@ -129,7 +183,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import AppBrand from '@/components/AppBrand.vue'
-import { navPrincipal, navMais } from '@/data/nav'
+import { navPrincipal, navMais, navMaisGroups, navLegal } from '@/data/nav'
 import { useAuthStore } from '@/stores/auth'
 import { useDataStore } from '@/stores/data'
 
@@ -139,8 +193,11 @@ const auth = useAuthStore()
 const data = useDataStore()
 const mobileOpen = ref(false)
 const maisOpen = ref(false)
+const maisBtnEl = ref(null)
+const maisMenuStyle = ref({})
 
-const navMobile = computed(() => [...navPrincipal, ...navMais])
+/** Garante lista estável no template (não depende só do binding do import). */
+const maisGroups = navMaisGroups
 
 watch(
   () => route.fullPath,
@@ -157,6 +214,26 @@ function isActive(item) {
 
 const isSecondaryActive = computed(() => navMais.some((item) => isActive(item)))
 
+function placeMaisMenu() {
+  const el = maisBtnEl.value
+  if (!el || typeof window === 'undefined') return
+  const r = el.getBoundingClientRect()
+  maisMenuStyle.value = {
+    position: 'fixed',
+    top: `${Math.round(r.bottom + 8)}px`,
+    right: `${Math.round(window.innerWidth - r.right)}px`,
+    left: 'auto',
+    zIndex: 10050,
+  }
+}
+
+function toggleMais() {
+  maisOpen.value = !maisOpen.value
+  if (maisOpen.value) {
+    placeMaisMenu()
+  }
+}
+
 function onKey(e) {
   if (e.key === 'Escape') {
     maisOpen.value = false
@@ -164,18 +241,44 @@ function onKey(e) {
   }
 }
 
+function onResize() {
+  if (maisOpen.value) placeMaisMenu()
+}
+
 async function retry() {
   await data.loadAll()
 }
 
-onMounted(() => window.addEventListener('keydown', onKey))
-onUnmounted(() => window.removeEventListener('keydown', onKey))
+/** Altura natural do conteúdo — evita o min-height 100vh do Quasar que cola o footer ao viewport. */
+function pageStyleFn() {
+  return { minHeight: 'auto' }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', onKey)
+  window.addEventListener('resize', onResize)
+})
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKey)
+  window.removeEventListener('resize', onResize)
+})
 </script>
 
 <style scoped lang="scss">
-.av-layout {
+/* Sticky footer: coluna ≥ ecrã; área principal cresce; navy só na faixa do footer */
+.av-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   min-height: 100vh;
   background: var(--pt-paper-2);
+}
+
+.av-layout {
+  flex: 1 0 auto;
+  min-height: 0 !important;
+  height: auto !important;
+  background: transparent;
 }
 
 .av-header {
@@ -250,18 +353,46 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 .mais {
   position: relative;
 }
+</style>
+
+<!-- Menu teleported: estilos não-scoped (fora do header) -->
+<style lang="scss">
+.mais-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10040;
+  background: transparent;
+}
 
 .mais__menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 200px;
-  background: var(--pt-white);
-  border: 1px solid var(--pt-line);
+  min-width: 240px;
+  max-width: min(92vw, 280px);
+  max-height: min(70vh, 28rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fff;
+  color: #12141a;
+  border: 1px solid #c8c4bb;
   border-radius: 0;
   box-shadow: 2px 4px 0 rgba(12, 27, 51, 0.08);
-  padding: 0.25rem 0;
-  z-index: 1000;
+  padding: 0.35rem 0 0.5rem;
+  z-index: 10050;
+}
+
+.mais__group:not(.mais__group--first) {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid #c8c4bb;
+}
+
+.mais__group-label {
+  padding: 0.4rem 0.9rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4a4f59;
+  font-family: var(--font-body, system-ui, sans-serif);
 }
 
 .mais__item {
@@ -271,25 +402,22 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   padding: 0.55rem 0.9rem;
   border-radius: 0;
   text-decoration: none;
-  color: var(--pt-ink);
+  color: #12141a !important;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
+  font-family: var(--font-body, system-ui, sans-serif);
+  line-height: 1.25;
 
   &:hover {
-    background: var(--pt-paper-2);
-    color: var(--pt-navy);
+    background: #f3efe6;
+    color: #0c1b33 !important;
   }
 
-  &.is-active {
-    background: var(--pt-paper-2);
-    color: var(--pt-red);
+  &.is-active,
+  &.router-link-active {
+    background: #f3efe6;
+    color: #c8102e !important;
   }
-}
-
-.mais-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
 }
 
 .btn-entrar {
@@ -362,6 +490,16 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   background: var(--pt-white);
 }
 
+.mobile-menu__group-label {
+  padding: 0.75rem 1rem 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pt-muted);
+  border-top: 1px solid var(--pt-line);
+  margin-top: 0.25rem;
+}
 .mobile-menu__link {
   display: flex;
   align-items: center;
@@ -386,7 +524,82 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 }
 
 .av-page {
-  min-height: calc(100vh - 62px);
+  display: block;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+/* Footer: no fundo do ecrã se o conteúdo for curto; se for longo, a seguir ao conteúdo.
+   O fundo navy é só a altura do footer — não sobe a tapar a página. */
+.av-footer {
+  display: block;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: auto;
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  transform: none !important;
+  background: var(--pt-navy);
+  color: rgba(255, 255, 255, 0.88);
+  border-top: 3px solid var(--pt-red);
+}
+
+.av-footer__inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.1rem 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  text-align: center;
+
+  @media (min-width: 640px) {
+    padding: 1.15rem 1.5rem 1.35rem;
+  }
+}
+
+.av-footer__brand {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.92);
+
+  strong {
+    font-weight: 800;
+    color: #fff;
+  }
+}
+
+.av-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.1rem;
+
+  a {
+    color: #fff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+
+    &:hover,
+    &.router-link-active {
+      border-bottom-color: var(--pt-red);
+      color: #fff;
+    }
+  }
+}
+
+.av-footer__note {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.4;
 }
 
 .boot-state {

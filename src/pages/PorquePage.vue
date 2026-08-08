@@ -2,89 +2,62 @@
   <div class="page-shell">
     <h1 class="page-title">O porquê</h1>
     <p class="page-subtitle">
-      O que me levou a criar a A Voto — contado de forma simples, sem jargão e sem lado
-      político.
+      Motivo de existir a A Voto — curto e objectivo. Sem manifesto e sem lado político.
     </p>
 
-    <section class="av-card letter" style="margin-bottom: 1rem">
-      <div class="flag-stripe" aria-hidden="true">
-        <span class="flag-stripe__green" />
-        <span class="flag-stripe__red" />
-      </div>
+    <section class="av-card" style="margin-bottom: 1rem">
       <div class="av-card-pad prose">
-        <p class="lead">
-          Chamo-me <strong>Tiago Sales</strong>. A A Voto nasceu de uma frustração muito concreta:
-          eu não conseguia acompanhar o que se discutia e se votava no Parlamento — nem perceber,
-          com clareza, o que o Governo e os partidos estavam a fazer em nome dos cidadãos.
-        </p>
-
-        <h2 class="section-title">O que sentia</h2>
+        <h2 class="section-title">Problema</h2>
         <p>
-          As medidas sucediam-se. As notícias falavam em siglas, números de projectos de lei e
-          debates que eu não conseguia seguir até ao fim. Queria saber, em linguagem básica:
+          As votações na Assembleia da República são públicas, mas difíceis de acompanhar no
+          dia-a-dia: muitos textos oficiais, pouco resumo útil e quase nenhuma forma simples de
+          ver, lado a lado, o que cada partido votou.
         </p>
+        <p>Em prática, falta resposta rápida a quatro perguntas:</p>
         <ul>
-          <li><strong>O que</strong> está a ser discutido?</li>
-          <li><strong>O que</strong> está a ser votado?</li>
-          <li><strong>Como</strong> votou cada partido?</li>
-          <li>E <strong>eu</strong>, se pudesse opinar, estaria a favor, contra ou abster-me-ia?</li>
+          <li>O que está a ser discutido ou votado?</li>
+          <li>Como votou cada partido?</li>
+          <li>Como votam os cidadãos que se registam aqui?</li>
+          <li>Há (ou não) desvio entre uns e outros?</li>
         </ul>
+
+        <h2 class="section-title">Resposta</h2>
         <p>
-          Sem isso, o sentido do que se passava no hemiciclo ficava longe. Não era falta de
-          interesse — era falta de uma forma simples de acompanhar e de comparar.
+          A A Voto junta <strong>dados oficiais</strong> (AR e portais de despesa) com
+          <strong>votos de cidadãos registados</strong> — um por pessoa e por iniciativa, imutável
+          depois de confirmado. O resultado é comparação factual, não opinião da plataforma.
+        </p>
+        <p>
+          Não substitui o Parlamento. Não é referendo. Não recomenda partidos. Serve para
+          <strong>ver</strong> e, se quiser, decidir melhor nas eleições.
         </p>
 
-        <h2 class="section-title">A ideia</h2>
-        <p>
-          Imaginei uma estrutura em que o povo também pudesse votar — não para substituir o
-          Parlamento, mas para tornar visível a vontade de quem se dá ao trabalho de participar.
-          Que esse voto cidadão tivesse <em>visibilidade</em> e <em>peso informativo</em> ao lado
-          do voto dos partidos eleitos: lado a lado, sem filtros, sem “quem ganhou o debate”.
-        </p>
-        <p>
-          Se os partidos representam os cidadãos, faz sentido poder ver, iniciativa a iniciativa,
-          se essa representação se aproxima ou se afasta de quem votou na plataforma. Não como
-          sentença. Como informação.
-        </p>
+        <h2 class="section-title">Limites (de propósito)</h2>
+        <ul>
+          <li>Não é amostra representativa da população portuguesa.</li>
+          <li>Não inventa dados: se a fonte oficial falha, a lacuna fica à vista.</li>
+          <li>Não é sítio do Estado nem afiliada a partidos.</li>
+          <li>Open source: o código e as regras são auditáveis.</li>
+        </ul>
 
-        <h2 class="section-title">O que isto não é</h2>
+        <h2 class="section-title">Quem mantém</h2>
         <p>
-          A A Voto <strong>não é sobre esquerda ou direita</strong>. Não é um manifesto de
-          políticas “certas” ou “erradas”. Não escolhe partidos, não recomenda votos e não
-          pretende dizer-lhe o que pensar.
-        </p>
-        <p>
-          Trata-se de <strong>entender</strong> — com palavras simples — o que se discute, o que se
-          vota, e como o voto no Parlamento se compara com o voto de cidadãos registados. Ponto.
-        </p>
-
-        <h2 class="section-title">O que quero que consiga fazer</h2>
-        <ol>
-          <li>Abrir uma iniciativa e perceber o essencial, sem precisar de ser jurista.</li>
-          <li>Registar o seu voto uma vez (a favor, contra ou abstenção).</li>
-          <li>Ver de imediato o que os partidos votaram na Assembleia da República.</li>
-          <li>Usar essa comparação como quiser — inclusive no dia das eleições.</li>
-        </ol>
-        <p>
-          Se eu, como cidadão, não conseguia seguir o fio, outros também não. A A Voto existe para
-          encurtar essa distância: transparência, linguagem clara, e a bancada cidadã ao lado da
-          bancada parlamentar — para que o desvio, quando existe, se veja à luz do dia.
-        </p>
-
-        <p class="signoff">
-          — Tiago Sales<br />
-          <span class="signoff__meta">Fundador · A Voto — Bancada Cidadã</span>
+          Projecto independente mantido por <strong>Tiago Sales</strong>. Contacto e repositório
+          estão nas páginas
+          <router-link to="/sobre">Sobre</router-link>
+          e
+          <router-link to="/privacidade">Privacidade</router-link>.
         </p>
       </div>
     </section>
 
     <section class="av-card">
       <div class="av-card-pad cta">
-        <p class="cta__text">Quer ver como funciona na prática?</p>
+        <p class="cta__text">Seguinte passo</p>
         <div class="cta__actions">
           <router-link to="/como-funciona" class="btn btn--primary">Como funciona</router-link>
-          <router-link to="/iniciativas" class="btn btn--outline">Ver iniciativas</router-link>
-          <router-link to="/sobre" class="btn btn--ghost">Sobre a plataforma</router-link>
+          <router-link to="/iniciativas" class="btn btn--outline">Iniciativas</router-link>
+          <router-link to="/sobre" class="btn btn--ghost">Sobre</router-link>
         </div>
       </div>
     </section>
@@ -92,52 +65,26 @@
 </template>
 
 <style scoped lang="scss">
-.letter {
-  .lead {
-    font-size: 1.05rem;
-    line-height: 1.65;
+.prose {
+  p {
+    margin: 0 0 1rem;
     color: var(--pt-ink);
-    margin-top: 0;
+    line-height: 1.55;
   }
 
-  .prose {
-    p {
-      margin: 0 0 1rem;
-      color: var(--pt-ink);
-      line-height: 1.65;
-    }
+  ul {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    color: var(--pt-ink);
+    line-height: 1.55;
 
-    ul,
-    ol {
-      margin: 0 0 1rem;
-      padding-left: 1.25rem;
-      color: var(--pt-ink);
-      line-height: 1.65;
-
-      li {
-        margin-bottom: 0.35rem;
-      }
-    }
-
-    h2 {
-      margin-top: 1.75rem;
+    li {
+      margin-bottom: 0.3rem;
     }
   }
-}
 
-.signoff {
-  margin: 1.75rem 0 0 !important;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--pt-line);
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  color: var(--pt-navy);
-  line-height: 1.45;
-
-  &__meta {
-    font-family: var(--font-body);
-    font-size: 0.88rem;
-    color: var(--pt-muted);
+  h2 {
+    margin-top: 1.5rem;
   }
 }
 
@@ -154,8 +101,7 @@
 
   &__text {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.1rem;
+    font-weight: 700;
     color: var(--pt-navy);
   }
 

@@ -45,7 +45,13 @@ async function onSubmit() {
     await auth.pedirRecuperacao(email.value)
     sent.value = true
   } catch (e) {
-    formError.value = e.message || 'Não foi possível enviar o email.'
+    const m = e.message || ''
+    if (/rate|too many|429|email rate|over_email/i.test(m)) {
+      formError.value =
+        'O serviço de email limitou envios. Espere cerca de 1 hora e tente de novo (não continue a clicar).'
+    } else {
+      formError.value = m || 'Não foi possível enviar o email.'
+    }
   }
 }
 </script>

@@ -1,7 +1,31 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref } from 'vue'
 import { fetchAllRows } from '@/lib/fetchAll'
+import { plainOfficialText } from '@/lib/plainText'
 import { supabase } from '@/lib/supabase'
+
+/** Limpa HTML residual do Portal Base (ex. `<br/>` → legível). */
+function cleanDespesaRow(row) {
+  if (!row) return row
+  return {
+    ...row,
+    titulo: plainOfficialText(row.titulo) || row.titulo,
+    entidade: plainOfficialText(row.entidade) || row.entidade,
+    categoria: plainOfficialText(row.categoria) || row.categoria,
+    descricao: plainOfficialText(row.descricao) || row.descricao,
+  }
+}
+
+function cleanInvestimentoRow(row) {
+  if (!row) return row
+  return {
+    ...row,
+    titulo: plainOfficialText(row.titulo) || row.titulo,
+    entidade: plainOfficialText(row.entidade) || row.entidade,
+    sector: plainOfficialText(row.sector) || row.sector,
+    descricao: plainOfficialText(row.descricao) || row.descricao,
+  }
+}
 
 /**
  * Digests · despesa pública · investimentos (+ votos cidadãos)
@@ -21,12 +45,13 @@ export const useFinanceStore = defineStore('finance', () => {
   }
 
   async function loadDespesas() {
-    despesas.value = await fetchAllRows(() =>
+    const rows = await fetchAllRows(() =>
       supabase
         .from('despesas_publicas')
         .select('*')
         .order('montante_eur', { ascending: false, nullsFirst: false }),
     )
+    despesas.value = (rows || []).map(cleanDespesaRow)
   }
 
   async function loadInvestimentos() {
@@ -40,14 +65,17 @@ export const useFinanceStore = defineStore('finance', () => {
       fetchAllRows(() => supabase.from('investimento_votos_agg').select('*')),
     ])
     const map = Object.fromEntries((agg || []).map((a) => [a.investimento_id, a]))
-    investimentos.value = (inv || []).map((row) => ({
-      ...row,
-      votosCidadaos: {
-        favor: Number(map[row.id]?.favor ?? 0),
-        contra: Number(map[row.id]?.contra ?? 0),
-        abstencao: Number(map[row.id]?.abstencao ?? 0),
-      },
-    }))
+    investimentos.value = (inv || []).map((row) => {
+      const cleaned = cleanInvestimentoRow(row)
+      return {
+        ...cleaned,
+        votosCidadaos: {
+          favor: Number(map[row.id]?.favor ?? 0),
+          contra: Number(map[row.id]?.contra ?? 0),
+          abstencao: Number(map[row.id]?.abstencao ?? 0),
+        },
+      }
+    })
   }
 
   async function loadAll() {
@@ -65,6 +93,29 @@ export const useFinanceStore = defineStore('finance', () => {
 
   function getInvestimento(id) {
     return investimentos.value.find((i) => i.id === id) || null
+  }
+
+  function getDespesa(id) {
+    return despesas.value.find((d) => d.id === id) || null
+  }
+
+  /** Garante detalhe mesmo se a lista em memória ainda não tiver o registo. */
+  async function ensureDespesa(id) {
+    if (!id) return null
+    const existing = getDespesa(id)
+    if (existing) return existing
+    const { data, error: err } = await supabase
+      .from('despesas_publicas')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle()
+    if (err) throw err
+    if (!data) return null
+    const cleaned = cleanDespesaRow(data)
+    if (!getDespesa(id)) {
+      despesas.value = [cleaned, ...despesas.value]
+    }
+    return cleaned
   }
 
   function getDigest(id) {
@@ -102,6 +153,8 @@ export const useFinanceStore = defineStore('finance', () => {
     loadDespesas,
     loadInvestimentos,
     getInvestimento,
+    getDespesa,
+    ensureDespesa,
     getDigest,
     refreshInvestimentoVotes,
   }

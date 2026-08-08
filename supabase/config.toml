@@ -238,10 +238,14 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
+# Templates pt-PT (só local `supabase start`; cloud = Dashboard — ver docs/AUTH-EMAIL-TEMPLATES.md)
+[auth.email.template.magic_link]
+subject = "Entrar na A Voto — link e código"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.confirmation]
+subject = "Confirme o email · A Voto"
+content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
