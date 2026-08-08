@@ -44,10 +44,6 @@
     <section class="av-card" style="margin-bottom: 1.25rem">
       <div class="av-card-pad cta">
         <h2 class="section-title">Apoiar</h2>
-        <p class="muted" style="margin-top: -0.25rem">
-          Qualquer pessoa pode apoiar — não é preciso ter conta. O pagamento abre noutro ecrã
-          (cartão ou MB WAY, quando disponível). Não pedimos nem mostramos o teu IBAN ou telemóvel.
-        </p>
         <a
           v-if="finance.canDonate"
           class="btn btn--primary btn--lg"
@@ -57,23 +53,15 @@
         >
           Quero apoiar
         </a>
-        <button
-          v-else
-          type="button"
-          class="btn btn--primary btn--lg"
-          disabled
-        >
+        <button v-else type="button" class="btn btn--primary btn--lg" disabled>
           Quero apoiar
         </button>
         <p v-if="!finance.canDonate && !finance.loading" class="muted sm" style="margin: 0">
-          O pagamento ainda está a ser preparado. Volta em breve.
+          Em breve.
         </p>
         <label v-if="auth.isLoggedIn && auth.cid && finance.canDonate" class="toggle publish-cid">
           <input v-model="publishCid" type="checkbox" />
-          <span>
-            Mostrar o meu ID de cidadão (<strong>{{ auth.cid }}</strong>) na lista de doações
-            (opcional; por omissão fica anónimo)
-          </span>
+          <span>Mostrar o meu ID (<strong>{{ auth.cid }}</strong>) na lista (opcional)</span>
         </label>
       </div>
     </section>
