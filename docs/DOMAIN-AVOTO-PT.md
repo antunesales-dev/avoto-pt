@@ -4,42 +4,37 @@
 
 | Peça | Estado |
 |------|--------|
-| Domínio OVH | **Em criação** (aguardar ficar Activo) |
-| Zona Cloudflare | `pending` · ID `b8bac63d614926b55f4f574a9fd12b53` |
+| Domínio (Dominios.pt) | Registado — **ainda falta** apontar NS para Cloudflare |
+| Zona Cloudflare | `pending` · ID `b8bac63d614926b55f4f574a9fd12b53` · plano **Free Website** |
 | Nameservers CF | `edna.ns.cloudflare.com` · `quinton.ns.cloudflare.com` |
+| DNS na CF (feito) | CNAME `@` + `www` → `avoto-pt.pages.dev` (**proxied**, free) |
+| SSL free (feito) | Full + Always HTTPS + min TLS 1.2 + Brotli + HTTPS rewrites |
+| **Não** activado | Argo, Load Balancing, Bot Management, Image Resizing, R2 extra, Workers paid |
 | Pages project | `avoto-pt` · fallback `https://avoto-pt.pages.dev` |
-| Custom domains Pages | `avoto.pt` + `www.avoto.pt` **adicionados** (pending CNAME/NS) |
+| Custom domains Pages | `avoto.pt` + `www.avoto.pt` (pending até NS no registo) |
 | App live | https://avoto-pt.pages.dev (já funciona) |
 
 ---
 
 ## O que fazer (ordem)
 
-### 1. OVH — nameservers (passo a passo na UI)
+### 1. Dominios.pt — nameservers (único passo que falta no registo)
 
-**Só depois** de Status / Estado técnico **não** estarem “Em criação” (estarem **Activo**).
-
-1. [manager.ovh.com](https://www.ovh.com/manager/) → **Web Cloud** → **Domínios e DNS**  
-2. Lista à esquerda: clica **avoto.pt**  
-3. Separador superior: **Servidores DNS**  
-4. Botão **Configificar** (à direita de “Servidores DNS” / “OVHcloud default”)  
-5. Opção tipo **Modificar os servidores DNS** / **Personalizar os servidores DNS**  
-6. Remove os 2–4 servidores OVH (`dns*.ovh.net`, etc.)  
-7. Adiciona **só estes dois** (um por linha):
+1. [my.dominios.pt](https://my.dominios.pt/) → domínio **avoto.pt** → **NAMESERVERS**  
+2. Escolhe **Usar nameservers personalizados**  
+3. Preenche **só**:
 
 ```
 edna.ns.cloudflare.com
 quinton.ns.cloudflare.com
 ```
 
-8. **Validar** / **Aplicar** / **Confirmar**  
-9. A OVH pode mostrar “modificação em curso” — normal  
+(NS 3–5 vazios. **Não** deixar `dns*.host-redirect.com`.)  
+4. **Alterar Nameservers**  
 
-**Não** uses o botão “Zona DNS → Gerir” na OVH para o site de produção se os NS forem Cloudflare: a zona que manda passa a ser a do Cloudflare.
+**Não** cries alojamento Dominios / “Web Domain 1GB” / “Site Onepage” — o site é Pages (grátis no free tier).
 
 Propagação: frequentemente &lt; 1 h; pior caso 24–48 h.
-
-> Enquanto o domínio estiver “Em criação”, a OVH bloqueia várias acções — espera.
 
 ### 2. Cloudflare — activar a zona
 
