@@ -23,13 +23,27 @@
       label="Dia do boletim"
       :options="periodoOpts"
       :count="filtrados.length"
-      style="margin-bottom: 1rem"
+      style="margin-bottom: 0.75rem"
     />
+
+    <label class="toggle empty-toggle">
+      <input v-model="showEmptyDays" type="checkbox" />
+      <span>
+        Mostrar dias sem actividade
+        <template v-if="nEmptyHidden > 0 && !showEmptyDays">
+          <span class="empty-toggle__n">({{ nEmptyHidden }} oculto{{ nEmptyHidden === 1 ? '' : 's' }})</span>
+        </template>
+      </span>
+    </label>
 
     <p v-if="finance.loading" class="muted">A carregar…</p>
     <p v-else-if="!finance.digests.length" class="muted">
       Ainda não há resumos. Quando o sistema sincroniza os dados oficiais, aparece aqui um
       boletim por dia.
+    </p>
+    <p v-else-if="!filtrados.length && !showEmptyDays && nEmptyInPeriod > 0" class="muted">
+      Neste período ({{ dateRangeLabel(periodo) }}) só há dias sem votações nem despesas com
+      data oficial. Marca «Mostrar dias sem actividade» para os ver, ou alarga o período.
     </p>
     <p v-else-if="!filtrados.length" class="muted">
       Nenhum resumo neste período ({{ dateRangeLabel(periodo) }}).
@@ -233,17 +247,57 @@ import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
 const periodo = ref('todos')
+/** Por defeito esconde boletins sem leis/despesas (datas oficiais vazias). */
+const showEmptyDays = ref(false)
 const sectionLimit = 6
+
+/** Tem pelo menos 1 votação AR ou 1 despesa com data oficial desse dia. */
+function digestHasActivity(d) {
+  const items = d?.items
+  if (items?.sections) {
+    const nIni =
+      items.sections.iniciativas?.count ?? items.sections.iniciativas?.items?.length ?? 0
+    const nDes =
+      items.sections.despesas?.count ?? items.sections.despesas?.items?.length ?? 0
+    if (Number(nIni) > 0 || Number(nDes) > 0) return true
+  }
+  if (Array.isArray(items) && items.length > 0) return true
+  if (Array.isArray(items?.legacy_items) && items.legacy_items.length > 0) return true
+  // fallback título gerado pelo RPC
+  if (typeof d?.title === 'string' && /sem actividade|sem atividade/i.test(d.title)) {
+    return false
+  }
+  return false
+}
+
+/** Base para chips de período e lista: com ou sem dias vazios. */
+const digestsForList = computed(() => {
+  const all = finance.digests || []
+  if (showEmptyDays.value) return all
+  return all.filter(digestHasActivity)
+})
 
 const periodoOpts = computed(() =>
   optionsForContext(
     'digest',
-    (finance.digests || []).map((d) => d.digest_date),
+    digestsForList.value.map((d) => d.digest_date),
   ),
 )
 
 const filtrados = computed(() =>
-  (finance.digests || []).filter((d) => matchesDateRange(d.digest_date, periodo.value)),
+  digestsForList.value.filter((d) => matchesDateRange(d.digest_date, periodo.value)),
+)
+
+/** Quantos vazios existem no total (para o contador do toggle). */
+const nEmptyHidden = computed(() =>
+  (finance.digests || []).filter((d) => !digestHasActivity(d)).length,
+)
+
+/** Vazios só no período de datas escolhido (mensagem quando a lista fica vazia). */
+const nEmptyInPeriod = computed(() =>
+  (finance.digests || []).filter(
+    (d) => !digestHasActivity(d) && matchesDateRange(d.digest_date, periodo.value),
+  ).length,
 )
 
 const {
@@ -264,7 +318,7 @@ function setPageSize(n) {
   pageSize.value = n
 }
 
-watch(periodo, () => resetPage())
+watch([periodo, showEmptyDays], () => resetPage())
 
 function estadoLabel(estado) {
   return estadosLabel[estado] || estado || '—'
@@ -359,6 +413,26 @@ onMounted(() => {
     font-size: 0.85rem;
     font-weight: 500;
   }
+}
+.empty-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0 0 1.15rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--pt-ink);
+  cursor: pointer;
+  line-height: 1.35;
+  input {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+  }
+}
+.empty-toggle__n {
+  color: var(--pt-muted);
+  font-weight: 500;
+  font-size: 0.88em;
 }
 .digest-list {
   display: flex;
