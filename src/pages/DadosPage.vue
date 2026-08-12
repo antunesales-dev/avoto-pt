@@ -69,8 +69,8 @@
         </div>
         <p class="muted" style="margin-top: 0.75rem">
           Despesa e investimentos <strong>não são duas fontes</strong>: o sync Base grava o
-          catálogo em Despesa e copia os ≥&nbsp;100&nbsp;000&nbsp;€ para Investimentos (voto
-          cidadão).
+          catálogo em Despesa e lista os ≥&nbsp;100&nbsp;000&nbsp;€ também em Investimentos
+          (só consulta, sem voto).
         </p>
       </div>
     </section>
@@ -137,9 +137,9 @@
 
         <h3>Votos de cidadãos</h3>
         <p>
-          São da própria A Voto (contas autenticadas, um voto por item, definitivo). Agregados
-          públicos sem dados pessoais. Não representam a população — só quem se registou e votou
-          aqui.
+          Só em <strong>iniciativas da Assembleia da República</strong> (contas autenticadas, um
+          voto por iniciativa, definitivo). Agregados públicos sem dados pessoais. Não representam
+          a população — só quem se registou e votou aqui. Despesa e investimentos são consulta.
         </p>
       </div>
     </section>

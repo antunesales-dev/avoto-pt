@@ -27,7 +27,7 @@
         tint="rgba(218, 41, 28, 0.1)"
       />
       <StatCard
-        label="Investimentos (≥100k, voto)"
+        label="Investimentos (≥100k, consulta)"
         :value="formatNumber(m.investimentos)"
         icon="savings"
         accent="#7a5f00"

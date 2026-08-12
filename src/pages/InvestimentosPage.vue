@@ -2,19 +2,18 @@
   <div class="page-shell">
     <h1 class="page-title">Investimentos</h1>
     <p class="page-subtitle">
-      <strong>Contratos de valor elevado</strong> (≥&nbsp;100&nbsp;000&nbsp;€), retirados da
-      mesma fonte oficial de despesa, onde os cidadãos registados podem
-      <strong>aprovar</strong>, <strong>rejeitar</strong> ou <strong>abster-se</strong> — um voto
-      por item, definitivo. Não é uma lista diferente de “outra despesa”: é o subconjunto em
-      que há voto. Não é vinculativo.
+      <strong>Contratos de valor elevado</strong> (≥&nbsp;100&nbsp;000&nbsp;€) da mesma fonte
+      oficial de despesa (Portal Base). Página de
+      <strong>consulta</strong> — sem voto cidadão. O voto na A Voto aplica-se às
+      <router-link to="/iniciativas">iniciativas da Assembleia da República</router-link>.
     </p>
 
     <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>Mesma fonte que Despesa</strong> (Portal Base), filtrada a
-      ≥&nbsp;100&nbsp;000&nbsp;€ para voto cidadão. Data = publicação oficial.
+      <strong>Mesma fonte que Despesa</strong>, filtrada a ≥&nbsp;100&nbsp;000&nbsp;€. Não é uma
+      segunda lista inventada: é o subconjunto de maior valor. Data = publicação oficial.
       Catálogo completo:
       <router-link to="/despesa">Despesa</router-link>.
-      Boletim (só o dia oficial):
+      Boletim do dia (AR + despesa):
       <router-link to="/digest">Resumo do dia</router-link>.
       Importações:
       <router-link to="/dados">Fontes de dados</router-link>.
@@ -84,16 +83,15 @@
               </a>
             </template>
           </p>
-          <VoteBar :votos="inv.votosCidadaos" :show-counts="false" />
-          <div class="inv-card__foot">Ver detalhe e votar →</div>
+          <div class="inv-card__foot">Ver detalhe →</div>
         </div>
       </router-link>
     </div>
     <div v-else class="av-card av-card-pad empty-box">
       <p v-if="!finance.investimentos.length" style="margin: 0 0 0.65rem">
         Ainda <strong>não há investimentos</strong> (≥&nbsp;100&nbsp;000&nbsp;€) importados.
-        Quando o <code>despesa-sync</code> trouxer contratos Base acima do limiar, aparecem
-        aqui com a mesma origem que em Despesa.
+        Quando o sync de despesa trouxer contratos Base acima do limiar, aparecem aqui com a
+        mesma origem que em Despesa.
       </p>
       <p v-else style="margin: 0 0 0.65rem">
         Nenhum item neste período (há
@@ -125,7 +123,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
-import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
 import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
@@ -149,7 +146,6 @@ const filtrados = computed(() =>
   ),
 )
 
-// toRef/storeToRefs garante reactividade da lista no usePagination
 const {
   page,
   pageSize,

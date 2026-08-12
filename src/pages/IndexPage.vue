@@ -20,10 +20,11 @@
     <section>
       <h2 class="section-title">Dados oficiais na plataforma</h2>
       <p class="section-hint">
-        Conteúdo de fontes oficiais. Investimentos = contratos grandes (≥100&nbsp;000&nbsp;€)
-        onde se pode votar; Despesa = catálogo completo (só consulta); Resumos = boletim
-        por <strong>data oficial</strong> (não por data de sync). Origem e últimas
-        importações:
+        Conteúdo de fontes oficiais. Voto cidadão só em
+        <router-link to="/iniciativas">iniciativas da AR</router-link>.
+        Investimentos = contratos ≥&nbsp;100&nbsp;000&nbsp;€ (consulta);
+        Despesa = catálogo completo (consulta); Resumos = boletim por
+        <strong>data oficial</strong> (não por data de sync). Origem e importações:
         <router-link to="/dados">Fontes de dados</router-link>.
       </p>
       <div class="stats-grid">

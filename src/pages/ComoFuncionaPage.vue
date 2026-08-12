@@ -87,7 +87,7 @@ const passos = [
   },
   {
     t: 'Consulta o resumo do dia',
-    d: 'Um boletim diário com leis/votações, despesa e investimentos — o que a plataforma reuniu a partir de fontes oficiais, sem notícias nem opinião.',
+    d: 'Um boletim diário com leis/votações e despesa pública — o que a plataforma reuniu a partir de fontes oficiais, sem notícias nem opinião. Voto cidadão só nas iniciativas da AR.',
   },
   {
     t: 'Usa a informação como quiser',
