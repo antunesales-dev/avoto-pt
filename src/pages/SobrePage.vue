@@ -44,35 +44,56 @@
     </section>
 
     <section class="av-card">
-      <div class="av-card-pad">
-        <h2 class="section-title">Stack tecnológica</h2>
-        <div class="av-table-wrap" style="border: none">
-          <table class="av-table">
-            <tbody>
-              <tr>
-                <th>Frontend</th>
-                <td>Vue 3 · Vite · Quasar · Pinia · Zod</td>
-              </tr>
-              <tr>
-                <th>Backend</th>
-                <td>Supabase (Auth, PostgreSQL, RLS) — fase seguinte</td>
-              </tr>
-              <tr>
-                <th>Edge / hosting</th>
-                <td>Cloudflare Pages / Workers — fase seguinte</td>
-              </tr>
-              <tr>
-                <th>Locale</th>
-                <td>Português de Portugal (pt-PT)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="page-subtitle" style="margin: 1rem 0 0">
-          Domínio previsto:
-          <a href="https://avoto.pt" target="_blank" rel="noopener noreferrer">avoto.pt</a>
+      <div class="av-card-pad prose">
+        <h2 class="section-title">O projecto hoje</h2>
+        <p>
+          A A Voto está <strong>disponível em
+          <a href="https://avoto.pt" rel="noopener noreferrer">avoto.pt</a></strong>:
+          podes registar-te, votar em iniciativas, comparar com os partidos, seguir o
+          <router-link to="/digest">resumo do dia</router-link>, consultar
+          <router-link to="/despesa">despesa pública</router-link> e
+          <router-link to="/investimentos">investimentos</router-link>, e ver o
+          <router-link to="/financiamento">financiamento transparente</router-link> do projecto.
+        </p>
+        <p>
+          O código e a documentação técnica estão no repositório público (não na interface da app):
+          <a
+            href="https://github.com/antunesales-dev/avoto-pt"
+            target="_blank"
+            rel="noopener noreferrer"
+            >github.com/antunesales-dev/avoto-pt ↗</a
+          >.
+        </p>
+        <p>
+          Critérios de dados e estado das importações:
+          <router-link to="/dados">Fontes e dados</router-link>.
+          Como usar a plataforma:
+          <router-link to="/como-funciona">Como funciona</router-link>.
         </p>
       </div>
     </section>
   </div>
 </template>
+
+<style scoped lang="scss">
+.prose {
+  h3 {
+    margin: 1.15rem 0 0.45rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--pt-navy);
+  }
+  p,
+  li {
+    line-height: 1.5;
+    color: var(--pt-ink);
+  }
+  ul {
+    margin: 0.35rem 0 0;
+    padding-left: 1.25rem;
+  }
+  a {
+    font-weight: 700;
+  }
+}
+</style>
