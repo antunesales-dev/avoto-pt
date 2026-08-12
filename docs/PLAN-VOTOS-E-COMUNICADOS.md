@@ -1,6 +1,6 @@
 # Plano · Voto só em iniciativas + Comunicados (info) sem duplicar
 
-**Estado:** planeamento (sem implementação neste doc).  
+**Estado:** Fase A em implementação (voto só iniciativas). Fase B (comunicados) pendente.  
 **Objectivo:** clarificar o produto; votação cidadã **apenas** em iniciativas da AR; nova área de **comunicados/medidas** só de leitura, com **digest próprio**, sem repetir o que já existe.
 
 ---

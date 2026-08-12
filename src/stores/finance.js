@@ -28,7 +28,7 @@ function cleanInvestimentoRow(row) {
 }
 
 /**
- * Digests · despesa pública · investimentos (+ votos cidadãos)
+ * Digests · despesa pública · investimentos (consulta; voto cidadão só em iniciativas AR)
  */
 export const useFinanceStore = defineStore('finance', () => {
   const digests = ref([])
@@ -55,27 +55,13 @@ export const useFinanceStore = defineStore('finance', () => {
   }
 
   async function loadInvestimentos() {
-    const [inv, agg] = await Promise.all([
-      fetchAllRows(() =>
-        supabase
-          .from('investimentos')
-          .select('*')
-          .order('montante_eur', { ascending: false, nullsFirst: false }),
-      ),
-      fetchAllRows(() => supabase.from('investimento_votos_agg').select('*')),
-    ])
-    const map = Object.fromEntries((agg || []).map((a) => [a.investimento_id, a]))
-    investimentos.value = (inv || []).map((row) => {
-      const cleaned = cleanInvestimentoRow(row)
-      return {
-        ...cleaned,
-        votosCidadaos: {
-          favor: Number(map[row.id]?.favor ?? 0),
-          contra: Number(map[row.id]?.contra ?? 0),
-          abstencao: Number(map[row.id]?.abstencao ?? 0),
-        },
-      }
-    })
+    const inv = await fetchAllRows(() =>
+      supabase
+        .from('investimentos')
+        .select('*')
+        .order('montante_eur', { ascending: false, nullsFirst: false }),
+    )
+    investimentos.value = (inv || []).map(cleanInvestimentoRow)
   }
 
   async function loadAll() {
@@ -122,26 +108,6 @@ export const useFinanceStore = defineStore('finance', () => {
     return digests.value.find((d) => d.id === id) || null
   }
 
-  async function refreshInvestimentoVotes(id) {
-    const { data, error: err } = await supabase
-      .from('investimento_votos_agg')
-      .select('*')
-      .eq('investimento_id', id)
-      .maybeSingle()
-    if (err) throw err
-    const idx = investimentos.value.findIndex((i) => i.id === id)
-    if (idx >= 0) {
-      investimentos.value[idx] = {
-        ...investimentos.value[idx],
-        votosCidadaos: {
-          favor: Number(data?.favor ?? 0),
-          contra: Number(data?.contra ?? 0),
-          abstencao: Number(data?.abstencao ?? 0),
-        },
-      }
-    }
-  }
-
   return {
     digests,
     despesas,
@@ -156,7 +122,6 @@ export const useFinanceStore = defineStore('finance', () => {
     getDespesa,
     ensureDespesa,
     getDigest,
-    refreshInvestimentoVotes,
   }
 })
 
