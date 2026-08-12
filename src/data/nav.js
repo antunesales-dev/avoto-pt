@@ -5,6 +5,7 @@ export const navPrincipal = [
   { to: '/digest', label: 'Resumo do dia', icon: 'today' },
   { to: '/despesa', label: 'Despesa', icon: 'account_balance' },
   { to: '/investimentos', label: 'Investimentos', icon: 'savings' },
+  { to: '/comunicados', label: 'Comunicados', icon: 'campaign' },
 ]
 
 /**

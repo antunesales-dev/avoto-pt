@@ -28,10 +28,12 @@ function cleanInvestimentoRow(row) {
 }
 
 /**
- * Digests · despesa pública · investimentos (consulta; voto cidadão só em iniciativas AR)
+ * Digests AR/despesa · comunicados (info) · despesa · investimentos (consulta)
  */
 export const useFinanceStore = defineStore('finance', () => {
   const digests = ref([])
+  const comunicados = ref([])
+  const comunicadosDigests = ref([])
   const despesas = ref([])
   const investimentos = ref([])
   const loading = ref(false)
@@ -41,6 +43,25 @@ export const useFinanceStore = defineStore('finance', () => {
     // todos os digests (paginado no servidor REST)
     digests.value = await fetchAllRows(() =>
       supabase.from('daily_digests').select('*').order('digest_date', { ascending: false }),
+    )
+  }
+
+  async function loadComunicados() {
+    const rows = await fetchAllRows(() =>
+      supabase
+        .from('comunicados')
+        .select('*')
+        .order('publicado_em', { ascending: false }),
+    )
+    comunicados.value = rows || []
+  }
+
+  async function loadComunicadosDigests() {
+    comunicadosDigests.value = await fetchAllRows(() =>
+      supabase
+        .from('comunicados_digests')
+        .select('*')
+        .order('digest_date', { ascending: false }),
     )
   }
 
@@ -68,7 +89,13 @@ export const useFinanceStore = defineStore('finance', () => {
     loading.value = true
     error.value = null
     try {
-      await Promise.all([loadDigests(), loadDespesas(), loadInvestimentos()])
+      await Promise.all([
+        loadDigests(),
+        loadComunicados(),
+        loadComunicadosDigests(),
+        loadDespesas(),
+        loadInvestimentos(),
+      ])
     } catch (e) {
       error.value = e.message || String(e)
       throw e
@@ -79,6 +106,10 @@ export const useFinanceStore = defineStore('finance', () => {
 
   function getInvestimento(id) {
     return investimentos.value.find((i) => i.id === id) || null
+  }
+
+  function getComunicado(id) {
+    return comunicados.value.find((c) => c.id === id) || null
   }
 
   function getDespesa(id) {
@@ -110,15 +141,20 @@ export const useFinanceStore = defineStore('finance', () => {
 
   return {
     digests,
+    comunicados,
+    comunicadosDigests,
     despesas,
     investimentos,
     loading,
     error,
     loadAll,
     loadDigests,
+    loadComunicados,
+    loadComunicadosDigests,
     loadDespesas,
     loadInvestimentos,
     getInvestimento,
+    getComunicado,
     getDespesa,
     ensureDespesa,
     getDigest,

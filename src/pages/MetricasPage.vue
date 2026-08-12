@@ -37,15 +37,15 @@
 
     <h2 class="section-title">Participação cidadã</h2>
     <p v-if="!m.votos_emitidos && !m.cidadaos_registados" class="page-subtitle" style="margin-bottom: 1rem">
-      Ainda não há participação cidadã: zero contas e zero votos. Os números oficiais acima vêm
+      Ainda não há participação cidadã: zero utilizadores e zero votos. Os números oficiais acima vêm
       dos portais do Estado / AR — não inventamos utilizadores.
     </p>
     <p v-else-if="!m.votos_emitidos" class="page-subtitle" style="margin-bottom: 1rem">
-      Há {{ formatNumber(m.cidadaos_registados) }} conta(s), mas ainda zero votos de cidadãos.
+      Há {{ formatNumber(m.cidadaos_registados) }} utilizador(es), mas ainda zero votos de cidadãos.
     </p>
     <div class="stats-grid" style="margin-bottom: 1.25rem">
       <StatCard
-        label="Contas registadas"
+        label="Utilizadores registados"
         :value="formatNumber(m.cidadaos_registados)"
         icon="groups"
       />

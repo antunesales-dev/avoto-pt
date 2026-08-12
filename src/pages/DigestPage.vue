@@ -5,10 +5,11 @@
       <strong>Boletim diário</strong> com o que tem
       <strong>data oficial nesse dia</strong>: votações na AR (<em>data de votação</em>) e
       contratos públicos (<em>data de publicação</em> no Portal Base). Não é “tudo o que o
-      sistema sincronizou hoje”. Não substitui as listas completas de
+      sistema sincronizou hoje”. Não inclui
+      <router-link to="/comunicados">comunicados do Governo</router-link>
+      (página e digest próprios). Listas completas:
       <router-link to="/iniciativas">Iniciativas</router-link>,
-      <router-link to="/despesa">Despesa</router-link>
-      ou
+      <router-link to="/despesa">Despesa</router-link>,
       <router-link to="/investimentos">Investimentos</router-link>.
     </p>
 

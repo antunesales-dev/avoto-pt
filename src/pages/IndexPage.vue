@@ -61,7 +61,7 @@
         <template v-if="m.votos_emitidos > 0">
           <p class="part-box__nums">
             <strong>{{ formatNumber(m.votos_emitidos) }}</strong> voto(s) ·
-            <strong>{{ formatNumber(m.cidadaos_registados) }}</strong> conta(s)
+            <strong>{{ formatNumber(m.cidadaos_registados) }}</strong> utilizador(es)
             <template v-if="m.taxa_participacao_media > 0">
               · taxa média {{ m.taxa_participacao_media }}%
             </template>
@@ -69,7 +69,7 @@
         </template>
         <template v-else>
           <p class="part-box__empty">
-            Ainda <strong>não há votos nem contas de cidadãos</strong> com participação. Os
+            Ainda <strong>não há votos nem utilizadores</strong> com participação. Os
             números de iniciativas e despesa vêm dos portais oficiais; a comparação com a
             vontade dos registados começa quando alguém entra e vota.
           </p>

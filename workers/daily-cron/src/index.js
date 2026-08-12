@@ -1,5 +1,5 @@
 /**
- * Cron diário A Voto: ar-sync → despesa-sync → daily-digest
+ * Cron diário A Voto: ar-sync → despesa-sync → daily-digest → comunicados-sync
  * Deploy: cd workers/daily-cron && wrangler deploy
  * Secrets: AVOTO_CRON_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
@@ -60,6 +60,8 @@ async function runPipeline(env) {
   steps.push(await callFn(base, 'ar-sync', secret, key, '?limit=200'))
   steps.push(await callFn(base, 'despesa-sync', secret, key, '?limit=80'))
   steps.push(await callFn(base, 'daily-digest', secret, key))
+  // Comunicados do Governo (portugal.gov.pt) — digest próprio gerado no sync
+  steps.push(await callFn(base, 'comunicados-sync', secret, key, '?limit=80'))
 
   return {
     ok: steps.every((s) => s.ok),
