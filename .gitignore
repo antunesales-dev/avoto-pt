@@ -108,3 +108,4 @@ temp/
 .claude/
 .cursor/
 .grok/
+.logs-drain/
