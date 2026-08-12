@@ -66,7 +66,7 @@
             <span class="badge badge--muted">{{ formatDate(c.publicado_em) }}</span>
           </div>
           <h2 class="com-card__title">{{ c.titulo }}</h2>
-          <p v-if="c.resumo" class="com-card__resumo">{{ c.resumo }}</p>
+          <p v-if="excerpt(c)" class="com-card__resumo">{{ excerpt(c) }}</p>
           <div class="com-card__actions">
             <a
               class="btn btn--primary btn--sm"
@@ -206,6 +206,17 @@ function tipoLabel(t) {
 
 function itemCount(d) {
   return Number(d?.items?.count ?? d?.items?.items?.length ?? 0)
+}
+
+/** Resumo curto para lista: preferir resumo; senão início do corpo. */
+function excerpt(c) {
+  const r = String(c?.resumo || '').trim()
+  if (r && r !== c.titulo) return r.length > 280 ? r.slice(0, 279) + '…' : r
+  const body = String(c?.corpo || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (!body) return r || ''
+  return body.length > 280 ? body.slice(0, 279) + '…' : body
 }
 
 onMounted(async () => {
