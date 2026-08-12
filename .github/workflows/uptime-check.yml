@@ -1,0 +1,45 @@
+# Smoke HTTP nos URLs públicos (grátis via GitHub Actions).
+# Se falhar: o job fica vermelho em Actions — avisa-te sem serviço pago.
+name: Uptime (avoto.pt)
+
+on:
+  schedule:
+    # A cada 30 min (UTC)
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: uptime-avoto
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: HTTP smoke (IPv4)
+        run: |
+          set -euo pipefail
+          fail=0
+          check() {
+            local url="$1"
+            local code
+            code=$(curl -4 -sS -o /dev/null -w '%{http_code}' --max-time 20 \
+              -A 'A-Voto-uptime/1.0 (+https://avoto.pt)' "$url" || echo '000')
+            echo "$code  $url"
+            if [ "$code" != "200" ] && [ "$code" != "301" ] && [ "$code" != "302" ] && [ "$code" != "308" ]; then
+              echo "::error::Falha $url → HTTP $code"
+              fail=1
+            fi
+          }
+          check 'https://avoto.pt/'
+          check 'https://www.avoto.pt/'
+          check 'https://avoto-pt.pages.dev/'
+          # DNS: sem AAAA (IPv6 off de propósito)
+          aaaa=$(dig +short AAAA avoto.pt | tr '\n' ' ' | xargs || true)
+          if [ -n "$aaaa" ]; then
+            echo "::warning::avoto.pt ainda tem AAAA ($aaaa) — preferimos IPv6 off na CF"
+          else
+            echo "OK  sem AAAA em avoto.pt"
+          fi
+          exit "$fail"

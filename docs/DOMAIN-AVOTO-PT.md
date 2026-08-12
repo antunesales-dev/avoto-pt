@@ -96,10 +96,11 @@ curl -sI https://www.avoto.pt | head -5
 
 ## Checklist
 
-- [ ] OVH: domínio Activo  
-- [ ] OVH: NS → edna + quinton  
-- [ ] Cloudflare: zona Active  
-- [ ] Cloudflare: CNAME `@` e `www` → `avoto-pt.pages.dev` (proxied)  
-- [ ] Pages: custom domains Active + HTTPS  
-- [ ] Supabase: Site URL + redirects  
-- [ ] Smoke: registo / login / votar em https://avoto.pt  
+- [x] Dominios.pt: NS → edna + quinton  
+- [x] Cloudflare: zona Active · Free · IPv6 **off**  
+- [x] Cloudflare: CNAME `@` e `www` → `avoto-pt.pages.dev` (proxied)  
+- [x] Pages: custom domains Active + HTTPS  
+- [ ] Supabase: Site URL + redirects → `https://avoto.pt` (confirmar no dashboard)  
+- [x] Smoke: https://avoto.pt  
+- [ ] Pitch: ver **docs/SITE-RELIABILITY.md** (fallback pages.dev + uptime)  
+
