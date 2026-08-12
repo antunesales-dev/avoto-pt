@@ -74,6 +74,7 @@ const SOURCE_TITLES = {
   'parlamento.pt': 'Assembleia da República (Dados Abertos)',
   despesa_publica: 'Despesa / Portal Base',
   despesa: 'Despesa / Portal Base',
+  comunicados_gov: 'Comunicados (portugal.gov.pt)',
 }
 
 function sourceTitle(s) {

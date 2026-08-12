@@ -55,13 +55,18 @@
               <tr>
                 <td><router-link to="/investimentos">Investimentos</router-link></td>
                 <td><code>data_referencia</code> (= publicação Base, ≥100k&nbsp;€)</td>
-                <td>Data do sync</td>
+                <td>Data do sync · sem voto</td>
+              </tr>
+              <tr>
+                <td><router-link to="/comunicados">Comunicados</router-link></td>
+                <td><code>publicado_em</code> (portugal.gov.pt)</td>
+                <td>Data do sync · sem voto · não entra no Resumo do dia AR</td>
               </tr>
               <tr>
                 <td><router-link to="/digest">Resumo do dia</router-link></td>
-                <td>Só itens com data oficial = dia do boletim</td>
+                <td>Só leis AR + despesa com data oficial = dia do boletim</td>
                 <td>
-                  “Tudo o que importámos hoje” (isso enchia o boletim com contratos antigos)
+                  “Tudo o que importámos hoje”; comunicados do Governo
                 </td>
               </tr>
             </tbody>
@@ -70,7 +75,9 @@
         <p class="muted" style="margin-top: 0.75rem">
           Despesa e investimentos <strong>não são duas fontes</strong>: o sync Base grava o
           catálogo em Despesa e lista os ≥&nbsp;100&nbsp;000&nbsp;€ também em Investimentos
-          (só consulta, sem voto).
+          (só consulta, sem voto). Comunicados do Governo são uma
+          <strong>terceira casa</strong> (portal do Governo), com digest próprio na página
+          Comunicados — sem repetir AR nem contratos.
         </p>
       </div>
     </section>
@@ -106,6 +113,13 @@
             >
           </li>
           <li>
+            <strong>Comunicados e notícias do Governo:</strong>
+            <a href="https://portugal.gov.pt" target="_blank" rel="noopener noreferrer"
+              >portugal.gov.pt ↗</a
+            >
+            (sitemap + páginas oficiais; sem redes sociais como fonte)
+          </li>
+          <li>
             <strong>Orçamento (referência):</strong>
             <a href="https://www.dgo.gov.pt" target="_blank" rel="noopener noreferrer">DGO ↗</a>
           </li>
@@ -116,13 +130,18 @@
           <li>Metadados e textos oficiais de iniciativas</li>
           <li>Resultados de votações por partido/bancada (quando o registo AR os tem)</li>
           <li>Contratos públicos com montante, entidade, datas e ligações oficiais</li>
-          <li>Ligações e documentos nos portais do Estado / AR</li>
+          <li>
+            Comunicados oficiais (ex. Conselho de Ministros), notícias e nomeações do portal do
+            Governo — só consulta
+          </li>
+          <li>Ligações e documentos nos portais do Estado / AR / Governo</li>
         </ul>
 
         <h3>O que fica de fora</h3>
         <ul>
-          <li>Sites de notícias, blogs, wikis, APIs de terceiros não oficiais, agregadores</li>
-          <li>Resumos ou “explicações” baseadas em fontes não governamentais</li>
+          <li>Sites de notícias privadas, blogs, wikis, agregadores não oficiais</li>
+          <li>Feeds de redes sociais (ex. X/@govpt) como base de dados</li>
+          <li>Resumos ou “explicações” baseadas em fontes não oficiais</li>
           <li>Conteúdo editorial ou de opinião política</li>
           <li>Dados de demonstração (“seed”) em produção</li>
         </ul>
@@ -139,7 +158,8 @@
         <p>
           Só em <strong>iniciativas da Assembleia da República</strong> (contas autenticadas, um
           voto por iniciativa, definitivo). Agregados públicos sem dados pessoais. Não representam
-          a população — só quem se registou e votou aqui. Despesa e investimentos são consulta.
+          a população — só quem se registou e votou aqui. Despesa, investimentos e comunicados são
+          consulta.
         </p>
       </div>
     </section>
@@ -154,7 +174,13 @@
         <ul class="jobs">
           <li><code>ar-sync</code> — Dados Abertos AR → iniciativas</li>
           <li><code>despesa-sync</code> — Portal Base → despesas + investimentos ≥100k</li>
-          <li><code>daily-digest</code> — boletim por data oficial (não por data de sync)</li>
+          <li><code>daily-digest</code> — boletim AR/despesa por data oficial</li>
+          <li>
+            <code>comunicados-sync</code> — portugal.gov.pt → comunicados + digests próprios
+          </li>
+          <li>
+            <code>comunicados-digest</code> — regenerar índice diário de comunicados (só)
+          </li>
         </ul>
       </div>
     </section>

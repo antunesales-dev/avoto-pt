@@ -11,10 +11,12 @@
       <strong>Data = publicação oficial</strong> no Portal Base (não a data em que a A Voto
       sincronizou). Contratos ≥&nbsp;100&nbsp;000&nbsp;€ estão também em
       <router-link to="/investimentos">Investimentos</router-link>
-      (voto cidadão). O
+      (só consulta). O
       <router-link to="/digest">Resumo do dia</router-link>
       só lista contratos com publicação
-      <em>nesse</em> dia. Estado das importações:
+      <em>nesse</em> dia. Comunicados do Governo:
+      <router-link to="/comunicados">Comunicados</router-link>.
+      Estado das importações:
       <router-link to="/dados">Fontes de dados</router-link>.
     </div>
 

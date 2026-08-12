@@ -5,8 +5,9 @@ Plataforma cívica **independente** (não governamental), **open source**, neutr
 | | |
 |---|---|
 | **Domínio** | [avoto.pt](https://avoto.pt) |
-| **Stack** | Vue 3 · Quasar · Pinia · Zod · Supabase · Cloudflare (deploy) · **PWA** |
+| **Stack** | Vue 3 · Quasar · Pinia · Zod · Supabase · Cloudflare (deploy) · **PWA** (só no repo) |
 | **Auth** | Só magic link / código email (prova o email; sem password na UI) |
+| **Voto cidadão** | Só **iniciativas da AR** (não despesa/investimentos/comunicados) |
 | **Locale** | pt-PT |
 | **Repo** | https://github.com/antunesales-dev/avoto-pt |
 

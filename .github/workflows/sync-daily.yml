@@ -1,5 +1,5 @@
-# Sync diário: AR (Node) + despesa/digest (edge)
-name: Sync diário (AR + despesa + digest)
+# Sync diário: AR (Node) + despesa/digest + comunicados (edge)
+name: Sync diário (AR + despesa + digest + comunicados)
 
 on:
   schedule:
@@ -55,3 +55,17 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/generate-digests.mjs
+
+      - name: comunicados-sync (portugal.gov.pt + digests próprios)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AVOTO_CRON_SECRET: ${{ secrets.AVOTO_CRON_SECRET }}
+        run: |
+          set -e
+          curl -fsS -X POST "$SUPABASE_URL/functions/v1/comunicados-sync?limit=80" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
+            -H "Content-Type: application/json" -d '{}'
+          echo

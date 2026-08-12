@@ -158,6 +158,7 @@ export const DATE_RANGE_BY_CONTEXT = {
   despesa: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
   investimentos: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
   digest: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
+  comunicados: ['todos', 'hoje', '7d', '30d', '90d', 'mes', 'ano', 'passados'],
 }
 
 /**

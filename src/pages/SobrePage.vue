@@ -49,10 +49,15 @@
         <p>
           A A Voto está <strong>disponível em
           <a href="https://avoto.pt" rel="noopener noreferrer">avoto.pt</a></strong>:
-          podes registar-te, votar em iniciativas, comparar com os partidos, seguir o
+          podes registar-te, votar em
+          <router-link to="/iniciativas">iniciativas da AR</router-link>, comparar com os
+          partidos, seguir o
           <router-link to="/digest">resumo do dia</router-link>, consultar
-          <router-link to="/despesa">despesa pública</router-link> e
-          <router-link to="/investimentos">investimentos</router-link>, e ver o
+          <router-link to="/despesa">despesa</router-link>,
+          <router-link to="/investimentos">investimentos</router-link>
+          e
+          <router-link to="/comunicados">comunicados oficiais do Governo</router-link>
+          (sem voto), e ver o
           <router-link to="/financiamento">financiamento transparente</router-link> do projecto.
         </p>
         <p>

@@ -1,91 +1,60 @@
-# Dados governamentais na A Voto
+# Dados oficiais na A Voto
 
-Plataforma **independente**. Usa **apenas** portais oficiais do Estado / AR.
+Plataforma **independente**. Usa **apenas** portais oficiais do Estado / AR / Governo.
 
-## Pilares
+## Pilares (sem repetir o mesmo facto em duas “fontes”)
 
-| Pilar | O quê | Tabelas | Voto cidadão |
-|-------|--------|---------|--------------|
-| **Parlamento** | Iniciativas e votações AR | `iniciativas`, contagens | A favor / Contra / Abstenção |
-| **Resumo do dia** | Boletim diário (leis + despesa do dia) | `daily_digests` | só agrega; não é 3.ª lista completa |
-| **Despesa** | Catálogo completo de contratos / spending | `despesas_publicas` | só consulta |
-| **Investimentos** | **Subconjunto** da despesa (≥ 100k €) para voto | `investimentos` (mesmo Base, `despesa_id`) | Aprovar / Rejeitar / Abster |
+| Pilar | O quê | Tabelas | Voto cidadão | Casa na UI |
+|-------|--------|---------|--------------|------------|
+| **Parlamento** | Iniciativas e votações AR | `iniciativas`, contagens | **Sim** | `/iniciativas`, Comparação |
+| **Resumo do dia** | Boletim **AR + despesa** do dia (datas oficiais) | `daily_digests` | só agrega votos AR | `/digest` |
+| **Despesa** | Catálogo de contratos Base | `despesas_publicas` | **Não** | `/despesa` |
+| **Investimentos** | **Subconjunto** da despesa (≥ 100k €) | `investimentos` (`despesa_id`) | **Não** (consulta) | `/investimentos` |
+| **Comunicados** | Notícias / CM / nomeações oficiais | `comunicados` | **Não** | `/comunicados` |
+| **Digest comunicados** | Índice diário **só** de comunicados | `comunicados_digests` | **Não** | secção em `/comunicados` |
 
-**Importante:** despesa e investimentos **não são duas fontes**. O sync Base grava tudo em despesa e copia os contratos ≥ 100k € para investimentos (voto). O resumo do dia **não** deve listar os dois como se fossem conteúdos distintos.
+**Importante:**
+
+- Despesa e investimentos **não são duas fontes** — mesmo Portal Base; investimentos = filtro de valor.
+- Comunicados **não** entram no Resumo do dia AR e **não** misturam contratos.
+- Voto cidadão **apenas** em iniciativas da AR.
 
 ## Fontes oficiais (permitidas)
 
 - [Dados Abertos AR](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx)
 - [Base.gov.pt](https://www.base.gov.pt) — contratos públicos
 - [dados.gov.pt](https://dados.gov.pt) — catálogo Estado
-- [DGO](https://www.dgo.gov.pt) — orçamento
+- [portugal.gov.pt](https://portugal.gov.pt) — comunicados e notícias do Governo (sitemap + páginas)
+- [DGO](https://www.dgo.gov.pt) — orçamento (referência)
 
-**Proibido:** notícias, blogs, wikis, agregadores não oficiais.
+**Proibido como fonte de verdade:** notícias privadas, blogs, wikis, **feeds X/Twitter** (ex. @govpt), agregadores não oficiais.
 
-## Jobs (edge)
+## Jobs (edge / Node)
 
-| Function | Frequência sugerida | Função |
-|----------|---------------------|--------|
-| `ar-sync` | diária | fetch Dados Abertos AR → `iniciativas` |
-| `despesa-sync` | diária | Portal Base (SNS open data) → despesas + investimentos |
-| `daily-digest` | diária (após syncs) | digest multi-secção |
+| Function / script | Frequência | Função |
+|-------------------|------------|--------|
+| `ar-sync` / `scripts/sync-ar.mjs` | diária | Dados Abertos AR → `iniciativas` |
+| `despesa-sync` | diária | Portal Base → despesas + investimentos |
+| `daily-digest` / `generate-digests.mjs` | diária | `daily_digests` (AR + despesa) |
+| `comunicados-sync` | diária | portugal.gov.pt → `comunicados` + `comunicados_digests` |
+| `comunicados-digest` | sob demanda | regenerar um dia de comunicados |
 
-Cron: `workers/daily-cron` (CF Worker, 06:15 UTC) com `x-avoto-cron-secret`.  
-Detalhe: [`docs/AR-IMPORT.md`](./AR-IMPORT.md).
+Cron: `workers/daily-cron` e `.github/workflows/sync-daily.yml`.
 
 ## Princípios de produto
 
 - Não é democracia directa nem voto vinculativo.
 - Não pretende ser amostra representativa da população.
 - Não recomenda partidos nem “vencedores”.
-- Despesa e investimentos: **transparência e comparação**, não “controlo do governo”.
-- **Voto de partidos:** sentido por grupo parlamentar (favor / contra / abstenção), sem peso por nº de deputados.
-- **Mudança de governo / legislatura:** cada iniciativa guarda o resultado da votação histórica da AR; o sync actualiza dados oficiais novos. Partidos novos = mapear sigla no import + metadados de UI (cor/sigla).
+- Despesa, investimentos e comunicados: **transparência**, não “controlo do governo”.
+- **Uma casa canónica por tipo de facto** — o resto liga, não duplica.
 
-## Ordem dos partidos (anti-enviesamento) — documentar ao utilizador
+## Ordem dos partidos (anti-enviesamento)
 
-**Regra canónica (UI e código):** listas e badges de partidos em
-**ordem alfabética da sigla** (`localeCompare` pt-PT):  
-BE → CDS-PP → CHEGA → IL → LIVRE → PAN → PCP → PS → PSD.
+**Regra canónica:** listas e badges em **ordem alfabética da sigla** (`localeCompare` pt-PT).
 
-| Contexto | Ordem / peso |
-|----------|----------------|
-| Listas, badges, matriz Comparação, resumo do dia | **Alfabética por sigla** |
-| Alinhamento % com cidadãos | Por métrica (empate → A–Z) |
-| **Peso no hemiciclo** (detalhe da iniciativa) | Assentos × sentido de voto (favor/contra/abstenção); tabela A–Z |
+Ver UI em `/como-funciona` e composição em `src/data/composicaoAr.js`.
 
-**Ordem A–Z** evita enviesar a leitura. **Peso** = aritmética legislativa (bancadas), não
-recomendação de voto. Composição em `src/data/composicaoAr.js` (actualizar após eleições).
+## Plano de evolução
 
-**Onde o utilizador lê isto na app:**  
-`/como-funciona` (secção dedicada), `/comparacao` (aviso + legendas), detalhe de iniciativa,
-`/dados`, subtítulo de `/iniciativas`.
-
-**Código:** `src/data/partidos.js` (`partidos` já sorted; `comparePartidosAlfa` / `sortPartidosAlfa`).  
-Fonte de verdade dos votos = Dados Abertos da AR (`resultado_partidos` por iniciativa) — as
-cores/siglas em `partidos.js` são só apresentação.
-
-## Digest (agora vs depois)
-
-| Agora | Depois (opcional) |
-|-------|-------------------|
-| Multi-secção: iniciativas + despesas (+ investimentos no JSON, não no título) | AI só para **rephrasing** informal por item |
-| Título/summary = **templates** pt-PT | Factos mandam; AI não inventa |
-| UI `/digest` por secção (despesa uma vez; inv ≥100k na página própria) | Mesma estrutura de `items.sections` |
-
-### Critério de data (obrigatório)
-
-O resumo do dia **não** usa `last_synced_at` (data do cron). Só datas oficiais:
-
-| Secção | Campo |
-|--------|--------|
-| Parlamento | `iniciativas.data_votacao` |
-| Despesa | `despesas_publicas.data_publicacao` |
-| Investimentos (JSON) | `investimentos.data_referencia` |
-
-Assim, sincronizar 400 contratos antigos num dia **não** enche o boletim desse dia.
-
-### Identidade de contratos
-
-IDs Base = `base-` + SHA-256 estável dos campos oficiais (NIF, datas, preço, objecto).
-Upsert por `id` / `source_id` evita re-registar o mesmo contrato em cada sync.
+- [`docs/PLAN-VOTOS-E-COMUNICADOS.md`](./PLAN-VOTOS-E-COMUNICADOS.md) — votos só AR + comunicados.

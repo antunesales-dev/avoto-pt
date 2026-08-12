@@ -58,6 +58,18 @@ const routes = [
         meta: { title: 'Investimento' },
       },
       {
+        path: 'comunicados',
+        name: 'comunicados',
+        component: () => import('@/pages/ComunicadosPage.vue'),
+        meta: { title: 'Comunicados' },
+      },
+      {
+        path: 'comunicados/:id',
+        name: 'comunicado-detalhe',
+        component: () => import('@/pages/ComunicadoDetailPage.vue'),
+        meta: { title: 'Comunicado' },
+      },
+      {
         path: 'metricas',
         name: 'metricas',
         component: () => import('@/pages/MetricasPage.vue'),
