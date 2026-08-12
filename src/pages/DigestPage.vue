@@ -2,22 +2,9 @@
   <div class="page-shell">
     <h1 class="page-title">Resumo do dia</h1>
     <p class="page-subtitle">
-      <strong>Boletim diário</strong> com o que tem
-      <strong>data oficial nesse dia</strong>: votações na AR (<em>data de votação</em>) e
-      contratos públicos (<em>data de publicação</em> no Portal Base). Não é “tudo o que o
-      sistema sincronizou hoje”. Não inclui
-      <router-link to="/comunicados">comunicados do Governo</router-link>
-      (página e digest próprios). Listas completas:
-      <router-link to="/iniciativas">Iniciativas</router-link>,
-      <router-link to="/despesa">Despesa</router-link>,
-      <router-link to="/investimentos">Investimentos</router-link>.
+      Boletim por <strong>data oficial</strong>: votações na AR nesse dia e contratos com
+      publicação nesse dia no Portal Base.
     </p>
-
-    <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      Factos oficiais e contagens da A Voto — não é notícias nem opinião. Sem inteligência
-      artificial a inventar texto. Contratos ≥ 100&nbsp;000&nbsp;€ do mesmo dia também estão em
-      Investimentos para voto; o boletim lista-os uma vez, em Despesa.
-    </div>
 
     <DateRangeFilter
       v-model="periodo"

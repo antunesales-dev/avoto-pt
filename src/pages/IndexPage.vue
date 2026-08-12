@@ -21,13 +21,7 @@
     <section>
       <h2 class="section-title">Dados oficiais na plataforma</h2>
       <p class="section-hint">
-        Conteúdo de fontes oficiais. Voto cidadão só em
-        <router-link to="/iniciativas">iniciativas da AR</router-link>.
-        Despesa e investimentos = contratos públicos (consulta);
-        <router-link to="/comunicados">Comunicados</router-link>
-        = Governo (portugal.gov.pt, sem voto);
-        Resumos = boletim AR/despesa por <strong>data oficial</strong>.
-        Origem e importações:
+        Contagens a partir de fontes oficiais.
         <router-link to="/dados">Fontes de dados</router-link>.
       </p>
       <div class="stats-grid">

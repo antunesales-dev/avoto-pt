@@ -261,8 +261,9 @@ a {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* 3–5 cartões na mesma linha quando há largura; evita órfão (ex. Comunicados sozinho) */
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(9.75rem, 1fr));
   }
 
   > * {

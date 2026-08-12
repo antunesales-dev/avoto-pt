@@ -2,11 +2,8 @@
   <div class="page-shell">
     <h1 class="page-title">Iniciativas</h1>
     <p class="page-subtitle">
-      Iniciativas da AR com tema e, quando existir no registo oficial, o
-      <strong>voto de cada partido</strong> (listado em
-      <strong>ordem alfabética por sigla</strong>, não por tamanho de bancada). Login para votar
-      como cidadão.
-      <router-link to="/como-funciona">Porquê esta ordem?</router-link>
+      Iniciativas da AR — tema e, quando existir, o voto oficial de cada partido (por ordem
+      alfabética de sigla). Login para votar.
     </p>
 
     <div class="toolbar av-card av-card-pad">

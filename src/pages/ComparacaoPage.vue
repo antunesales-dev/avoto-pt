@@ -2,28 +2,16 @@
   <div class="page-shell">
     <h1 class="page-title">Comparação global</h1>
     <p class="page-subtitle">
-      Duas coisas distintas: (1) se há votos de cidadãos, o
-      <strong>alinhamento médio</strong> entre esse agregado e o voto de cada partido na AR;
-      (2) a <strong>matriz</strong> com o sentido de voto oficial de cada partido por iniciativa
-      (sempre útil, mesmo sem participação cidadã). Não é ranking político nem “quem manda” no
-      hemiciclo.
+      Alinhamento médio dos votos de cidadãos com cada partido, e matriz do voto oficial na AR
+      por iniciativa.
     </p>
-
-    <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>Como lemos a ordem dos partidos:</strong> as colunas da matriz e as listas sem
-      métrica estão em <strong>ordem alfabética por sigla</strong> (BE → … → PSD), de propósito —
-      para não enviesar. Só as barras de “alinhamento médio” ordenam por percentagem; em empate,
-      volta o alfabético. Ver também
-      <router-link to="/como-funciona">Como funciona</router-link>.
-    </div>
 
     <section class="av-card" style="margin-bottom: 1.25rem">
       <div class="av-card-pad">
         <h2 class="section-title">Alinhamento médio por partido</h2>
         <p class="section-hint" style="margin-top: -0.35rem; margin-bottom: 0.85rem">
-          Em cada iniciativa com votos de cidadãos: % de votos cujo sentido coincide com o do
-          partido. Depois faz-se a média só dessas iniciativas. Sem votos de cidadãos não há
-          percentagem — não se mostra 0%.
+          Média, por partido, da percentagem de votos de cidadãos com o mesmo sentido que o
+          partido (só iniciativas com participação).
         </p>
 
         <div v-if="!temBaseCidada" class="empty-align">
@@ -51,9 +39,8 @@
         <template v-else>
           <p class="section-hint" style="margin-bottom: 0.85rem">
             Base:
-            <strong>{{ formatNumber(totalVotosCidadaos) }}</strong> voto(s) de cidadãos em
-            <strong>{{ formatNumber(nIniciativasComVoto) }}</strong> iniciativa(s). Ordenado do
-            maior para o menor %; empate → alfabético.
+            <strong>{{ formatNumber(totalVotosCidadaos) }}</strong> voto(s) em
+            <strong>{{ formatNumber(nIniciativasComVoto) }}</strong> iniciativa(s).
           </p>
           <div class="align-list">
             <div v-for="row in mediaPartidos" :key="row.id" class="align-row">
@@ -85,10 +72,8 @@
       <div class="av-card-pad">
         <h2 class="section-title">Matriz por iniciativa</h2>
         <p class="section-hint" style="margin-top: -0.35rem; margin-bottom: 0.85rem">
-          Sentido de voto oficial na AR:
           <strong>F</strong> a favor · <strong>C</strong> contra · <strong>A</strong> abstenção ·
-          <strong>—</strong> não participou / sem registo. Colunas em
-          <strong>ordem alfabética de sigla</strong> (não por tamanho de bancada).
+          <strong>—</strong> sem registo. Colunas por ordem alfabética de sigla.
         </p>
 
         <ListPager
