@@ -16,6 +16,7 @@ export const useDataStore = defineStore('data', () => {
     digests: 0,
     despesas: 0,
     investimentos: 0,
+    comunicados: 0,
     taxa_participacao_media: 0,
   })
 
@@ -28,6 +29,7 @@ export const useDataStore = defineStore('data', () => {
       digests: Number(row.digests || 0),
       despesas: Number(row.despesas || 0),
       investimentos: Number(row.investimentos || 0),
+      comunicados: Number(row.comunicados || 0),
       taxa_participacao_media: Number(row.taxa_participacao_media || 0),
     }
   }

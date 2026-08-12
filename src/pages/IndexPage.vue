@@ -13,6 +13,7 @@
         <router-link to="/digest" class="btn btn--outline">Resumo do dia</router-link>
         <router-link to="/despesa" class="btn btn--outline">Despesa</router-link>
         <router-link to="/investimentos" class="btn btn--outline">Investimentos</router-link>
+        <router-link to="/comunicados" class="btn btn--outline">Comunicados</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/registo" class="btn btn--ghost">Criar conta</router-link>
       </div>
     </section>
@@ -22,9 +23,11 @@
       <p class="section-hint">
         Conteúdo de fontes oficiais. Voto cidadão só em
         <router-link to="/iniciativas">iniciativas da AR</router-link>.
-        Investimentos = contratos ≥&nbsp;100&nbsp;000&nbsp;€ (consulta);
-        Despesa = catálogo completo (consulta); Resumos = boletim por
-        <strong>data oficial</strong> (não por data de sync). Origem e importações:
+        Despesa e investimentos = contratos públicos (consulta);
+        <router-link to="/comunicados">Comunicados</router-link>
+        = Governo (portugal.gov.pt, sem voto);
+        Resumos = boletim AR/despesa por <strong>data oficial</strong>.
+        Origem e importações:
         <router-link to="/dados">Fontes de dados</router-link>.
       </p>
       <div class="stats-grid">
@@ -53,6 +56,13 @@
           icon="savings"
           accent="#7a5f00"
           tint="rgba(241, 191, 0, 0.18)"
+        />
+        <StatCard
+          label="Comunicados"
+          :value="formatNumber(m.comunicados)"
+          icon="campaign"
+          accent="var(--pt-green-dark)"
+          tint="rgba(0, 102, 51, 0.1)"
         />
       </div>
 

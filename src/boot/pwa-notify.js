@@ -6,11 +6,10 @@ import { fetchNotificationPrefs, showLocalNotification } from '@/lib/notificatio
 
 /**
  * Notificações locais (tab / PWA instalada) via Realtime:
- * - resumo do dia (daily digests)
+ * - resumo do dia (daily digests) — AR + despesa
  * - novas iniciativas (leis / votações)
- * - novos investimentos
- *
- * Push com app fechada: VAPID + edge (docs/AUTH-PWA.md).
+ * - novos investimentos (consulta)
+ * - novos comunicados do Governo (consulta, sem voto)
  */
 export default defineBoot(() => {
   const auth = useAuthStore()
@@ -24,6 +23,7 @@ export default defineBoot(() => {
         notify_iniciativas: true,
         notify_investimentos: true,
         notify_despesa: false,
+        notify_comunicados: true,
       }
     }
   }
@@ -37,6 +37,8 @@ export default defineBoot(() => {
       digest: prefs.notify_digest,
       iniciativa: prefs.notify_iniciativas,
       investimento: prefs.notify_investimentos,
+      despesa: prefs.notify_despesa,
+      comunicado: prefs.notify_comunicados,
     }[kind]
     if (!flag) return
 
@@ -59,7 +61,9 @@ export default defineBoot(() => {
         const d = payload.new
         await maybeNotify('digest', {
           title: d?.title || 'Resumo do dia · A Voto',
-          body: d?.summary || 'Há um novo resumo da actividade pública (Parlamento, despesa, investimentos).',
+          body:
+            d?.summary ||
+            'Há um novo resumo da actividade pública (Parlamento e despesa).',
           url: '/digest',
           tag: `digest-${d?.id || Date.now()}`,
         })
@@ -85,9 +89,35 @@ export default defineBoot(() => {
         const inv = payload.new
         await maybeNotify('investimento', {
           title: 'Novo investimento público',
-          body: inv?.titulo || 'Foi registado um investimento para a sua opinião.',
+          body: inv?.titulo || 'Foi registado um contrato de valor elevado (consulta).',
           url: inv?.id ? `/investimentos/${inv.id}` : '/investimentos',
           tag: `inv-${inv?.id || Date.now()}`,
+        })
+      },
+    )
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'despesas_publicas' },
+      async (payload) => {
+        const d = payload.new
+        await maybeNotify('despesa', {
+          title: 'Nova despesa / contrato',
+          body: d?.titulo || 'Foi importado um contrato público (consulta).',
+          url: d?.id ? `/despesa/${d.id}` : '/despesa',
+          tag: `desp-${d?.id || Date.now()}`,
+        })
+      },
+    )
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'comunicados' },
+      async (payload) => {
+        const c = payload.new
+        await maybeNotify('comunicado', {
+          title: 'Novo comunicado oficial',
+          body: c?.titulo || 'Há um novo comunicado do Governo (informação — sem voto).',
+          url: c?.id ? `/comunicados/${c.id}` : '/comunicados',
+          tag: `com-${c?.id || Date.now()}`,
         })
       },
     )

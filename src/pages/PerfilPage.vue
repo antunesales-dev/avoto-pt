@@ -75,7 +75,7 @@
           <div class="toggle-list">
             <label class="toggle">
               <input v-model="prefs.notify_digest" type="checkbox" @change="onSavePrefs" />
-              <span>Resumo do dia (Parlamento, despesa e investimentos)</span>
+              <span>Resumo do dia (Parlamento e despesa)</span>
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_iniciativas" type="checkbox" @change="onSavePrefs" />
@@ -83,11 +83,15 @@
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_investimentos" type="checkbox" @change="onSavePrefs" />
-              <span>Novos investimentos públicos</span>
+              <span>Novos investimentos públicos (consulta)</span>
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_despesa" type="checkbox" @change="onSavePrefs" />
               <span>Actualizações de despesa pública</span>
+            </label>
+            <label class="toggle">
+              <input v-model="prefs.notify_comunicados" type="checkbox" @change="onSavePrefs" />
+              <span>Comunicados do Governo (informação — sem voto)</span>
             </label>
           </div>
           <p v-if="!anyPrefOn" class="muted notif-off-msg">
@@ -213,6 +217,7 @@ const prefs = reactive({
   notify_iniciativas: true,
   notify_investimentos: true,
   notify_despesa: false,
+  notify_comunicados: true,
 })
 
 const {
@@ -241,7 +246,8 @@ const anyPrefOn = computed(
     prefs.notify_digest ||
     prefs.notify_iniciativas ||
     prefs.notify_investimentos ||
-    prefs.notify_despesa,
+    prefs.notify_despesa ||
+    prefs.notify_comunicados,
 )
 const permLabel = computed(() => {
   if (permission.value === 'unsupported') return 'não suportado'
@@ -368,6 +374,7 @@ async function onDisableAllNotifs() {
   prefs.notify_iniciativas = false
   prefs.notify_investimentos = false
   prefs.notify_despesa = false
+  prefs.notify_comunicados = false
   savingNotif.value = true
   try {
     await saveNotificationPrefs(auth.user.id, prefs)
@@ -389,6 +396,7 @@ async function onEnableAllNotifs() {
   prefs.notify_iniciativas = true
   prefs.notify_investimentos = true
   prefs.notify_despesa = true
+  prefs.notify_comunicados = true
   savingNotif.value = true
   try {
     await saveNotificationPrefs(auth.user.id, prefs)
