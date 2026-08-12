@@ -2,23 +2,9 @@
   <div class="page-shell">
     <h1 class="page-title">Despesa pública</h1>
     <p class="page-subtitle">
-      <strong>Catálogo de consulta</strong> de contratos e despesa do Estado (Portal Base e
-      fontes oficiais). Aqui <strong>não se vota</strong> — só se vê montantes, entidades e
-      ligações oficiais.
+      Contratos e despesa do Estado (Portal Base). Consulta — montantes, entidades e link
+      oficial. A data do filtro é a de <strong>publicação</strong> no portal.
     </p>
-
-    <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>Data = publicação oficial</strong> no Portal Base (não a data em que a A Voto
-      sincronizou). Contratos ≥&nbsp;100&nbsp;000&nbsp;€ estão também em
-      <router-link to="/investimentos">Investimentos</router-link>
-      (só consulta). O
-      <router-link to="/digest">Resumo do dia</router-link>
-      só lista contratos com publicação
-      <em>nesse</em> dia. Comunicados do Governo:
-      <router-link to="/comunicados">Comunicados</router-link>.
-      Estado das importações:
-      <router-link to="/dados">Fontes de dados</router-link>.
-    </div>
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
       <div class="stat-mini av-card av-card-pad">

@@ -2,19 +2,8 @@
   <div class="page-shell">
     <h1 class="page-title">Comunicados</h1>
     <p class="page-subtitle">
-      <strong>Informação oficial do Governo</strong> (portugal.gov.pt): comunicados do Conselho de
-      Ministros, notícias e nomeações do XXV Governo. Página de
-      <strong>consulta</strong> — <strong>sem voto</strong> cidadão. O voto na A Voto aplica-se só
-      às
-      <router-link to="/iniciativas">iniciativas da AR</router-link>.
+      Comunicados e notícias oficiais do Governo (portugal.gov.pt) — consulta, com link à fonte.
     </p>
-
-    <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>Não é o Resumo do dia</strong> (Parlamento + despesa). Aqui só entram entradas
-      oficiais do portal do Governo, com link à fonte. Não repetimos contratos nem votações AR.
-      Fontes e importações:
-      <router-link to="/dados">Fontes de dados</router-link>.
-    </div>
 
     <div class="filter-row">
       <button
@@ -97,15 +86,9 @@
       <router-link to="/dados" class="btn btn--ghost btn--sm">Ver estado das importações</router-link>
     </div>
 
-    <!-- Índice por dia (digest próprio; não repete o catálogo inteiro) -->
     <section v-if="digestsComConteudo.length" class="av-card" style="margin-top: 1.5rem">
       <div class="av-card-pad">
-        <h2 class="section-title">Índice por dia (comunicados)</h2>
-        <p class="muted sm">
-          Boletim próprio — separado do
-          <router-link to="/digest">Resumo do dia</router-link>
-          (AR e despesa). Só dias com entradas.
-        </p>
+        <h2 class="section-title">Índice por dia</h2>
         <ul class="day-index">
           <li v-for="d in digestsComConteudo.slice(0, 12)" :key="d.id">
             <strong>{{ formatDate(d.digest_date) }}</strong>

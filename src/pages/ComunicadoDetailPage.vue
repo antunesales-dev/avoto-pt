@@ -26,8 +26,8 @@
         </p>
 
         <p class="hint source-note">
-          Texto extraído da fonte oficial para consulta na A Voto. Em caso de divergência, prevalece
-          o portal do Governo. Não é voto nem posição da plataforma.
+          Em caso de divergência com esta página, prevalece a
+          <a :href="item.url_oficial" target="_blank" rel="noopener noreferrer">fonte oficial</a>.
         </p>
 
         <div class="actions">

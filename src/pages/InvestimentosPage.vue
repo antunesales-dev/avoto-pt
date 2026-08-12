@@ -2,22 +2,9 @@
   <div class="page-shell">
     <h1 class="page-title">Investimentos</h1>
     <p class="page-subtitle">
-      <strong>Contratos de valor elevado</strong> (≥&nbsp;100&nbsp;000&nbsp;€) da mesma fonte
-      oficial de despesa (Portal Base). Página de
-      <strong>consulta</strong> — sem voto cidadão. O voto na A Voto aplica-se às
-      <router-link to="/iniciativas">iniciativas da Assembleia da República</router-link>.
+      Contratos ≥&nbsp;100&nbsp;000&nbsp;€ do Portal Base (subconjunto de
+      <router-link to="/despesa">Despesa</router-link>). Consulta — data de publicação oficial.
     </p>
-
-    <div class="notice notice-info" style="margin-bottom: 1.25rem">
-      <strong>Mesma fonte que Despesa</strong>, filtrada a ≥&nbsp;100&nbsp;000&nbsp;€. Não é uma
-      segunda lista inventada: é o subconjunto de maior valor. Data = publicação oficial.
-      Catálogo completo:
-      <router-link to="/despesa">Despesa</router-link>.
-      Boletim do dia (AR + despesa):
-      <router-link to="/digest">Resumo do dia</router-link>.
-      Importações:
-      <router-link to="/dados">Fontes de dados</router-link>.
-    </div>
 
     <DateRangeFilter
       v-model="periodo"
