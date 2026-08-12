@@ -95,8 +95,8 @@
             browser (se estiver activa) só se remove nas definições do browser/sistema.
           </p>
           <p class="muted" style="margin-top: 0.75rem; font-size: 0.82rem">
-            Com a app aberta ou instalada, as notificações chegam em tempo quase real. Push com a
-            app totalmente fechada (Web Push / VAPID) activa-se numa fase seguinte.
+            Com a app aberta ou instalada, as notificações chegam em tempo quase real quando o
+            browser o permite.
           </p>
         </div>
       </section>

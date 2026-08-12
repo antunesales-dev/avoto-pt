@@ -64,7 +64,7 @@
         </ul>
         <div class="notice" style="margin-top: 1rem">
           Conta com email, ID permanente (CID-…), um voto por iniciativa com confirmação e sem
-          alteração posterior — persistido na base de dados (Supabase).
+          alteração posterior — o teu voto fica registado de forma permanente.
         </div>
       </div>
     </section>
