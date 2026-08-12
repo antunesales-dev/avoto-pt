@@ -33,6 +33,13 @@
         accent="#7a5f00"
         tint="rgba(241, 191, 0, 0.18)"
       />
+      <StatCard
+        label="Comunicados (Governo)"
+        :value="formatNumber(m.comunicados)"
+        icon="campaign"
+        accent="var(--pt-green-dark)"
+        tint="rgba(0, 102, 51, 0.1)"
+      />
     </div>
 
     <h2 class="section-title">Participação cidadã</h2>

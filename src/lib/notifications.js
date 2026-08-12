@@ -5,6 +5,7 @@ const DEFAULT_PREFS = {
   notify_iniciativas: true,
   notify_investimentos: true,
   notify_despesa: false,
+  notify_comunicados: true,
 }
 
 export function notificationSupport() {
@@ -29,7 +30,9 @@ export async function fetchNotificationPrefs(userId) {
   if (!userId) return { ...DEFAULT_PREFS }
   const { data, error } = await supabase
     .from('notification_prefs')
-    .select('notify_digest, notify_iniciativas, notify_investimentos, notify_despesa')
+    .select(
+      'notify_digest, notify_iniciativas, notify_investimentos, notify_despesa, notify_comunicados',
+    )
     .eq('user_id', userId)
     .maybeSingle()
   if (error) throw error
@@ -47,6 +50,7 @@ export async function fetchNotificationPrefs(userId) {
     notify_iniciativas: data.notify_iniciativas !== false,
     notify_investimentos: data.notify_investimentos !== false,
     notify_despesa: data.notify_despesa === true,
+    notify_comunicados: data.notify_comunicados !== false,
   }
 }
 
@@ -58,6 +62,7 @@ export async function saveNotificationPrefs(userId, prefs) {
     notify_iniciativas: !!prefs.notify_iniciativas,
     notify_investimentos: !!prefs.notify_investimentos,
     notify_despesa: !!prefs.notify_despesa,
+    notify_comunicados: !!prefs.notify_comunicados,
     updated_at: new Date().toISOString(),
   }
   const { error } = await supabase.from('notification_prefs').upsert(row, {
