@@ -11,6 +11,8 @@ export type MappedComunicado = {
   id: string
   titulo: string
   resumo: string
+  /** Texto principal para ler na app (extraído da fonte oficial). */
+  corpo: string
   url_oficial: string
   publicado_em: string
   tipo: 'noticia' | 'comunicado_cm' | 'intervencao' | 'outro'
@@ -99,17 +101,114 @@ function metaContent(html: string, names: string[]): string | null {
   return null
 }
 
-function stripHtml(s: string): string {
+function decodeEntities(s: string): string {
   return s
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&ccedil;/gi, 'ç')
+    .replace(/&Ccedil;/gi, 'Ç')
+    .replace(/&atilde;/gi, 'ã')
+    .replace(/&otilde;/gi, 'õ')
+    .replace(/&aacute;/gi, 'á')
+    .replace(/&eacute;/gi, 'é')
+    .replace(/&iacute;/gi, 'í')
+    .replace(/&oacute;/gi, 'ó')
+    .replace(/&uacute;/gi, 'ú')
+    .replace(/&agrave;/gi, 'à')
+    .replace(/&ecirc;/gi, 'ê')
+    .replace(/&ocirc;/gi, 'ô')
+    .replace(/&Aacute;/gi, 'Á')
+    .replace(/&Eacute;/gi, 'É')
+    .replace(/&Iacute;/gi, 'Í')
+    .replace(/&Oacute;/gi, 'Ó')
+    .replace(/&Uacute;/gi, 'Ú')
+    .replace(/&#(\d+);/g, (_, n) => {
+      try {
+        return String.fromCharCode(Number(n))
+      } catch {
+        return ''
+      }
+    })
+}
+
+function stripHtml(s: string): string {
+  return decodeEntities(
+    s
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim(),
+  )
+}
+
+/** HTML de conteúdo → texto legível com parágrafos (para a app). */
+function htmlToCorpo(html: string): string {
+  let h = decodeEntities(html)
+  h = h
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(div|h[1-6]|li|tr)>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+  return h
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
     .trim()
+}
+
+/**
+ * Extrai o corpo principal do HTML (Sitecore/Next Content field ou fallback).
+ */
+function extractCorpoFromPage(html: string): string {
+  const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i)
+  if (m) {
+    try {
+      const data = JSON.parse(m[1])
+      const fields = data?.props?.pageProps?.layoutData?.sitecore?.route?.fields
+      const content = fields?.Content?.value
+      if (typeof content === 'string' && content.length > 40) {
+        return htmlToCorpo(content).slice(0, 50000)
+      }
+      // fallback: contextItem.content
+      const walk = (o: unknown): string | null => {
+        if (!o || typeof o !== 'object') return null
+        if (Array.isArray(o)) {
+          for (const x of o) {
+            const r = walk(x)
+            if (r) return r
+          }
+          return null
+        }
+        const rec = o as Record<string, unknown>
+        if (typeof rec.value === 'string' && rec.value.includes('<p') && rec.value.length > 200) {
+          // prefer Content-like
+          return htmlToCorpo(rec.value).slice(0, 50000)
+        }
+        for (const v of Object.values(rec)) {
+          const r = walk(v)
+          if (r && r.length > 200) return r
+        }
+        return null
+      }
+      const found = walk(fields)
+      if (found && found.length > 80) return found
+    } catch {
+      /* ignore */
+    }
+  }
+  // HTML visível: juntar <p> longos (ignora nav/footer curtos)
+  const paras = [...html.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)]
+    .map((x) => stripHtml(x[1]))
+    .filter((p) => p.length > 50 && !/cookie|navegação no sítio/i.test(p))
+  if (paras.length) return paras.join('\n\n').slice(0, 50000)
+  return ''
 }
 
 function parseDate(raw: string | null | undefined, fallbackLastmod?: string): string | null {
@@ -176,9 +275,13 @@ export async function fetchComunicadoPage(
     titulo = slugFromUrl(url_oficial).replace(/-/g, ' ').slice(0, 200)
   }
 
-  const resumo = stripHtml(
+  const corpo = extractCorpoFromPage(html)
+  let resumo = stripHtml(
     metaContent(html, ['og:description', 'description']) || '',
   ).slice(0, 800)
+  if (!resumo && corpo) {
+    resumo = corpo.replace(/\s+/g, ' ').slice(0, 400)
+  }
 
   const publicado_em = parseDate(
     metaContent(html, ['card:date', 'article:published_time', 'date']),
@@ -193,6 +296,7 @@ export async function fetchComunicadoPage(
     id,
     titulo,
     resumo,
+    corpo,
     url_oficial,
     publicado_em,
     tipo,
@@ -200,6 +304,7 @@ export async function fetchComunicadoPage(
     meta: {
       lastmod: lastmod || null,
       slug: slugFromUrl(url_oficial),
+      corpo_chars: corpo.length,
     },
   }
 }

@@ -52,6 +52,7 @@ Deno.serve(async (req) => {
         id: c.id,
         titulo: c.titulo,
         resumo: c.resumo,
+        corpo: c.corpo || '',
         url_oficial: c.url_oficial,
         publicado_em: c.publicado_em,
         tipo: c.tipo,
