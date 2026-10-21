@@ -34,6 +34,8 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Opcional: fallback se a descoberta em parlamento.pt falhar (vazio = não definido)
+          AR_INICIATIVAS_URL: ${{ vars.AR_INICIATIVAS_URL || secrets.AR_INICIATIVAS_URL }}
         run: node scripts/sync-ar.mjs --limit=${{ github.event.inputs.ar_limit || 'all' }}
 
       - name: despesa-sync (edge, paginado)
