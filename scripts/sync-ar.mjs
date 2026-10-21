@@ -249,21 +249,59 @@ function mapAr(raw) {
   }
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+/**
+ * Fetch an HTML page and extract a match, retrying on network errors,
+ * non-2xx responses or pages missing the expected link (parlamento.pt
+ * occasionally serves an error/maintenance page to CI runners).
+ */
+async function fetchAndMatch(url, headers, patterns, what, attempts = 3) {
+  let lastInfo = ''
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const res = await fetch(url, { headers, signal: AbortSignal.timeout(60_000) })
+      const html = await res.text()
+      const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] || '').trim().slice(0, 120)
+      lastInfo = `HTTP ${res.status}, ${html.length} bytes, title="${title}"`
+      if (res.ok) {
+        for (const re of patterns) {
+          const m = html.match(re)
+          if (m) return m
+        }
+      }
+    } catch (e) {
+      lastInfo = String(e?.message || e)
+    }
+    if (attempt < attempts) {
+      console.warn(`${what} not found (attempt ${attempt}/${attempts}: ${lastInfo}); retrying…`)
+      await sleep(30_000 * attempt)
+    }
+  }
+  throw new Error(`${what} not found (${lastInfo})`)
+}
+
 async function discoverJsonUrl() {
   if (process.env.AR_INICIATIVAS_URL) return process.env.AR_INICIATIVAS_URL
-  const page = await fetch(DA, { headers: { 'User-Agent': UA } })
-  const html0 = await page.text()
-  const leg =
-    html0.match(/href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=57465a4a[^"]+)"/i) ||
-    html0.match(/href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=[^"]+Path=[^"]+)"/i)
-  if (!leg) throw new Error('Legislatura link not found')
+  const leg = await fetchAndMatch(
+    DA,
+    { 'User-Agent': UA },
+    [
+      /href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=57465a4a[^"]+)"/i,
+      /href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=[^"]+Path=[^"]+)"/i,
+    ],
+    'Legislatura link',
+  )
   const legUrl = 'https://www.parlamento.pt' + leg[1].replace(/&amp;/g, '&')
-  const html = await (await fetch(legUrl, { headers: { 'User-Agent': UA, Referer: DA } })).text()
-  const jsonLink =
-    html.match(
+  const jsonLink = await fetchAndMatch(
+    legUrl,
+    { 'User-Agent': UA, Referer: DA },
+    [
       /href="(https:\/\/app\.parlamento\.pt\/webutils\/docs\/doc\.txt\?[^"]*Iniciativas[A-Z0-9]*_json\.txt[^"]*)"/i,
-    ) || html.match(/href="(https:\/\/app\.parlamento\.pt\/webutils\/docs\/doc\.txt\?path=[^"]+)"/i)
-  if (!jsonLink) throw new Error('JSON file link not found')
+      /href="(https:\/\/app\.parlamento\.pt\/webutils\/docs\/doc\.txt\?path=[^"]+)"/i,
+    ],
+    'JSON file link',
+  )
   return jsonLink[1].replace(/&amp;/g, '&')
 }
 
