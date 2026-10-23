@@ -37,6 +37,20 @@
       :count="filtradas.length"
       style="margin-bottom: 1rem"
     />
+    <div class="filter-row ordem-row" role="group" aria-label="Ordenar despesas">
+      <span class="ordem-row__l">Ordenar</span>
+      <button
+        v-for="o in ORDEM_OPCOES"
+        :key="o.id"
+        type="button"
+        class="chip-btn"
+        :class="{ 'is-active': ordem === o.id }"
+        :aria-pressed="ordem === o.id"
+        @click="ordem = o.id"
+      >
+        {{ o.label }}
+      </button>
+    </div>
 
     <ListPager
       :page="page"
@@ -143,12 +157,14 @@ import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
 import { formatDate, formatNumber } from '@/data/partidos'
 import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
+import { ORDEM_DATA, ORDEM_OPCOES, ordenarPorDataOuValor } from '@/lib/ordenar'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
 const finance = useFinanceStore()
 const tipo = ref('todos')
 const periodo = ref('todos')
+const ordem = ref(ORDEM_DATA)
 
 function dataRefDespesa(d) {
   return d.data_publicacao || d.data_inicio || null
@@ -187,6 +203,9 @@ const totalMontante = computed(() =>
   filtradas.value.reduce((s, d) => s + (Number(d.montante_eur) || 0), 0),
 )
 
+/** Ordena antes de paginar (defeito: mais recentes; alternativa: maior valor). */
+const ordenadas = computed(() => ordenarPorDataOuValor(filtradas.value, ordem.value, dataRefDespesa))
+
 const {
   page,
   pageSize,
@@ -199,7 +218,7 @@ const {
   pageWindow,
   goPage,
   resetPage,
-} = usePagination(filtradas, { defaultSize: 12, sizes: [12, 24, 48] })
+} = usePagination(ordenadas, { defaultSize: 12, sizes: [12, 24, 48] })
 
 function setPageSize(n) {
   pageSize.value = n
@@ -218,7 +237,7 @@ function formatMoney(n) {
   }).format(Number(n))
 }
 
-watch([tipo, periodo], () => resetPage())
+watch([tipo, periodo, ordem], () => resetPage())
 onMounted(() => finance.loadDespesas().catch(console.error))
 </script>
 
@@ -239,6 +258,18 @@ onMounted(() => finance.loadDespesas().catch(console.error))
   font-size: 1.35rem;
   margin-top: 0.25rem;
   color: var(--pt-navy);
+}
+.ordem-row {
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.ordem-row__l {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pt-muted);
+  margin-right: 0.25rem;
 }
 .foot {
   margin-top: 1rem;
