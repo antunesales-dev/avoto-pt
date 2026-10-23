@@ -227,3 +227,43 @@ test('comissão: junta relatores das várias entradas da mesma comissão compete
   assert.deepEqual(m.comissao.relatores, [{ nome: 'Ana Silva', gp: 'PS' }])
   assert.deepEqual(m.comissao.pareceres_recebidos, ['Ordem dos Médicos'])
 })
+
+// --- Contexto extra (ficha): petições, iniciativas de origem/originadas, apreciação pública, audições ---
+import { extractPeticoes, extractRelacionadasAr, extractComissao as extractComissaoCtx, AR_PETICAO_URL } from '../supabase/functions/_shared/ar-mapper.js'
+
+test('petições: Peticoes (com ficha na AR) + PeticoesConjuntas por fase, sem duplicados', () => {
+  const r = extractPeticoes({
+    Peticoes: [{ id: '34231', numero: '12', legislatura: 'XVII', assunto: 'Pela criação de um regime <b>transitório</b>' }],
+    IniEventos: [
+      { PeticoesConjuntas: [{ id: '11', nr: '256', leg: 'XV', titulo: 'Vacinas antialérgicas' }, { nr: '12', leg: 'XVII', titulo: 'dup' }] },
+    ],
+  })
+  assert.deepEqual(r, [
+    { id: '34231', numero: '12', legislatura: 'XVII', assunto: 'Pela criação de um regime transitório', url: AR_PETICAO_URL + '34231', conjunta: false },
+    { id: null, numero: '256', legislatura: 'XV', assunto: 'Vacinas antialérgicas', url: null, conjunta: true },
+  ])
+  assert.deepEqual(extractPeticoes({}), [])
+})
+
+test('iniciativas de origem / originadas → ids internos', () => {
+  assert.deepEqual(extractRelacionadasAr([{ assunto: 'CPI ao INEM', descTipo: 'Inquérito Parlamentar', id: '315171', legislatura: 'XVII', numero: '2', tipo: 'I' }]), [
+    { ar_ini_id: '315171', id_oficial: 'I 2 XVII', iniciativa_id: 'ar-xvii-i-2', tipo: 'Inquérito Parlamentar', titulo: 'CPI ao INEM' },
+  ])
+  assert.deepEqual(extractRelacionadasAr(null), [])
+})
+
+test('comissão: apreciação pública e datas das audições (sem repetir)', () => {
+  const c = extractComissaoCtx([
+    { Comissao: [{ Competente: 'S', Nome: 'Comissão X', DatainicioApreciacaoPublica: '2025-10-16', DatafimApreciacaoPublica: '2025-11-15', Audicoes: [{ data: '2025-10-22' }] }] },
+    { Comissao: [{ Competente: 'S', Nome: 'Comissão X', DatainicioApreciacaoPublica: '0001-01-01T00:00:00', Audicoes: [{ data: '2025-10-22' }, { data: '2026-02-11' }] }] },
+  ])
+  assert.deepEqual(c.apreciacao_publica, { inicio: '2025-10-16', fim: '2025-11-15' })
+  assert.deepEqual(c.audicoes_datas, ['2025-10-22', '2026-02-11'])
+  assert.equal(c.audicoes, 3)
+})
+
+test('mapArIniciativa: payload inclui os campos novos (P 1 real)', () => {
+  const m = mapArIniciativa(P1)
+  for (const k of ['peticoes', 'iniciativas_origem', 'iniciativas_originadas']) assert.ok(Array.isArray(m[k]), k)
+  assert.ok('texto_substituido' in m)
+})
