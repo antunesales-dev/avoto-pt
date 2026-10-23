@@ -7,8 +7,8 @@ cd "$(dirname "$0")/../.."
 export PGHOST="${PGHOST:-127.0.0.1}" PGPORT="${PGPORT:-55439}" PGUSER="${PGUSER:-postgres}"
 DB=avoto_c_edge
 q() { psql -X -q -v ON_ERROR_STOP=1 -d "$DB" "$@"; }
-DB=$DB STOP_BEFORE=20261023000000 supabase/tests/apply-local.sh >/dev/null 2>&1
-q -f supabase/tests/load-prod-copy.sql
+DB=$DB STOP_BEFORE=20261023000000 scripts/db-local/apply-local.sh >/dev/null 2>&1
+q -f scripts/db-local/load-prod-copy.sql
 q <<'SQL'
 -- A) antiga sem gémeo
 insert into despesas_publicas (id, titulo, entidade, montante_eur, data_publicacao, source, meta)

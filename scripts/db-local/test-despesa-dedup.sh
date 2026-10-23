@@ -8,8 +8,8 @@ DB=avoto_c_dedup
 MIG=supabase/migrations/20261023120000_despesa_dedup_legacy_entidade_nif.sql
 q() { psql -X -q -v ON_ERROR_STOP=1 -d "$DB" "$@"; }
 
-DB=$DB STOP_BEFORE=20261023000000 supabase/tests/apply-local.sh >/dev/null 2>&1
-q -f supabase/tests/load-prod-copy.sql
+DB=$DB STOP_BEFORE=20261023000000 scripts/db-local/apply-local.sh >/dev/null 2>&1
+q -f scripts/db-local/load-prod-copy.sql
 
 echo "== ANTES"
 q -c "create table _before as select * from despesas_publicas; create table _inv_before as select * from investimentos; create table _votos_before as select * from votos_investimentos;"
