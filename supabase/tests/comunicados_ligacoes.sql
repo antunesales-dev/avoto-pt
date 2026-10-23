@@ -47,6 +47,14 @@ begin
   assert (select (motivo->>'data_citada')::boolean from public.comunicado_iniciativa
           where comunicado_id = 't-com-1' and iniciativa_id = 't-ini-1'), 'data da votação não detetada';
 
+  -- Lotes (p_ids): um lote de outro comunicado não recalcula nem apaga as propostas de t-com-1
+  select * into r from public.propose_comunicado_links('2026-10-01', p_ids => array['nao-existe']);
+  assert r.comunicados = 0 and r.propostas = 0, 'lote vazio devia dar 0';
+  assert exists (select 1 from public.comunicado_iniciativa where comunicado_id = 't-com-1' and iniciativa_id = 't-ini-1'),
+    'lote de outro comunicado apagou propostas';
+  select * into r from public.propose_comunicado_links('2026-10-01', p_ids => array['t-com-1']);
+  assert r.comunicados = 1 and r.novas = 0, 'lote de t-com-1 devia ser idempotente';
+
   -- Revisão manual sobrevive a nova proposta
   perform public.review_comunicado_link('t-com-1', 't-ini-1', false, 'teste');
   perform public.propose_comunicado_links('2026-10-01');
