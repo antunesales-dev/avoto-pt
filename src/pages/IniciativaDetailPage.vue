@@ -395,7 +395,7 @@ const deputadosVisiveis = computed(() =>
 const temaFonteTexto = computed(() => {
   const f = item.value?.temaFonte
   if (f === 'comissao') return `Tema “${item.value.tema}” atribuído pela comissão competente da AR.`
-  if (f === 'palavras_chave') return `Tema “${item.value.tema}” deduzido do título (sem comissão competente indicada pela AR).`
+  if (f === 'palavras_chave' || f === 'palavras_chave_legado') return `Tema “${item.value.tema}” deduzido do título (sem comissão competente indicada pela AR).`
   if (f === 'procedimento') return 'Procedimento interno da Assembleia da República.'
   return ''
 })

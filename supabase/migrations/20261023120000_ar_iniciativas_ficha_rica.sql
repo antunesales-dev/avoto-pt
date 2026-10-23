@@ -26,7 +26,7 @@ alter table public.iniciativas
 
 comment on column public.iniciativas.ar_ini_id is 'IniId da AR (ficha: DetalheIniciativa.aspx?BID=<ar_ini_id>).';
 comment on column public.iniciativas.autores_deputados is 'Deputados proponentes [{nome, gp}] (IniAutorDeputados).';
-comment on column public.iniciativas.tema_fonte is 'comissao | palavras_chave | procedimento | nenhuma — de onde veio o tema.';
+comment on column public.iniciativas.tema_fonte is 'comissao | palavras_chave | procedimento | nenhuma | palavras_chave_legado (scripts/reclassify-temas-legacy.mjs) — de onde veio o tema.';
 comment on column public.iniciativas.votacao_principal is 'Votação que define estado e resultado_partidos {id, fase, tipo, data, resultado, deputados}.';
 comment on column public.iniciativas.fases is 'Percurso na AR [{data, fase, codigo, obs, dar:{tipo,numero,url}, votacao, debate}].';
 comment on column public.iniciativas.votacoes is 'Todas as votações em plenário [{id, data, fase, tipo, resultado, unanime, descricao, partidos, deputados, ausencias}].';

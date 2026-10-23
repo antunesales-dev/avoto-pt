@@ -257,7 +257,7 @@ begin
   end if;
 
   -- permite várias chamadas na mesma transação
-  drop table if exists _com, _ini, _df, _iw, _cands;
+  drop table if exists _com, _ini, _df, _iw, _it, _ct, _cands;
 
   create temporary table _com on commit drop as
   select c.id, c.publicado_em, lower(c.titulo) as t,
@@ -294,6 +294,9 @@ begin
     select unnest(public.ligacao_tokens(c.titulo || ' ' || c.corpo)) from public.comunicados c
   ) x
   group by t;
+  -- Sem índice, as subconsultas de _iw fazem um seq scan de _df por iniciativa (≈ 10 s).
+  create unique index on _df (t);
+  analyze _df;
 
   create temporary table _iw on commit drop as
   select i.*,
@@ -303,20 +306,48 @@ begin
   from _ini i
   where cardinality(i.tok) >= 2;
 
+  -- Palavras em comum por par (comunicado, iniciativa) com um hash join sobre tokens, em vez
+  -- de subconsultas por par (eram ~150 mil pares × 3 varrimentos de arrays: 11 s para 60 dias,
+  -- acima dos 8 s de statement_timeout do PostgREST em produção). Mesmos valores de wl/wb/raras:
+  -- os tokens são distintos em ambos os lados; pares sem palavras em comum nunca passam `scored`.
+  create temporary table _it on commit drop as
+  select i.id as iniciativa_id, u.t, u.w
+  from _iw i, unnest(i.tok, i.ws) u(t, w);
+
+  create temporary table _ct on commit drop as
+  select c.id as comunicado_id, x.t, bool_or(x.lead) as lead, bool_or(not x.lead) as body
+  from _com c,
+    lateral (
+      select t, true as lead from unnest(c.tok_lead) t
+      union all
+      select t, false from unnest(c.tok_body) t
+    ) x
+  group by 1, 2;
+  analyze _it;
+  analyze _ct;
+
   create temporary table _cands on commit drop as
-  with pairs as (
+  with overlap as (
+    select ct.comunicado_id, it.iniciativa_id,
+      coalesce(sum(it.w) filter (where ct.lead), 0) as wl,
+      coalesce(sum(it.w) filter (where ct.body), 0) as wb,
+      count(*) filter (where ct.body and it.w >= 3) as raras
+    from _ct ct
+    join _it it on it.t = ct.t
+    group by 1, 2
+  ),
+  pairs as (
     select c.id as comunicado_id, i.id as iniciativa_id, cardinality(i.tok) as n_i, i.wsum,
-      (select coalesce(sum(w), 0) from unnest(i.tok, i.ws) u(t, w) where t = any (c.tok_lead)) as wl,
-      (select coalesce(sum(w), 0) from unnest(i.tok, i.ws) u(t, w) where t = any (c.tok_body)) as wb,
-      (select count(*) from unnest(i.tok, i.ws) u(t, w) where t = any (c.tok_body) and w >= 3) as raras,
+      o.wl, o.wb, o.raras,
       similarity(c.t, lower(i.titulo)) as s_tit,
       ('Governo' = any (i.autores) and i.tipo in ('Proposta de Lei', 'Proposta de Resolução')) as gov,
       c.leg,
       (i.data_votacao is not null and public.pt_dia_mes(i.data_votacao) = any (c.datas)) as data_citada
-    from _com c
-    join _iw i
-      on (i.data_entrada between c.publicado_em - p_dias_antes and c.publicado_em + p_dias_depois)
-      or (i.data_votacao between c.publicado_em - p_dias_voto and c.publicado_em + p_dias_voto)
+    from overlap o
+    join _com c on c.id = o.comunicado_id
+    join _iw i on i.id = o.iniciativa_id
+    where (i.data_entrada between c.publicado_em - p_dias_antes and c.publicado_em + p_dias_depois)
+       or (i.data_votacao between c.publicado_em - p_dias_voto and c.publicado_em + p_dias_voto)
   ),
   scored as (
     select *,
@@ -333,7 +364,7 @@ begin
         + case when leg then 0.05 else 0 end
         + case when data_citada then 0.10 else 0 end
         - case when n_i < 3 and not (wl >= wsum and wl >= 6) then 0.15 else 0 end
-      )::real as score
+      )::numeric(6, 4)::real as score  -- 4 casas: desempates estáveis (soma de reais não é associativa)
     from scored
   ),
   ranked as (
