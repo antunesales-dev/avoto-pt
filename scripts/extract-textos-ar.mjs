@@ -175,7 +175,7 @@ async function candidatosDb(admin, o) {
   for (let from = 0; ; from += 1000) {
     const { data, error } = await admin
       .from('iniciativa_textos')
-      .select('iniciativa_id,fonte_url,versao,estado,extraido_em')
+      .select('iniciativa_id,fonte_url,versao,estado,erro,extraido_em')
       .order('iniciativa_id')
       .range(from, from + 999)
     if (error) throw error
@@ -193,7 +193,10 @@ async function candidatosDb(admin, o) {
       if (!h) return true
       if ((h.fonte_url || null) !== (r.url || null)) return true
       if (Number(h.versao || 0) < EXTRATOR_VERSAO) return true
-      return h.estado === 'erro' && new Date(h.extraido_em).getTime() < dayAgo
+      if (h.estado !== 'erro') return false
+      // Erro por falta de ferramenta local (não da AR): repetir logo que o pdftotext exista
+      if (h.erro === 'pdftotext indisponível' && hasPdftotext()) return true
+      return new Date(h.extraido_em).getTime() < dayAgo
     })
     .slice(0, o.limit)
 }
