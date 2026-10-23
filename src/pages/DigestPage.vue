@@ -133,9 +133,9 @@
             <h3 class="digest-section__title">Despesa pública desse dia</h3>
             <p class="muted sm" style="margin: -0.25rem 0 0.75rem">
               Só contratos com <strong>data de publicação = este dia</strong> (Portal Base).
-              Os de valor elevado (≥ 100&nbsp;000&nbsp;€) também estão em
-              <router-link to="/investimentos">Investimentos</router-link>
-              para voto — não os listamos duas vezes aqui. Catálogo completo:
+              Os de valor elevado (≥ 100&nbsp;000&nbsp;€) também aparecem na vista
+              <router-link to="/contratos">Contratos ≥ 100&nbsp;000&nbsp;€</router-link>
+              — não os listamos duas vezes aqui. Catálogo completo:
               <router-link to="/despesa">Despesa</router-link>.
             </p>
             <div

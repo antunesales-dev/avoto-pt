@@ -12,7 +12,7 @@
         <router-link to="/iniciativas" class="btn btn--primary">Iniciativas</router-link>
         <router-link to="/digest" class="btn btn--outline">Resumo do dia</router-link>
         <router-link to="/despesa" class="btn btn--outline">Despesa</router-link>
-        <router-link to="/investimentos" class="btn btn--outline">Investimentos</router-link>
+        <router-link to="/contratos" class="btn btn--outline">Contratos ≥ 100 000 €</router-link>
         <router-link to="/comunicados" class="btn btn--outline">Comunicados</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/registo" class="btn btn--ghost">Criar conta</router-link>
       </div>
@@ -45,7 +45,7 @@
           tint="rgba(218, 41, 28, 0.1)"
         />
         <StatCard
-          label="Investimentos"
+          label="Contratos ≥ 100 000 €"
           :value="formatNumber(m.investimentos)"
           icon="savings"
           accent="#7a5f00"

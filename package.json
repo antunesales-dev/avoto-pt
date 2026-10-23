@@ -10,9 +10,10 @@
   "scripts": {
     "dev": "quasar dev",
     "dev:pwa": "quasar dev -m pwa",
-    "build": "quasar build -m pwa",
-    "build:spa": "quasar build",
-    "test": "node --test tests/*.test.mjs",
+    "build": "quasar build -m pwa && node scripts/prerender-meta.mjs dist/pwa",
+    "build:spa": "quasar build && node scripts/prerender-meta.mjs dist/spa",
+    "test": "node --test tests/*.test.mjs scripts/tests/*.test.mjs scripts/*.test.mjs seo/*.test.mjs",
+    "test:deno": "deno test -A supabase/functions/tests/ supabase/functions/_shared/",
     "postinstall": "quasar prepare --silent",
     "deploy": "pnpm build && wrangler pages deploy dist/pwa --project-name=avoto-pt --branch=main",
     "db:start": "supabase start",

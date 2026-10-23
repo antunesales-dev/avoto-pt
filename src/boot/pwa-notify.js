@@ -88,9 +88,9 @@ export default defineBoot(() => {
       async (payload) => {
         const inv = payload.new
         await maybeNotify('investimento', {
-          title: 'Novo investimento público',
+          title: 'Novo contrato ≥ 100 000 €',
           body: inv?.titulo || 'Foi registado um contrato de valor elevado (consulta).',
-          url: inv?.id ? `/investimentos/${inv.id}` : '/investimentos',
+          url: inv?.despesa_id ? `/despesa/${inv.despesa_id}` : '/contratos',
           tag: `inv-${inv?.id || Date.now()}`,
         })
       },

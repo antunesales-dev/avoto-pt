@@ -53,8 +53,8 @@
                 <td>Data do sync</td>
               </tr>
               <tr>
-                <td><router-link to="/investimentos">Investimentos</router-link></td>
-                <td><code>data_referencia</code> (= publicação Base, ≥100k&nbsp;€)</td>
+                <td><router-link to="/contratos">Contratos ≥&nbsp;100&nbsp;000&nbsp;€</router-link></td>
+                <td><code>data_publicacao</code> (vista de Despesa, ≥&nbsp;100&nbsp;000&nbsp;€)</td>
                 <td>Data do sync · sem voto</td>
               </tr>
               <tr>
@@ -73,9 +73,10 @@
           </table>
         </div>
         <p class="muted" style="margin-top: 0.75rem">
-          Despesa e investimentos <strong>não são duas fontes</strong>: o sync Base grava o
-          catálogo em Despesa e lista os ≥&nbsp;100&nbsp;000&nbsp;€ também em Investimentos
-          (só consulta, sem voto). Comunicados do Governo são uma
+          Despesa e “Contratos ≥&nbsp;100&nbsp;000&nbsp;€” <strong>não são duas fontes</strong>:
+          o sync Base grava o catálogo em Despesa e a página de contratos é só um filtro
+          desse catálogo (só consulta, sem voto). O nome da entidade é o nome canónico do
+          NIF adjudicante. Comunicados do Governo são uma
           <strong>terceira casa</strong> (portal do Governo), com digest próprio na página
           Comunicados — sem repetir AR nem contratos.
         </p>
