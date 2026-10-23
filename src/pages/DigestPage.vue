@@ -89,7 +89,7 @@
                 <span v-if="it.estado" class="badge" :class="estadoBadge(it.estado)">
                   {{ estadoLabel(it.estado) }}
                 </span>
-                <span v-if="it.tema" class="badge badge--muted">{{ it.tema }}</span>
+                <span v-if="it.tema" class="badge badge--muted">{{ canonicalTema(it.tema) }}</span>
               </div>
               <h4 class="digest-item__titulo">{{ it.titulo || 'Sem título' }}</h4>
               <p v-if="it.data_votacao" class="digest-item__line">
@@ -230,6 +230,7 @@ import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
 import { estadoBadgeClass, estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
+import { canonicalTema } from '@/data/temas'
 import { dateRangeLabel, matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { useFinanceStore } from '@/stores/finance'
 
