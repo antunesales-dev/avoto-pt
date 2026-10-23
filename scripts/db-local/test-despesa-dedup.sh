@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Prova local da migração 20261023120000 sobre uma cópia dos dados de produção.
+# Prova local da migração 20261023122000 sobre uma cópia dos dados de produção.
 # Pré-requisitos: Postgres local (PGHOST/PGPORT), /workspace/avoto-C-data/{despesas,investimentos}.json
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 export PGHOST="${PGHOST:-127.0.0.1}" PGPORT="${PGPORT:-55439}" PGUSER="${PGUSER:-postgres}"
 DB=avoto_c_dedup
-MIG=supabase/migrations/20261023120000_despesa_dedup_legacy_entidade_nif.sql
+MIG=supabase/migrations/20261023122000_despesa_dedup_legacy_entidade_nif.sql
 q() { psql -X -q -v ON_ERROR_STOP=1 -d "$DB" "$@"; }
 
 DB=$DB STOP_BEFORE=20261023000000 scripts/db-local/apply-local.sh >/dev/null 2>&1

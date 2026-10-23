@@ -1,30 +1,21 @@
 /**
  * Área governativa (portugal.gov.pt `card:areas`) → tema canónico da avoto.
- * Taxonomia: plano de conteúdo (16 temas). Puro, sem I/O — testável com `deno test`.
+ * Taxonomia: os 16 temas canónicos de `_shared/temas.js` (mesmos nomes que as iniciativas). Puro, sem I/O — testável com `deno test`.
  * Áreas genéricas (Primeiro-Ministro, Presidência, Assuntos Parlamentares) desempatam
  * pelas tags (`card:tags`) e, em último caso, pelo título.
  */
 
-export const TEMAS_CANONICOS = [
-  'Saúde',
-  'Educação e Ciência',
-  'Trabalho e Segurança Social',
-  'Habitação',
-  'Transportes e Infraestruturas',
-  'Finanças e Impostos',
-  'Economia',
-  'Ambiente e Energia',
-  'Agricultura e Mar',
-  'Justiça e Direitos',
-  'Imigração e Nacionalidade',
-  'Segurança e Administração Interna',
-  'Defesa',
-  'Europa e Mundo',
-  'Cultura, Juventude e Desporto',
-  'Estado, Autarquias e Instituições',
-] as const
+import { TEMAS, TEMA_OUTROS } from './temas.js'
 
-export type TemaCanonico = (typeof TEMAS_CANONICOS)[number]
+/**
+ * Os 16 temas canónicos vêm da fonte única partilhada com o sync da AR e a UI
+ * (`_shared/temas.js`), sem “Outros”: uma notícia do Governo tem sempre área governativa.
+ */
+export const TEMAS_CANONICOS: readonly string[] = Object.freeze(
+  (TEMAS as string[]).filter((t) => t !== TEMA_OUTROS),
+)
+
+export type TemaCanonico = string
 
 const FALLBACK: TemaCanonico = 'Estado, Autarquias e Instituições'
 
@@ -109,4 +100,11 @@ export function temaFromGov(input: {
     if (t) return t
   }
   return byKeywords(input.titulo || '') || FALLBACK
+}
+
+// Guarda: qualquer tema usado aqui tem de existir na taxonomia canónica partilhada.
+for (const t of [FALLBACK, ...Object.values(AREA_MAP), ...KEYWORDS.map(([, t]) => t)]) {
+  if (t !== null && !TEMAS_CANONICOS.includes(t)) {
+    throw new Error(`govTemas: tema '${t}' não existe em _shared/temas.js`)
+  }
 }

@@ -5,7 +5,7 @@ Tudo foi testado localmente. **Nada foi aplicado em produção.**
 
 ## Passo 6: despesas duplicadas e entidade por NIF
 
-Migração `supabase/migrations/20261023120000_despesa_dedup_legacy_entidade_nif.sql`:
+Migração `supabase/migrations/20261023122000_despesa_dedup_legacy_entidade_nif.sql`:
 
 - apaga as linhas com id antigo (`base-<nif>-<data>-<preço>-<slug>`) **só quando há gémeo** com id hash:
   mesmo NIF adjudicante (vem no id antigo), título normalizado (minúsculas, espaços colapsados), montante,

@@ -54,11 +54,14 @@ export const STATIC_ROUTES = {
   '/direitos': { title: 'Direitos RGPD', description: 'Como exercer os teus direitos RGPD na A Voto.' },
 }
 
+// Igual a estadosLabel (src/data/partidos.js), incl. os estados novos do plano A.
 const ESTADOS = {
   aprovado: 'Aprovado',
+  aprovado_generalidade: 'Aprovado na generalidade',
   rejeitado: 'Rejeitado',
   em_discussao: 'Em discussão',
   arquivado: 'Arquivado',
+  retirado: 'Retirado',
 }
 
 export function pageTitle(title) {
@@ -121,7 +124,10 @@ export function recordMeta(kind, row, path) {
     return { title: pageTitle(truncate(head, 110)), description, path, type: 'article', h1: head }
   }
   if (kind === 'comunicado') {
-    const description = truncate(row.resumo || row.titulo, 200)
+    // Plano B: nomeações estão ocultas no site → meta genérica da secção.
+    if (row.tipo === 'nomeacao') return null
+    const lead = row.tema ? `${row.tema}. ` : ''
+    const description = truncate(`${lead}${row.resumo || row.titulo}`, 200)
     return { title: pageTitle(truncate(row.titulo, 110)), description, path, type: 'article', h1: row.titulo }
   }
   return null

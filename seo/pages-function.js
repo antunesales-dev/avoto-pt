@@ -8,7 +8,7 @@ import { SITE_URL, applyMeta, fallbackMeta, recordMeta } from './meta.js'
 const TABLE = {
   iniciativa: { table: 'iniciativas', select: 'id,id_oficial,titulo,estado,tema,data_entrada,descricao_oficial' },
   despesa: { table: 'despesas_publicas', select: 'id,titulo,entidade,montante_eur,data_publicacao' },
-  comunicado: { table: 'comunicados', select: 'id,titulo,resumo,publicado_em' },
+  comunicado: { table: 'comunicados', select: 'id,titulo,resumo,publicado_em,tipo,tema' },
 }
 const ID_RE = /^[A-Za-z0-9._~-]{1,160}$/
 const API_TTL = 600

@@ -100,3 +100,9 @@ Deno.test('discoverNoticias: erro HTTP repetido fica em errors, sem rebentar', a
   assertEquals(n, 3)
   assert(r.errors[0].includes('HTTP 502'))
 })
+
+Deno.test('govTemas usa exactamente os 16 temas canónicos de _shared/temas.js', async () => {
+  const { TEMAS, TEMA_OUTROS } = await import('../_shared/temas.js')
+  assertEquals([...TEMAS_CANONICOS], TEMAS.filter((t: string) => t !== TEMA_OUTROS))
+  assertEquals(TEMAS_CANONICOS.length, 16)
+})

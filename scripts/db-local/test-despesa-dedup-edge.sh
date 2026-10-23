@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Casos-limite da migração 20261023120000 (sobre a cópia de prod + dados sintéticos):
+# Casos-limite da migração 20261023122000 (sobre a cópia de prod + dados sintéticos):
 #  A) linha antiga SEM gémeo → não é apagada, fica meta.legacy_sem_gemeo
 #  B) gémeo sem investimento + voto no investimento antigo → cria inv-<gémeo>, move voto e contagem
 set -euo pipefail
@@ -25,7 +25,7 @@ SQL
 TWIN=$(q -Atc "select n.id from despesas_publicas n, despesas_publicas l, _caso_b b where l.id=b.legacy_id and n.id ~ '^base-[0-9a-f]{28}\$' and regexp_replace(lower(btrim(n.titulo)),'\s+',' ','g')=regexp_replace(lower(btrim(l.titulo)),'\s+',' ','g') and n.montante_eur=l.montante_eur and n.data_publicacao=l.data_publicacao and n.data_inicio is not distinct from l.data_inicio and n.meta->>'nif_adjudicante'=substring(l.id from '^base-([0-9]{9})-') limit 1")
 q -c "delete from investimentos where id = 'inv-$TWIN'"
 echo "caso B: antigo=$(q -Atc 'select old_inv from _caso_b') gémeo=$TWIN"
-q -1 -f supabase/migrations/20261023120000_despesa_dedup_legacy_entidade_nif.sql 2>&1 | grep -E 'despesa legacy|ERROR' || true
+q -1 -f supabase/migrations/20261023122000_despesa_dedup_legacy_entidade_nif.sql 2>&1 | grep -E 'despesa legacy|ERROR' || true
 q -c "select
   (select count(*) from despesas_publicas where id='base-507606787-2030-01-01-123-sem-gemeo' and (meta->>'legacy_sem_gemeo')::boolean) a_mantida_e_marcada,
   (select count(*) from despesas_publicas where id !~ '^base-[0-9a-f]{28}\$') antigas_restantes,

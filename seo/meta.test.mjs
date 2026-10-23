@@ -49,3 +49,13 @@ test('truncate corta em palavra e acrescenta reticências', () => {
   assert.equal(truncate('um dois três quatro', 14), 'um dois três…')
   assert.equal(truncate('curto', 50), 'curto')
 })
+
+test('integração A+B: estados novos e comunicados com tema / nomeações ocultas', () => {
+  const ini = recordMeta('iniciativa', { id_oficial: 'P 1', titulo: 'X', estado: 'aprovado_generalidade' }, '/iniciativas/x')
+  assert.match(ini.description, /Estado: Aprovado na generalidade\./)
+  const ret = recordMeta('iniciativa', { id_oficial: 'P 2', titulo: 'Y', estado: 'retirado' }, '/iniciativas/y')
+  assert.match(ret.description, /Estado: Retirado\./)
+  const com = recordMeta('comunicado', { titulo: 'Heranças', resumo: 'Casas no mercado', tipo: 'noticia', tema: 'Habitação' }, '/comunicados/h')
+  assert.equal(com.description, 'Habitação. Casas no mercado')
+  assert.equal(recordMeta('comunicado', { titulo: 'Nomeação', tipo: 'nomeacao' }, '/comunicados/n'), null)
+})

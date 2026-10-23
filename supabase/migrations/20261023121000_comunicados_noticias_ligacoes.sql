@@ -279,7 +279,10 @@ begin
   create temporary table _ini on commit drop as
   select i.id, i.titulo, i.autores, i.tipo, i.data_entrada, i.data_votacao,
     public.ligacao_tokens(i.titulo) as tok
-  from public.iniciativas i;
+  from public.iniciativas i
+  -- Integração com o plano A: procedimentos internos da AR (prazos de CPI, deslocações do PR…)
+  -- estão ocultos por defeito e não devem receber notícias ligadas.
+  where not i.procedimento;
 
   -- IDF no corpus conjunto (títulos das iniciativas + texto dos comunicados)
   select (select count(*) from _ini) + (select count(*) from public.comunicados) into v_n;
