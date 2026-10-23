@@ -63,14 +63,19 @@ export async function discoverArIniciativasJsonUrl(): Promise<{ url: string; lab
 
 /**
  * Stream-parse de um array JSON top-level sem carregar o ficheiro inteiro na RAM
- * (o JSON da AR XVII tem ~80 MB — rebenta o limite da edge se fizer res.json()).
+ * (o JSON da AR XVII tem ~100 MB — rebenta o limite da edge se fizer res.json()).
+ *
+ * O estado do scanner (posição, profundidade, string/escape) mantém-se entre chunks:
+ * a versão anterior recomeçava do início do objecto em cada chunk sem repor a
+ * profundidade e nunca fechava objectos maiores do que um chunk (devolvia 0 linhas).
  */
-async function* streamJsonArrayObjects(
+export async function* streamJsonArrayObjects(
   body: ReadableStream<Uint8Array>,
 ): AsyncGenerator<Record<string, unknown>> {
   const reader = body.getReader()
   const decoder = new TextDecoder()
   let buf = ''
+  let i = 0 // próxima posição a analisar em buf
   let depth = 0
   let inString = false
   let escape = false
@@ -82,16 +87,12 @@ async function* streamJsonArrayObjects(
     if (done) break
     buf += decoder.decode(value, { stream: true })
 
-    let i = 0
-    while (i < buf.length) {
+    for (; i < buf.length; i++) {
       const ch = buf[i]
-
       if (!arrayStarted) {
         if (ch === '[') arrayStarted = true
-        i++
         continue
       }
-
       if (objStart < 0) {
         if (ch === '{') {
           objStart = i
@@ -99,51 +100,33 @@ async function* streamJsonArrayObjects(
           inString = false
           escape = false
         }
-        i++
         continue
       }
-
-      // dentro de objecto
       if (inString) {
         if (escape) escape = false
         else if (ch === '\\') escape = true
         else if (ch === '"') inString = false
-        i++
         continue
       }
-
-      if (ch === '"') {
-        inString = true
-        i++
-        continue
-      }
-      if (ch === '{') depth++
-      else if (ch === '}') {
-        depth--
-        if (depth === 0) {
-          const slice = buf.slice(objStart, i + 1)
-          objStart = -1
-          try {
-            yield JSON.parse(slice) as Record<string, unknown>
-          } catch {
-            /* objecto malformado — ignora */
-          }
-          // descarta prefixo processado
-          buf = buf.slice(i + 1)
-          i = 0
-          continue
+      if (ch === '"') inString = true
+      else if (ch === '{') depth++
+      else if (ch === '}' && --depth === 0) {
+        const slice = buf.slice(objStart, i + 1)
+        objStart = -1
+        try {
+          yield JSON.parse(slice) as Record<string, unknown>
+        } catch {
+          /* objecto malformado — ignora */
         }
       }
-      i++
     }
 
-    // manter só a partir do objecto em curso
-    if (objStart > 0) {
-      buf = buf.slice(objStart)
-      objStart = 0
-    } else if (objStart < 0 && buf.length > 64) {
-      // só whitespace/vírgulas entre objectos
-      buf = buf.slice(-8)
+    // descartar o que já foi processado, mantendo o objecto em curso
+    const keepFrom = objStart >= 0 ? objStart : buf.length
+    if (keepFrom > 0) {
+      buf = buf.slice(keepFrom)
+      i -= keepFrom
+      if (objStart >= 0) objStart = 0
     }
   }
 }
