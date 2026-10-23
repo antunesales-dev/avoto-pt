@@ -10,7 +10,7 @@ on:
         type: boolean
         default: true
       news_days:
-        description: 'Dias de notícias a importar (0 = saltar; precisa GOV_SEARCH_KEY na edge)'
+        description: 'Dias de notícias a importar (0 = saltar; usa o secret GOV_SEARCH_KEY do repo)'
         default: '60'
       link_days:
         description: 'Janela das ligações comunicados ↔ iniciativas (0 = saltar)'
@@ -45,11 +45,14 @@ jobs:
 
       - name: Notícias (backfill)
         if: ${{ inputs.news_days != '0' }}
+        env:
+          GOV_SEARCH_KEY: ${{ secrets.GOV_SEARCH_KEY }}
         run: |
           set -e
           curl -fsS --max-time 140 -X POST "$SUPABASE_URL/functions/v1/comunicados-sync?news_only=1&days=${{ inputs.news_days }}" \
             -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
             -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "x-gov-search-key: $GOV_SEARCH_KEY" \
             -H "Content-Type: application/json" -d '{}'
           echo
 
