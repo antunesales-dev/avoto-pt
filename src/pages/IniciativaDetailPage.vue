@@ -171,6 +171,7 @@
         </div>
       </div>
     </section>
+    <ComunicadosRelacionados :iniciativa-id="item.id" />
   </div>
 
   <div v-else class="page-shell">
@@ -186,6 +187,7 @@ import { useQuasar } from 'quasar'
 import VoteBar from '@/components/VoteBar.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import PartyWeightPanel from '@/components/PartyWeightPanel.vue'
+import ComunicadosRelacionados from '@/components/ComunicadosRelacionados.vue'
 import { assentosPartido } from '@/data/composicaoAr'
 import {
   partidos,

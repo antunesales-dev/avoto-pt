@@ -12,10 +12,28 @@
           <span class="badge badge--navy">{{ tipoLabel(item.tipo) }}</span>
           <span class="badge badge--muted">Informação — sem voto</span>
           <span class="badge badge--muted">{{ formatDate(item.publicado_em) }}</span>
+          <span v-if="item.tema" class="badge badge--gold">{{ item.tema }}</span>
         </div>
         <h1 class="page-title" style="border: none; padding: 0; margin-top: 0.5rem">
           {{ item.titulo }}
         </h1>
+
+        <dl v-if="hasCard" class="card-meta">
+          <template v-if="item.areas?.length">
+            <dt>Área governativa</dt>
+            <dd>{{ item.areas.join(' · ') }}</dd>
+          </template>
+          <template v-if="item.officials?.length">
+            <dt>Membros do Governo</dt>
+            <dd>{{ item.officials.join(' · ') }}</dd>
+          </template>
+          <template v-if="item.tags?.length">
+            <dt>Etiquetas</dt>
+            <dd class="tags">
+              <span v-for="t in item.tags" :key="t" class="tag">{{ t }}</span>
+            </dd>
+          </template>
+        </dl>
 
         <div v-if="paragrafos.length" class="corpo">
           <p v-for="(p, i) in paragrafos" :key="i">{{ p }}</p>
@@ -26,9 +44,14 @@
         </p>
 
         <p class="hint source-note">
-          Em caso de divergência com esta página, prevalece a
+          Texto reproduzido de
+          <a :href="item.url_oficial" target="_blank" rel="noopener noreferrer">portugal.gov.pt</a>
+          (Portal do Governo), com indicação da fonte; as imagens não são reproduzidas. Em caso de
+          divergência com esta página, prevalece a
           <a :href="item.url_oficial" target="_blank" rel="noopener noreferrer">fonte oficial</a>.
         </p>
+
+        <IniciativasRelacionadas :comunicado-id="item.id" />
 
         <div class="actions">
           <a
@@ -55,11 +78,15 @@ import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { formatDate } from '@/data/partidos'
 import { useFinanceStore } from '@/stores/finance'
+import IniciativasRelacionadas from '@/components/IniciativasRelacionadas.vue'
 
 const route = useRoute()
 const finance = useFinanceStore()
 
 const item = computed(() => finance.getComunicado(route.params.id))
+const hasCard = computed(
+  () => !!(item.value?.areas?.length || item.value?.officials?.length || item.value?.tags?.length),
+)
 
 /** Parágrafos do corpo (texto já normalizado no sync). */
 const paragrafos = computed(() => {
@@ -86,6 +113,7 @@ function tipoLabel(t) {
     comunicado_cm: 'Conselho de Ministros',
     noticia: 'Notícia',
     intervencao: 'Intervenção',
+    nomeacao: 'Nomeação',
     outro: 'Oficial',
   }
   return m[t] || t
@@ -115,6 +143,31 @@ function tipoLabel(t) {
     &:last-child {
       margin-bottom: 0;
     }
+  }
+}
+.card-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.3rem 0.9rem;
+  margin: 1rem 0 0;
+  font-size: 0.9rem;
+  dt {
+    font-weight: 700;
+    color: var(--pt-muted);
+  }
+  dd {
+    margin: 0;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .tag {
+    background: var(--pt-line);
+    border-radius: 999px;
+    padding: 0.05rem 0.55rem;
+    font-size: 0.8rem;
   }
 }
 .body {
