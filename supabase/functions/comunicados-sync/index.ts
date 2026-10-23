@@ -7,13 +7,14 @@
  *   ?news_max=300    máximo de notícias por execução
  *   ?delay_ms=1000   pausa entre pedidos ao portal (mín. 500)
  *   ?news_only=1     salta o sitemap (útil em backfill)
+ * Header opcional: x-gov-search-key (só de chamadores autorizados; tem prioridade sobre o env).
  * Env: GOV_SEARCH_KEY (chave pública do índice do portal; sem ela as notícias ficam desligadas),
  *      GOV_SEARCH_ENDPOINT (opcional).
  * Nomeações: não são importadas. Digests: só para dias com entradas (nunca vazios).
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
-import { authorized } from '../_shared/auth.ts'
+import { authorized, govSearchKey } from '../_shared/auth.ts'
 import { discoverNoticias, fetchComunicados, type MappedComunicado } from '../_shared/comunicados.ts'
 
 function intParam(u: URL, name: string, def: number, min: number, max: number): number {
@@ -40,7 +41,7 @@ Deno.serve(async (req) => {
   const newsMax = intParam(urlObj, 'news_max', 300, 1, 2000)
   const delayMs = intParam(urlObj, 'delay_ms', 1000, 500, 10000)
   const newsOnly = urlObj.searchParams.get('news_only') === '1'
-  const searchKey = Deno.env.get('GOV_SEARCH_KEY') || ''
+  const searchKey = govSearchKey(req)
   const searchEndpoint = Deno.env.get('GOV_SEARCH_ENDPOINT') || undefined
 
   const { data: run, error: runErr } = await admin

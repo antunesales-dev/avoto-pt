@@ -2,9 +2,10 @@
  * Cron diário A Voto: ar-sync → despesa-sync → daily-digest → comunicados-sync
  * Deploy: cd workers/daily-cron && wrangler deploy
  * Secrets: AVOTO_CRON_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ *          GOV_SEARCH_KEY (opcional; enviado só ao comunicados-sync em x-gov-search-key)
  */
 
-async function callFn(base, name, secret, serviceKey, pathQuery = '') {
+async function callFn(base, name, secret, serviceKey, pathQuery = '', extraHeaders = {}) {
   const url = `${base.replace(/\/$/, '')}/functions/v1/${name}${pathQuery}`
   const res = await fetch(url, {
     method: 'POST',
@@ -13,6 +14,7 @@ async function callFn(base, name, secret, serviceKey, pathQuery = '') {
       Authorization: `Bearer ${serviceKey}`,
       apikey: serviceKey,
       'x-avoto-cron-secret': secret,
+      ...extraHeaders,
     },
     body: '{}',
   })
@@ -61,7 +63,8 @@ async function runPipeline(env) {
   steps.push(await callFn(base, 'despesa-sync', secret, key, '?limit=80'))
   steps.push(await callFn(base, 'daily-digest', secret, key))
   // Comunicados do Governo (portugal.gov.pt) — digest próprio gerado no sync
-  steps.push(await callFn(base, 'comunicados-sync', secret, key, '?limit=30&days=3'))
+  const govKey = env.GOV_SEARCH_KEY ? { 'x-gov-search-key': env.GOV_SEARCH_KEY } : {}
+  steps.push(await callFn(base, 'comunicados-sync', secret, key, '?limit=30&days=3', govKey))
 
   return {
     ok: steps.every((s) => s.ok),

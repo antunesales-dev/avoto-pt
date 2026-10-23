@@ -44,7 +44,11 @@ pelo índice de pesquisa público que a própria página `/gc25/comunicacao/noti
 supabase secrets set GOV_SEARCH_KEY='<chave pública enviada pelo portal no header Authorization>'
 ```
 
-Sem `GOV_SEARCH_KEY` a função continua a importar os comunicados do CM pelo sitemap e regista
+Alternativa (usada em produção): o secret `GOV_SEARCH_KEY` do repositório GitHub é enviado pelos
+workflows "Sync diário" e "Backfill plano de conteúdo" no header `x-gov-search-key`. A função só aceita
+esse header de chamadores autorizados (cron secret / service_role) e tem prioridade sobre o env.
+
+Sem chave (header ou env) a função continua a importar os comunicados do CM pelo sitemap e regista
 o aviso em `ar_sync_runs.meta.sample_errors`. Pedidos com pausa (`delay_ms`, mín. 500 ms) e UA
 identificado; guarda texto + `card:tags/areas/officials/roles` + link; não guarda imagens (Lusa).
 Nomeações (`/governo/nomeacoes/`) não são importadas; digests só para dias com entradas.
