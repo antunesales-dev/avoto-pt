@@ -1,0 +1,2715 @@
+{
+ "DataFimleg": "2026-09-15",
+ "DataInicioleg": "2025-06-03",
+ "IniAnexos": [
+  {
+   "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a49344e6d51354f5445774c5449304f4467744e446c694e693035597a4d784c54646d4d446b335a5459775a4759354e7935775a47593d&fich=286d9910-2488-49b6-9c31-7f097e60df97.pdf&Inline=true",
+   "anexoNome": "A.I.G."
+  },
+  {
+   "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a41355a5451354d44457a4c546c694d6a51744e446869597930344e47466a4c5452695a4463784e475132593249354d4335775a47593d&fich=09e49013-9b24-48bc-84ac-4bd714d6cb90.pdf&Inline=true",
+   "anexoNome": "Ofício pedido de processo de urgência"
+  }
+ ],
+ "IniAutorDeputados": null,
+ "IniAutorGruposParlamentares": null,
+ "IniAutorOutros": {
+  "iniAutorComissao": null,
+  "nome": "Governo",
+  "sigla": "V"
+ },
+ "IniciativasEuropeias": null,
+ "IniciativasOrigem": null,
+ "IniciativasOriginadas": null,
+ "IniDescTipo": "Proposta de Lei",
+ "IniEpigrafe": null,
+ "IniEventos": [
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "10",
+   "Comissao": null,
+   "DataFase": "2025-06-25",
+   "EvtId": "1",
+   "Fase": "Entrada",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1627597",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "50",
+   "Comissao": null,
+   "DataFase": "2025-06-25",
+   "EvtId": "51",
+   "Fase": "Publicação",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641853",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023073",
+     "obs": null,
+     "pag": [
+      "19-46"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-06-25",
+     "pubLeg": "XVII",
+     "pubNr": "13",
+     "pubSL": "1",
+     "pubTipo": "DAR II série A",
+     "pubTp": "A",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/s2a/17/01/013/2025-06-25/19?pgs=19-46&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a67334e6a68694d544d774c5451335a5451744e4746684d6931684e474a6b4c5745774d6a5a6a5954566d4e545a685953356b62324e34&fich=8768b130-47e4-4aa2-a4bd-a026ca5f56aa.docx&Inline=true",
+     "anexoNome": "Nota de Admissiblidade"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a6330595751784e474a6a4c545a6b597a6b744e44686c4e7930344e444e684c546c6d597a646a4d544a6b4d7a49314e7935775a47593d&fich=74ad14bc-6dc9-48e7-843a-9fc7c12d3257.pdf&Inline=true",
+     "anexoNome": "Despacho PAR n.º 20/XVII - Admissão"
+    }
+   ],
+   "CodigoFase": "20",
+   "Comissao": null,
+   "DataFase": "2025-07-03",
+   "EvtId": "2",
+   "Fase": "Admissão",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1628211",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1022117",
+     "obs": "Despacho n.º 20/XVII do PAR",
+     "pag": [
+      "2-5"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-07-03",
+     "pubLeg": "XVII",
+     "pubNr": "7",
+     "pubSL": "1",
+     "pubTipo": "DAR II série E",
+     "pubTp": "H",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/s2e/17/01/007/2025-07-03/2?pgs=2-5&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "21",
+   "Comissao": null,
+   "DataFase": "2025-07-03",
+   "EvtId": "3",
+   "Fase": "Anúncio",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1628262",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "180",
+   "Comissao": [
+    {
+     "AccId": "87275",
+     "AguardaAgendamentoPlenario": null,
+     "Audicoes": null,
+     "Audiencias": null,
+     "Competente": "S",
+     "DataAgendamentoDiscussao": null,
+     "DataAgendamentoPlenario": "0001-01-01T00:00:00",
+     "DataDistribuicao": "2025-07-03",
+     "DataDistruibuicaoSubcomissao": null,
+     "DataEntrada": null,
+     "DatafimApreciacaoPublica": null,
+     "DatainicioApreciacaoPublica": null,
+     "DataMotivoNaoParecer": null,
+     "DataRelatorio": null,
+     "DataRemessa": null,
+     "DataReqAgendamentoPlenario": null,
+     "DistribuicaoSubcomissao": null,
+     "Documentos": [
+      {
+       "DataDocumento": "2025-07-04",
+       "TipoDocumento": "Informação",
+       "TituloDocumento": "Informação não emissão de relatório",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a595738765a4749785a5463354e6a4d744d4749335a4330305a4463314c5749775a5759744d475a6d59544e6b4e6d5a6d4f44597a4c6e426b5a673d3d&fich=db1e7963-0b7d-4d75-b0ef-0ffa3d6ff863.pdf&Inline=true"
+      },
+      {
+       "DataDocumento": "2025-07-07",
+       "TipoDocumento": "Quadro comparativo",
+       "TituloDocumento": "Quadro comparativo da PPL 1 XVII 1 GOV e PJL 20 XVII 1 CH",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a595738764e5756684e54417959324574596a41774e433030597a45784c546b7a5a475974596a55794e3255784e4745775a6a55324c6e426b5a673d3d&fich=5ea502ca-b004-4c11-93df-b527e14a0f56.pdf&Inline=true"
+      },
+      {
+       "DataDocumento": "2026-07-03",
+       "TipoDocumento": "Link",
+       "TituloDocumento": "Recolha de contributos - Consulta pública",
+       "URL": "https://www.parlamento.pt/Cidadania/Paginas/08_ContributosIniciativasII.aspx?ID_Ini=218"
+      }
+     ],
+     "GpAgendamentoPlenario": null,
+     "IdComissao": "8447",
+     "Legislatura": null,
+     "MotivoNaoParecer": null,
+     "Nome": "Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias ",
+     "Numero": "8447",
+     "Observacao": null,
+     "PareceresRecebidos": null,
+     "PedidosParecer": null,
+     "Prorrogado": null,
+     "Publicacao": null,
+     "PublicacaoRelatorio": null,
+     "Relatores": null,
+     "RemessaRedaccaoFinal": null,
+     "Remessas": null,
+     "Sessao": null,
+     "Sigla": null,
+     "Votacao": null
+    }
+   ],
+   "DataFase": "2025-07-03",
+   "EvtId": "9",
+   "Fase": "Baixa comissão distribuição inicial generalidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1628212",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": "61155",
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "190",
+   "Comissao": null,
+   "DataFase": "2025-07-04",
+   "EvtId": "10",
+   "Fase": "Discussão generalidade",
+   "IniciativasConjuntas": [
+    {
+     "autor": "CH",
+     "dataEntrada": null,
+     "descTipo": "Projeto de Lei",
+     "id": "315073",
+     "leg": "XVII",
+     "nr": "20",
+     "publicacao": [
+      {
+       "debateDtReu": null,
+       "idAct": null,
+       "idDeb": null,
+       "idInt": null,
+       "idPag": "56706",
+       "obs": null,
+       "pag": [
+        "4-30"
+       ],
+       "pagFinalDiarioSupl": null,
+       "pubdt": "2025-07-05",
+       "pubLeg": "XVII",
+       "pubNr": "9",
+       "pubSL": "1",
+       "pubTipo": "DAR I série",
+       "pubTp": "D",
+       "supl": null,
+       "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/4?pgs=4-30&org=PLC"
+      },
+      {
+       "debateDtReu": null,
+       "idAct": null,
+       "idDeb": null,
+       "idInt": null,
+       "idPag": "56706",
+       "obs": null,
+       "pag": [
+        "4-30"
+       ],
+       "pagFinalDiarioSupl": null,
+       "pubdt": "2025-07-05",
+       "pubLeg": "XVII",
+       "pubNr": "9",
+       "pubSL": "1",
+       "pubTipo": "DAR I série",
+       "pubTp": "D",
+       "supl": null,
+       "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/4?pgs=4-30&org=PLC"
+      }
+     ],
+     "sel": "1",
+     "tipo": "J",
+     "titulo": "Altera a Lei da Nacionalidade no sentido de restringir a aquisição da nacionalidade portuguesa e assegurar a possibilidade da sua perda em determinados casos "
+    },
+    {
+     "autor": "BE",
+     "dataEntrada": null,
+     "descTipo": "Projeto de Lei",
+     "id": "315223",
+     "leg": "XVII",
+     "nr": "67",
+     "publicacao": [
+      {
+       "debateDtReu": null,
+       "idAct": null,
+       "idDeb": null,
+       "idInt": null,
+       "idPag": "56706",
+       "obs": null,
+       "pag": [
+        "4-30"
+       ],
+       "pagFinalDiarioSupl": null,
+       "pubdt": "2025-07-05",
+       "pubLeg": "XVII",
+       "pubNr": "9",
+       "pubSL": "1",
+       "pubTipo": "DAR I série",
+       "pubTp": "D",
+       "supl": null,
+       "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/4?pgs=4-30&org=PLC"
+      },
+      {
+       "debateDtReu": null,
+       "idAct": null,
+       "idDeb": null,
+       "idInt": null,
+       "idPag": "56706",
+       "obs": null,
+       "pag": [
+        "4-30"
+       ],
+       "pagFinalDiarioSupl": null,
+       "pubdt": "2025-07-05",
+       "pubLeg": "XVII",
+       "pubNr": "9",
+       "pubSL": "1",
+       "pubTipo": "DAR I série",
+       "pubTp": "D",
+       "supl": null,
+       "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/4?pgs=4-30&org=PLC"
+      }
+     ],
+     "sel": "1",
+     "tipo": "J",
+     "titulo": "Altera a Lei da nacionalidade (altera a Lei n.º 37/81, de 3 de outubro)\n\n"
+    }
+   ],
+   "Intervencoesdebates": [
+    {
+     "dataReuniaoPlenaria": "2025-07-04",
+     "oradores": [
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": null,
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "10:02",
+       "horaTermo": "15:44",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/9/3"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": "Ministro da Presidência",
+        "governo": "XXV GOVERNO CONSTITUCIONAL",
+        "nome": "António Leitão Amaro"
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "466679",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "4-5"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2025-07-05",
+         "pubLeg": "XVII",
+         "pubNr": "9",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/4?pgs=4-5&org=PLC"
+        }
+       ],
+       "sumario": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a lei da nacionalidade; Altera a lei da nacionalidade no sentido de restringir a aquisição da nacionalidade portuguesa e assegurar a possibilidade da sua perda em determinados casos;  Altera a lei da nacionalidade",
+       "teor": null
+      },
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": [
+        {
+         "GP": "CDS-PP",
+         "idCadastro": "8723",
+         "nome": "Paulo Núncio"
+        }
+       ],
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "10:02",
+       "horaTermo": "15:44",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/9/4"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": null,
+        "governo": null,
+        "nome": null
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "466683",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "6-6"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2025-07-05",
+         "pubLeg": "XVII",
+         "pubNr": "9",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/6?pgs=6&org=PLC"
+        }
+       ],
+       "sumario": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a lei da nacionalidade; Altera a lei da nacionalidade no sentido de restringir a aquisição da nacionalidade portuguesa e assegurar a possibilidade da sua perda em determinados casos; Altera a lei da nacionalidade",
+       "teor": null
+      },
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": [
+        {
+         "GP": "CH",
+         "idCadastro": "6535",
+         "nome": "André Ventura"
+        }
+       ],
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "10:02",
+       "horaTermo": "15:44",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/9/5"
+        },
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/9/7"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": null,
+        "governo": null,
+        "nome": null
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "466684",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "6-8"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2025-07-05",
+         "pubLeg": "XVII",
+         "pubNr": "9",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/6?pgs=6-8&org=PLC"
+        }
+       ],
+       "sumario": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a lei da nacionalidade; Altera a lei da nacionalidade no sentido de restringir a aquisição da nacionalidade portuguesa e assegurar a possibilidade da sua perda em determinados casos; Altera a lei da nacionalidade",
+       "teor": null
+      }
+     ]
+    }
+   ],
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1628216",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1022276",
+     "obs": null,
+     "pag": [
+      "4-30"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-07-05",
+     "pubLeg": "XVII",
+     "pubNr": "9",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/4?pgs=4-30&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a426b5a544e6c596d466a4c5459324f544d744e44466c4e7930344d3251784c5467354d6a466b596d45794d5441774e5335775a47593d&fich=0de3ebac-6693-41e7-83d1-8921dba21005.pdf&Inline=true",
+     "anexoNome": "Requerimento (substituído)"
+    }
+   ],
+   "CodigoFase": "237",
+   "Comissao": null,
+   "DataFase": "2025-07-04",
+   "EvtId": "122",
+   "Fase": "Requerimento Baixa Comissão sem Votação (Generalidade)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1628253",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1022763",
+     "obs": null,
+     "pag": [
+      "95-96"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-07-05",
+     "pubLeg": "XVII",
+     "pubNr": "9",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/009/2025-07-05/95?pgs=95-96&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2025-07-04",
+     "descricao": "Requerimento, apresentado pelo Governo, solicitando a baixa à Comissão de Assuntos Constitucionais, Direitos, Liberdade e Garantias, sem votação, da Proposta de Lei n.º 1/XVII/1.ª (GOV)",
+     "detalhe": "A Favor: <I>PSD</I>, <I> CH</I>, <I> PS</I>, <I> IL</I>, <I> L</I>, <I> CDS-PP</I>, <I> PAN</I>, <I> JPP</I><BR>Contra:<I>PCP</I>, <I> BE</I>",
+     "id": "139074",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "9",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "240",
+   "Comissao": [
+    {
+     "AccId": "87289",
+     "AguardaAgendamentoPlenario": null,
+     "Audicoes": null,
+     "Audiencias": null,
+     "Competente": "S",
+     "DataAgendamentoDiscussao": null,
+     "DataAgendamentoPlenario": "0001-01-01T00:00:00",
+     "DataDistribuicao": "2025-07-04",
+     "DataDistruibuicaoSubcomissao": null,
+     "DataEntrada": null,
+     "DatafimApreciacaoPublica": null,
+     "DatainicioApreciacaoPublica": null,
+     "DataMotivoNaoParecer": null,
+     "DataRelatorio": null,
+     "DataRemessa": null,
+     "DataReqAgendamentoPlenario": null,
+     "DistribuicaoSubcomissao": [
+      {
+       "leg": "XVII",
+       "nome": "Grupo de Trabalho – Audições sobre a alteração à Lei da Nacionalidade ",
+       "num": "8",
+       "orgId": "8469",
+       "publicacao": null,
+       "sigla": "GT-AALN"
+      }
+     ],
+     "Documentos": [
+      {
+       "DataDocumento": "2025-07-09",
+       "TipoDocumento": "Requerimento",
+       "TituloDocumento": "Requerimento audições PPL 1/XVII/1 (GOV)",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a595738764f474e6d4d6a6733596d45745a4745795a5330304e546b334c546b794d4455744e3259795a6d5669596a4d30596d46694c6e426b5a673d3d&fich=8cf287ba-da2e-4597-9205-7f2febb34bab.pdf&Inline=true"
+      },
+      {
+       "DataDocumento": "2025-07-16",
+       "TipoDocumento": "Requerimento",
+       "TituloDocumento": "Requerimentos para pareceres escritos",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a595738764f4441774e47466c4d6a41744d4749324d6930304d474d344c5749784e7a45744d4745775a6d526a5a544e6a4d6a6b794c6e426b5a673d3d&fich=8004ae20-0b62-40c8-b171-0a0fdce3c292.pdf&Inline=true"
+      },
+      {
+       "DataDocumento": "2025-07-22",
+       "TipoDocumento": "Parecer AP",
+       "TituloDocumento": "Parecer - Ordem dos Advogados",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a59573876597a49774e445933596d51744e6d49325a5330304d4746694c5749355a574574596a41794f4449315a6d45345a6d49774c6e426b5a673d3d&fich=c20467bd-6b6e-40ab-b9ea-b02825fa8fb0.pdf&Inline=true"
+      }
+     ],
+     "GpAgendamentoPlenario": null,
+     "IdComissao": "8447",
+     "Legislatura": null,
+     "MotivoNaoParecer": null,
+     "Nome": "Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias ",
+     "Numero": "8",
+     "Observacao": null,
+     "PareceresRecebidos": [
+      {
+       "link": "",
+       "nome": "Conselho Superior da Magistratura em 2025-09-15"
+      },
+      {
+       "link": "",
+       "nome": "Conselho Superior do Ministério Público em 2025-09-08"
+      },
+      {
+       "link": "",
+       "nome": "Ordem dos Advogados em 2025-07-22"
+      },
+      {
+       "link": "",
+       "nome": "Comunidade Israelita de Lisboa em 2025-09-01"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Jorge Reis Novais  em 2025-09-08"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Inês Ferreira Leite  em 2025-09-08"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Ana Rita Gil  em 2025-09-08"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Luís Menezes do Vale  em 2025-09-29"
+      },
+      {
+       "link": "",
+       "nome": "Professor Catedrático Doutor Jorge Miranda em 2025-09-18"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Rui Moura Ramos  em 2025-09-16"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Jónatas Machado em 2025-09-05"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Paulo Otero em 2025-08-11"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Jorge Bacelar Gouveia em 2025-09-14"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Catarina Santos Botelho em 2025-09-08"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Miguel Nogueira de Brito em 2025-09-03"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Carlos Blanco de Morais em 2025-09-02"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Catarina Reis de Oliveira em 2025-09-09"
+      }
+     ],
+     "PedidosParecer": [
+      {
+       "link": "",
+       "nome": "Conselho Superior da Magistratura em 2025-07-09"
+      },
+      {
+       "link": "",
+       "nome": "Conselho Superior do Ministério Público em 2025-07-09"
+      },
+      {
+       "link": "",
+       "nome": "Ordem dos Advogados em 2025-07-09"
+      },
+      {
+       "link": "",
+       "nome": "Conselho Superior dos Tribunais Administrativos e Fiscais em 2025-07-09"
+      },
+      {
+       "link": "",
+       "nome": "Comunidade Israelita de Lisboa em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Jorge Reis Novais  em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Inês Ferreira Leite  em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Ana Rita Gil  em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Emellin de Oliveira em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Luís Menezes do Vale  em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Catedrático Doutor Jorge Miranda em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Rui Moura Ramos  em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Rui Medeiros em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Jónatas Machado em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Paulo Otero em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Jorge Bacelar Gouveia em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Catarina Santos Botelho em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Miguel Nogueira de Brito em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor José Carlos Vieira de Andrade em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professor Doutor Carlos Blanco de Morais em 2025-07-17"
+      },
+      {
+       "link": "",
+       "nome": "Professora Doutora Catarina Reis de Oliveira em 2025-07-18"
+      }
+     ],
+     "Prorrogado": null,
+     "Publicacao": null,
+     "PublicacaoRelatorio": null,
+     "Relatores": null,
+     "RemessaRedaccaoFinal": null,
+     "Remessas": null,
+     "Sessao": null,
+     "Sigla": null,
+     "Votacao": null
+    }
+   ],
+   "DataFase": "2025-07-04",
+   "EvtId": "12",
+   "Fase": "Nova apreciação comissão generalidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1628418",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "110",
+   "Comissao": null,
+   "DataFase": "2025-07-10",
+   "EvtId": "54",
+   "Fase": "Processo de urgência",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Concedido processo de urgência (Deliberação n.º 9-PL/2025)",
+   "OevId": "1628977",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1022424",
+     "obs": null,
+     "pag": [
+      "4-27"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-07-11",
+     "pubLeg": "XVII",
+     "pubNr": "11",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/011/2025-07-11/4?pgs=4-27&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c3259304d4745795a6d5a6b4c5759335a446b744e4464695a693034597a6c6a4c545a6b595759794d444932595745334f5335775a47593d&fich=f40a2ffd-f7d9-47bf-8c9c-6daf2026aa79.pdf&Inline=true",
+     "anexoNome": "Propostas de alteração do CH"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c324d314d7a5a6b4d5745324c5755794e3249744e444d32597931694f5463324c5455794e44466d597a6b344d44686d5a5335775a47593d&fich=c536d1a6-e27b-436c-b976-5241fc9808fe.pdf&Inline=true",
+     "anexoNome": "Propostas de alteração do L"
+    }
+   ],
+   "CodigoFase": "260",
+   "Comissao": null,
+   "DataFase": "2025-10-27",
+   "EvtId": "46",
+   "Fase": "Admissão Proposta de Alteração",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641698",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a68684e575a684d5756694c546b35596a4d744e444a6c4d4330354f474e6b4c545a69597a566a4d4759305a6d55334e5335775a47593d&fich=8a5fa1eb-99b3-42e0-98cd-6bc5c0f4fe75.pdf&Inline=true",
+     "anexoNome": "Propostas de alteração do CH-substituição"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a45334e575a6d4d7a55304c574931595755744e44466d4e6931694e3246684c5756684e474d795a54597a4f4459314e5335775a47593d&fich=175ff354-b5ae-41f6-b7aa-ea4c2e638655.pdf&Inline=true",
+     "anexoNome": "Propostas de alteração do PS"
+    }
+   ],
+   "CodigoFase": "260",
+   "Comissao": null,
+   "DataFase": "2025-10-28",
+   "EvtId": "46",
+   "Fase": "Admissão Proposta de Alteração",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641699",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "250",
+   "Comissao": null,
+   "DataFase": "2025-10-28",
+   "EvtId": "13",
+   "Fase": "Votação na generalidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "* O GOV retirou a sua iniciativa a favor dos textos de substituição.",
+   "OevId": "1641815",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023320",
+     "obs": null,
+     "pag": [
+      "169-169"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-10-29",
+     "pubLeg": "XVII",
+     "pubNr": "29",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/029/2025-10-29/169?pgs=169&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2025-10-28",
+     "descricao": "Texto de substituição, apresentado pela Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias, relativo à Proposta de Lei n.º 1/XVII/1.ª (GOV) – Décima primeira alteração à Lei n.º 37/81, de 3 de outubro, que aprova a Lei da nacionalidade",
+     "detalhe": "A Favor: <I>PSD</I>, <I> CH</I>, <I> IL</I>, <I> CDS-PP</I><BR>Contra:<I>PS</I>, <I> L</I>, <I> PCP</I>, <I> BE</I>, <I> PAN</I><BR>Abstenção:<I>JPP</I>",
+     "id": "140043",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "27",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "250",
+   "Comissao": null,
+   "DataFase": "2025-10-28",
+   "EvtId": "13",
+   "Fase": "Votação na generalidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "* O GOV retirou a sua iniciativa a favor dos textos de substituição.",
+   "OevId": "1641816",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023319",
+     "obs": null,
+     "pag": [
+      "169-169"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-10-29",
+     "pubLeg": "XVII",
+     "pubNr": "29",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/029/2025-10-29/169?pgs=169&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2025-10-28",
+     "descricao": "Texto de substituição, apresentado pela Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias, relativo à Proposta de Lei n.º 1/XVII/1.ª (GOV) – Altera o Código Penal, criando a pena acessória de perda da nacionalidade\n",
+     "detalhe": "A Favor: <I>PSD</I>, <I> CH</I>, <I> IL</I>, <I> CDS-PP</I><BR>Contra:<I>CH</I>, <I> L</I>, <I> PCP</I>, <I> BE</I>, <I> PAN</I><BR>Abstenção:<I>JPP</I>",
+     "id": "140044",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "27",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a673359324d314e4445344c544d314d5751744e4451324e5330355a6a68684c57453259544d794f5467324d6d466d4d5335775a47593d&fich=87cc5418-351d-4465-9f8a-a6a329862af1.pdf&Inline=true",
+     "anexoNome": "Resultado de Votações"
+    }
+   ],
+   "CodigoFase": "310",
+   "Comissao": null,
+   "DataFase": "2025-10-28",
+   "EvtId": "34",
+   "Fase": "Votação na especialidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "** Obrigatoriedade de votação na especialidade em Plenário, nos termos da alínea f) do artigo 164.º e do n.º 4 do artigo 168.º da CRP.\n[Texto de substituição, apresentado pela Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias, relativo à Proposta de Lei n.º 1/XVII/1.ª (GOV) – Décima primeira alteração à Lei n.º 37/81, de 3 de outubro, que aprova a Lei da nacionalidade] - \n[Texto de substituição, apresentado pela Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias, relativo à Proposta de Lei n.º 1/XVII/1.ª (GOV) – Altera o Código Penal, criando a pena acessória de perda da nacionalidade]",
+   "OevId": "1641817",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023321",
+     "obs": null,
+     "pag": [
+      "183-183"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-10-29",
+     "pubLeg": "XVII",
+     "pubNr": "29",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/029/2025-10-29/183?pgs=183&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "320",
+   "Comissao": null,
+   "DataFase": "2025-10-28",
+   "EvtId": "18",
+   "Fase": "Votação final global",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "**Maioria absoluta dos Deputados em efetividade de funções, com recurso a votação eletrónica, nos termos da alínea f) do artigo 164.º, do n.º 2 do artigo 166.º e n.º 5 do artigo 168.º da CRP e n.º 4 do artigo 94.º do RAR.",
+   "OevId": "1641824",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023322",
+     "obs": null,
+     "pag": [
+      "183-184"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-10-29",
+     "pubLeg": "XVII",
+     "pubNr": "29",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/029/2025-10-29/183?pgs=183-184&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2025-10-28",
+     "descricao": "Texto de substituição, apresentado pela Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias, relativo à Proposta de Lei n.º 1/XVII/1.ª (GOV) – Décima primeira alteração à Lei n.º 37/81, de 3 de outubro, que aprova a Lei da nacionalidade",
+     "detalhe": "A Favor: <I>86-PSD</I>, <I> 59-CH</I>, <I> 9-IL</I>, <I> 2-CDS-PP</I>, <I> 1-JPP</I><BR>Contra:<I>54-PS</I>, <I> 5-L</I>, <I> 3-PCP</I>, <I> 1-BE</I>, <I> 1-PAN</I>",
+     "id": "140052",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "27",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "320",
+   "Comissao": null,
+   "DataFase": "2025-10-28",
+   "EvtId": "18",
+   "Fase": "Votação final global",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "**Maioria absoluta dos Deputados em efetividade de funções, com recurso a votação eletrónica, nos termos da alínea f) do artigo 164.º, do n.º 2 do artigo 166.º e n.º 5 do artigo 168.º da CRP e n.º 4 do artigo 94.º do RAR.",
+   "OevId": "1641825",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023323",
+     "obs": null,
+     "pag": [
+      "184-184"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2025-10-29",
+     "pubLeg": "XVII",
+     "pubNr": "29",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/029/2025-10-29/184?pgs=184&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2025-10-28",
+     "descricao": "Texto de substituição, apresentado pela Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias, relativo à Proposta de Lei n.º 1/XVII/1.ª (GOV) – Altera o Código Penal, criando a pena acessória de perda da nacionalidade ",
+     "detalhe": "A Favor: <I>86-PSD</I>, <I> 59-CH</I>, <I> 9-IL</I>, <I> 2-CDS-PP</I>, <I> 1-JPP</I><BR>Contra:<I>54-PS</I>, <I> 5-L</I>, <I> 3-PCP</I>, <I> 1-BE</I>, <I> 1-PAN</I>",
+     "id": "140053",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "27",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a51304d5745795a54637a4c54557a5a474d744e44526d4d5331685a44637a4c5745785a6a51324e7a4e694d44526d4e43356b62324e34&fich=441a2e73-53dc-44f1-ad73-a1f4673b04f4.docx&Inline=true",
+     "anexoNome": "Informação "
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c3252695a5446695a5449774c574e6c5a4749744e44526d4e7931684d44646b4c5751315a6a55774e5445344d574d304d53356b62324e34&fich=dbe1be20-cedb-44f7-a07d-d5f505181c41.docx&Inline=true",
+     "anexoNome": "Projeto de decreto-Código Penal"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a55774e546c6d4d7a4a6d4c545a694f5459744e444530595330344e7a59304c5463334e57557a4e7a4d304e7a4d775979356b62324e34&fich=5059f32f-6b96-414a-8764-775e3734730c.docx&Inline=true",
+     "anexoNome": "Projeto de decreto-Lei da Nacionalidade"
+    }
+   ],
+   "CodigoFase": "348",
+   "Comissao": [
+    {
+     "AccId": "87898",
+     "AguardaAgendamentoPlenario": null,
+     "Audicoes": null,
+     "Audiencias": null,
+     "Competente": "N",
+     "DataAgendamentoDiscussao": null,
+     "DataAgendamentoPlenario": "0001-01-01T00:00:00",
+     "DataDistribuicao": "2025-11-04",
+     "DataDistruibuicaoSubcomissao": null,
+     "DataEntrada": null,
+     "DatafimApreciacaoPublica": null,
+     "DatainicioApreciacaoPublica": null,
+     "DataMotivoNaoParecer": null,
+     "DataRelatorio": null,
+     "DataRemessa": null,
+     "DataReqAgendamentoPlenario": null,
+     "DistribuicaoSubcomissao": null,
+     "Documentos": [
+      {
+       "DataDocumento": "2025-11-05",
+       "TipoDocumento": "Redação final",
+       "TituloDocumento": "Redação final",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a595738764e4451794e3252685a6d49745a6a4d314d5330304e44637a4c574a684e5749745a6a497a4e7a45314f5459324e5759314c6e426b5a673d3d&fich=4427dafb-f351-4473-ba5b-f237159665f5.pdf&Inline=true"
+      }
+     ],
+     "GpAgendamentoPlenario": null,
+     "IdComissao": "8447",
+     "Legislatura": null,
+     "MotivoNaoParecer": null,
+     "Nome": "Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias ",
+     "Numero": "8447",
+     "Observacao": null,
+     "PareceresRecebidos": null,
+     "PedidosParecer": null,
+     "Prorrogado": null,
+     "Publicacao": null,
+     "PublicacaoRelatorio": null,
+     "Relatores": null,
+     "RemessaRedaccaoFinal": null,
+     "Remessas": [
+      {
+       "dataDocumento": "2025-11-05",
+       "dataRemessa": "2025-11-05",
+       "numeroOficio": null,
+       "observacoes": null,
+       "tipoRemessa": "Redação Final"
+      }
+     ],
+     "Sessao": null,
+     "Sigla": null,
+     "Votacao": null
+    }
+   ],
+   "DataFase": "2025-11-04",
+   "EvtId": "133",
+   "Fase": "Envio à Comissão para fixação da Redação final",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641873",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "348",
+   "Comissao": [
+    {
+     "AccId": "87899",
+     "AguardaAgendamentoPlenario": null,
+     "Audicoes": null,
+     "Audiencias": null,
+     "Competente": "S",
+     "DataAgendamentoDiscussao": null,
+     "DataAgendamentoPlenario": "0001-01-01T00:00:00",
+     "DataDistribuicao": "2025-11-04",
+     "DataDistruibuicaoSubcomissao": null,
+     "DataEntrada": null,
+     "DatafimApreciacaoPublica": null,
+     "DatainicioApreciacaoPublica": null,
+     "DataMotivoNaoParecer": null,
+     "DataRelatorio": null,
+     "DataRemessa": null,
+     "DataReqAgendamentoPlenario": null,
+     "DistribuicaoSubcomissao": null,
+     "Documentos": [
+      {
+       "DataDocumento": "2025-11-05",
+       "TipoDocumento": "Redação final",
+       "TituloDocumento": "Redação final",
+       "URL": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c304e505453387851304644524578484c305276593356745a57353062334e4a626d6c6a6157463061585a685132397461584e7a595738764e7a51315a6d597a593259744d4467315a4330304e546c6c4c546c6d4d7a59744f5745794e7a686a4f5459335a6d4d314c6e426b5a673d3d&fich=745ff3cf-085d-459e-9f36-9a278c967fc5.pdf&Inline=true"
+      }
+     ],
+     "GpAgendamentoPlenario": null,
+     "IdComissao": "8447",
+     "Legislatura": null,
+     "MotivoNaoParecer": null,
+     "Nome": "Comissão de Assuntos Constitucionais, Direitos, Liberdades e Garantias ",
+     "Numero": "8447",
+     "Observacao": null,
+     "PareceresRecebidos": null,
+     "PedidosParecer": null,
+     "Prorrogado": null,
+     "Publicacao": null,
+     "PublicacaoRelatorio": null,
+     "Relatores": null,
+     "RemessaRedaccaoFinal": null,
+     "Remessas": [
+      {
+       "dataDocumento": "2025-11-05",
+       "dataRemessa": "2025-11-05",
+       "numeroOficio": null,
+       "observacoes": null,
+       "tipoRemessa": "Redação Final"
+      }
+     ],
+     "Sessao": null,
+     "Sigla": null,
+     "Votacao": null
+    }
+   ],
+   "DataFase": "2025-11-04",
+   "EvtId": "133",
+   "Fase": "Envio à Comissão para fixação da Redação final",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641874",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "350",
+   "Comissao": null,
+   "DataFase": "2025-11-05",
+   "EvtId": "31",
+   "Fase": "Decreto (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641880",
+   "OevTextId": "105163",
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": "105163",
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a55314d57526a4e5456684c57566b4d7a41744e4463354d5330345a4446684c5463335a6a67795a6a686b4e444e6b4d6935775a47593d&fich=551dc55a-ed30-4791-8d1a-77f82f8d43d2.pdf&Inline=true",
+     "anexoNome": "Reclamação contra inexatidão apresentada pelo PS"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a63344e7a67775a4449784c57526c4d5455744e4459795a4331685a5459324c5755795a6a41304e6d59774d6a4a6c595335775a47593d&fich=78780d21-de15-462d-ae66-e2f046f022ea.pdf&Inline=true",
+     "anexoNome": "Despacho n.º 52/XVII do PAR"
+    }
+   ],
+   "CodigoFase": "350",
+   "Comissao": null,
+   "DataFase": "2025-11-05",
+   "EvtId": "31",
+   "Fase": "Decreto (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1641881",
+   "OevTextId": "105164",
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": "105164",
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "370",
+   "Comissao": null,
+   "DataFase": "2025-11-11",
+   "EvtId": "23",
+   "Fase": "Envio para promulgação",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 17/XVII",
+   "OevId": "1641909",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "370",
+   "Comissao": null,
+   "DataFase": "2025-11-11",
+   "EvtId": "23",
+   "Fase": "Envio para promulgação",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 18/XVII",
+   "OevId": "1641910",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c32517859574d79597a49354c574535596a49744e47526d4e4331685a5449344c5746684e6a41335a446335596a4d30596935775a47593d&fich=d1ac2c29-a9b2-4df4-ae28-aa607d79b34b.pdf&Inline=true",
+     "anexoNome": "Acórdão do Tribunal Constitucional n.º 1133-2025"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a6b7a5932557a4e446b7a4c544e6b4d4745744e44557a5a6930344e545a694c5463775a47526b4e6a46695a5746694d4335775a47593d&fich=93ce3493-3d0a-453f-856b-70ddd61beab0.pdf&Inline=true",
+     "anexoNome": "Mensagem do Presidente da República"
+    }
+   ],
+   "CodigoFase": "409",
+   "Comissao": null,
+   "DataFase": "2025-12-19",
+   "EvtId": "120",
+   "Fase": "Veto (Receção)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 17/XVII - Acórdão do Tribunal Constitucional n.º 1133/2025",
+   "OevId": "1642799",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a51785a4446684e6a526a4c546b315a5467744e444a695a6930354e7a5a6c4c54557a5a6a4d345a5467345a6a4d774e6935775a47593d&fich=41d1a64c-95e8-42bf-976e-53f38e88f306.pdf&Inline=true",
+     "anexoNome": "Acórdão do Tribunal Constitucional n.º 1134-2025"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c3255774e544e6a4d5449344c545133597a67744e4759324d5331685a5463774c544a6a59325a684f57466d5a544d355a6935775a47593d&fich=e053c128-47c8-4f61-ae70-2ccfa9afe39f.pdf&Inline=true",
+     "anexoNome": "Mensagem do Presidente da República"
+    }
+   ],
+   "CodigoFase": "409",
+   "Comissao": null,
+   "DataFase": "2025-12-19",
+   "EvtId": "120",
+   "Fase": "Veto (Receção)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 18/XVII - Acórdão do Tribunal Constitucional n.º 1134/2025",
+   "OevId": "1642798",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "410",
+   "Comissao": null,
+   "DataFase": "2026-01-07",
+   "EvtId": "30",
+   "Fase": "Veto (Leitura)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 17/XVII",
+   "OevId": "1663150",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "410",
+   "Comissao": null,
+   "DataFase": "2026-01-07",
+   "EvtId": "30",
+   "Fase": "Veto (Leitura)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 18/XVII",
+   "OevId": "1663151",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "415",
+   "Comissao": null,
+   "DataFase": "2026-01-07",
+   "EvtId": "47",
+   "Fase": "Veto (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 17/XVII",
+   "OevId": "1663188",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023249",
+     "obs": null,
+     "pag": [
+      "2-2"
+     ],
+     "pagFinalDiarioSupl": "1º Supl.",
+     "pubdt": "2026-01-07",
+     "pubLeg": "XVII",
+     "pubNr": "121",
+     "pubSL": "1",
+     "pubTipo": "DAR II série A",
+     "pubTp": "A",
+     "supl": "1º Supl.",
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/s2a/17/01/121S1/2026-01-07/2?pgs=2&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "415",
+   "Comissao": null,
+   "DataFase": "2026-01-07",
+   "EvtId": "47",
+   "Fase": "Veto (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 18/XVII",
+   "OevId": "1663159",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1023250",
+     "obs": null,
+     "pag": [
+      "2-2"
+     ],
+     "pagFinalDiarioSupl": "1º Supl.",
+     "pubdt": "2026-01-07",
+     "pubLeg": "XVII",
+     "pubNr": "121",
+     "pubSL": "1",
+     "pubTipo": "DAR II série A",
+     "pubTp": "A",
+     "supl": "1º Supl.",
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/s2a/17/01/121S1/2026-01-07/2?pgs=2&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a59784e6d45334d5746694c546b7a5a444d744e44637a595331684f5746694c5445344e6a6b784d5459784e6d526b596935775a47593d&fich=616a71ab-93d3-473a-a9ab-186911616ddb.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração BE - Decreto n.º 17/XVII - Substituição"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a46684d57526c4d6a45354c57453559544d744e474a695a6931685954426c4c575a6c4d6d4d334e7a4e694f4756684d4335775a47593d&fich=1a1de219-a9a3-4bbf-aa0e-fe2c773b8ea0.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração CH - Decreto n.º 17/XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a41784e4745355a6a55774c5455334d6d4d744e4751785a4331685a4759334c5441304f575a684d6d5a6c595759304d5335775a47593d&fich=014a9f50-572c-4d1d-adf7-049fa2feaf41.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração L - Decreto n.º 17/XVII - Substituição"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a6b315a574e6d5a4464684c5755344d6a49744e4749345a4330354e6d4e6b4c544578597a6b315a4449324f4455314e6935775a47593d&fich=95ecfd7a-e822-4b8d-96cd-11c95d268556.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração L - Decreto n.º 18/XVII - Substituição"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c324d344f54466d4e5441794c54526c4d6a4d744e444e6b4d6931695a44457a4c5749794d324a6c4e6d49774d5441354e5335775a47593d&fich=c891f502-4e23-43d2-bd13-b23be6b01095.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do JPP - Decreto n.º 17-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a41315a5467334d44677a4c574d314f4751744e474e6a4f5331694f5449794c574e6b595755775a6a553059324e6b4e7935775a47593d&fich=05e87083-c58d-4cc9-b922-cdae0f54ccd7.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do PSD e CDS-PP - Decreto n.º 17-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a59794d324a6c596d59304c574933595459744e4759314e533168596a45354c57466d4d4751774d574a684d3259784e7935775a47593d&fich=623bebf4-b7a6-4f55-ab19-af0d01ba3f17.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do PSD e CDS-PP - Decreto n.º 18-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a5530597a6c6b4d3255324c544e6c4e4449744e475132596930354e444d314c54646d5a4445795a57526a5a5463354e4335775a47593d&fich=54c9d3e6-3e42-4d6b-9435-7fd12edce794.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do PS- Decreto n.º 17-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a67774f474a6d4d6a4e684c575a6a4e3255744e44466a4d6931694e7a51354c574e6c4e7a6c6c4d446b344f54526c5a5335775a47593d&fich=808bf23a-fc7e-41c2-b749-ce79e09894ee.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do BE- Decreto n.º 17-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c324d30595463344f4455324c5451334e4751744e44677a4d5331684f474e694c575a6d4d5445314d7a46685954426a4d7935775a47593d&fich=c4a78856-474d-4831-a8cb-ff11531aa0c3.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do L - Decreto n.º 17-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a426b4e6a6c694e4442684c5455794d5449744e4455344e7930344d3249334c54566a4f5455344d6d4d784e6a49305a6935775a47593d&fich=0d69b40a-5212-4587-83b7-5c9582c1624f.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do L - Decreto n.º 18-XVII"
+    },
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c3245795a444d31597a4d7a4c54566c4e3255744e4455774e6931694e7a63354c54457a4d5442684d6a5669595759794d5335775a47593d&fich=a2d35c33-5e7e-4506-b779-1310a25baf21.pdf&Inline=true",
+     "anexoNome": "Proposta de alteração do CH - Decretos n.ºs 17 e 18-XVII"
+    }
+   ],
+   "CodigoFase": "460",
+   "Comissao": null,
+   "DataFase": "2026-03-31",
+   "EvtId": "61",
+   "Fase": "Admissão Proposta de Alteração decreto",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1716796",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": "72051",
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "441",
+   "Comissao": null,
+   "DataFase": "2026-04-01",
+   "EvtId": "111",
+   "Fase": "Reapreciação do decreto",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": [
+    {
+     "dataReuniaoPlenaria": "2026-04-01",
+     "oradores": [
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": null,
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "14:59",
+       "horaTermo": "19:33",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/73/57"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": "Ministro da Presidência",
+        "governo": "XXV GOVERNO CONSTITUCIONAL",
+        "nome": "António Leitão Amaro"
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "482206",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "51-52"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2026-04-02",
+         "pubLeg": "XVII",
+         "pubNr": "73",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/073/2026-04-02/51?pgs=51-52&org=PLC"
+        }
+       ],
+       "sumario": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade",
+       "teor": null
+      },
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": [
+        {
+         "GP": "CH",
+         "idCadastro": "6535",
+         "nome": "André Ventura"
+        }
+       ],
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "14:59",
+       "horaTermo": "19:33",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/73/58"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": null,
+        "governo": null,
+        "nome": null
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "482207",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "52-53"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2026-04-02",
+         "pubLeg": "XVII",
+         "pubNr": "73",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/073/2026-04-02/52?pgs=52-53&org=PLC"
+        }
+       ],
+       "sumario": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade",
+       "teor": null
+      },
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": [
+        {
+         "GP": "JPP",
+         "idCadastro": "9378",
+         "nome": "Filipe Sousa"
+        }
+       ],
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "14:59",
+       "horaTermo": "19:33",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/73/59"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": null,
+        "governo": null,
+        "nome": null
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "482208",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "53-53"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2026-04-02",
+         "pubLeg": "XVII",
+         "pubNr": "73",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/073/2026-04-02/53?pgs=53&org=PLC"
+        }
+       ],
+       "sumario": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade",
+       "teor": null
+      }
+     ]
+    }
+   ],
+   "Links": null,
+   "ObsFase": "Reapreciação do Decreto da Assembleia da República n.º 17/XVII - \"Alteração à Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade\" e do Decreto da\nAssembleia da República n.º 18/XVII - \"Altera o Código Penal, criando a pena acessória de perda da nacionalidade\"",
+   "OevId": "1716795",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": "67514",
+     "idPag": null,
+     "obs": null,
+     "pag": [
+      "51-65"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2026-04-02",
+     "pubLeg": "XVII",
+     "pubNr": "73",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/073/2026-04-02/51?pgs=51-65&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a686c4d546c694f574d314c5755324e544d744e444135595330354d7a59774c5455324f44426c4d47566c596d51774f5335775a47593d&fich=8e19b9c5-e653-409a-9360-5680e0eebd09.pdf&Inline=true",
+     "anexoNome": "Resultado de Votações"
+    }
+   ],
+   "CodigoFase": "310",
+   "Comissao": null,
+   "DataFase": "2026-04-01",
+   "EvtId": "34",
+   "Fase": "Votação na especialidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1716938",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "511",
+   "Comissao": null,
+   "DataFase": "2026-04-01",
+   "EvtId": "100",
+   "Fase": "Votação novo decreto",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Votação do novo Decreto da Assembleia da República sobre \"Alteração à Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade\"",
+   "OevId": "1716940",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2026-04-01",
+     "descricao": null,
+     "detalhe": "A Favor: <I>85-PSD</I>, <I> 57-CH</I>, <I> 8-IL</I>, <I> 2-CDS-PP</I><BR>Contra:<I>54-PS</I>, <I> 6-L</I>, <I> 2-PCP</I>, <I> 1-BE</I>, <I> 1-PAN</I><BR>Abstenção:<I>1-JPP</I>",
+     "id": "171299",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "71",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "511",
+   "Comissao": null,
+   "DataFase": "2026-04-01",
+   "EvtId": "100",
+   "Fase": "Votação novo decreto",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Votação do novo Decreto da Assembleia da República que \"Altera o Código Penal, criando a pena acessória de perda da nacionalidade\"",
+   "OevId": "1716942",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2026-04-01",
+     "descricao": null,
+     "detalhe": "A Favor: <I>85-PSD</I>, <I> 56-CH</I>, <I> 8-IL</I>, <I> 2-CDS-PP</I><BR>Contra:<I>54-PS</I>, <I> 6-L</I>, <I> 2-PCP</I>, <I> 1-BE</I>, <I> 1-PAN</I>, <I> 1-JPP</I>",
+     "id": "171301",
+     "publicacao": null,
+     "resultado": "Aprovado",
+     "reuniao": "71",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "519",
+   "Comissao": null,
+   "DataFase": "2026-04-07",
+   "EvtId": "60",
+   "Fase": "Decreto (2ª versão) (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1716968",
+   "OevTextId": "125427",
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": "125427",
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "519",
+   "Comissao": null,
+   "DataFase": "2026-04-07",
+   "EvtId": "60",
+   "Fase": "Decreto (2ª versão) (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1716969",
+   "OevTextId": "125428",
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": "125428",
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "520",
+   "Comissao": null,
+   "DataFase": "2026-04-13",
+   "EvtId": "66",
+   "Fase": "Envio para promulgação (2ª versão)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 48/XVII",
+   "OevId": "1717271",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "520",
+   "Comissao": null,
+   "DataFase": "2026-04-13",
+   "EvtId": "66",
+   "Fase": "Envio para promulgação (2ª versão)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 49/XVII",
+   "OevId": "1717272",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "526",
+   "Comissao": null,
+   "DataFase": "2026-05-03",
+   "EvtId": "67",
+   "Fase": "Promulgação (2ª versão)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 48/XVII",
+   "OevId": "1728457",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "527",
+   "Comissao": null,
+   "DataFase": "2026-05-04",
+   "EvtId": "68",
+   "Fase": "Referenda (2ª versão)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 48/XVII",
+   "OevId": "1728458",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "528",
+   "Comissao": null,
+   "DataFase": "2026-05-06",
+   "EvtId": "69",
+   "Fase": "Envio INCM (2ª versão)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 48/XVII",
+   "OevId": "1728459",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a49774e7a55794e7a686d4c54673459574d744e475a694d6931694d6a4d784c545a6c5a4459334d6a466d4f5463335a5335775a47593d&fich=2075278f-88ac-4fb2-b231-6ed6721f977e.pdf&Inline=true",
+     "anexoNome": "Carta do Presidente da República"
+    }
+   ],
+   "CodigoFase": "409",
+   "Comissao": null,
+   "DataFase": "2026-05-13",
+   "EvtId": "120",
+   "Fase": "Veto (Receção)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 49/XVII",
+   "OevId": "1728986",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "410",
+   "Comissao": null,
+   "DataFase": "2026-05-14",
+   "EvtId": "30",
+   "Fase": "Veto (Leitura)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 49/XVII",
+   "OevId": "1729012",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "415",
+   "Comissao": null,
+   "DataFase": "2026-05-14",
+   "EvtId": "47",
+   "Fase": "Veto (Publicação)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto n.º 49/XVII",
+   "OevId": "1729013",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": null,
+     "idPag": "1024717",
+     "obs": null,
+     "pag": [
+      "2-2"
+     ],
+     "pagFinalDiarioSupl": "1º Supl.",
+     "pubdt": "2026-05-14",
+     "pubLeg": "XVII",
+     "pubNr": "206",
+     "pubSL": "1",
+     "pubTipo": "DAR II série A",
+     "pubTp": "A",
+     "supl": "1º Supl.",
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/s2a/17/01/206S1/2026-05-14/2?pgs=2&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "580",
+   "Comissao": null,
+   "DataFase": "2026-05-18",
+   "EvtId": "32",
+   "Fase": "Lei (Publicação DR)",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Declaração de Retificação n.º 17/2026/1, de 18 de maio, Retifica a Lei Orgânica n.º 1/2026, de 18 de maio, que altera a Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade",
+   "OevId": "1729179",
+   "OevTextId": "135585",
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": "135585",
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a59774d44526b4f4759324c54457a4e6a45744e4745304d6931684e446b314c5451354e5441785a4759314d32466c4d7935775a47593d&fich=6004d8f6-1361-4a42-a495-49501df53ae3.pdf&Inline=true",
+     "anexoNome": "Proposta de Alteração PSD e CDS-PP"
+    }
+   ],
+   "CodigoFase": "260",
+   "Comissao": null,
+   "DataFase": "2026-07-02",
+   "EvtId": "46",
+   "Fase": "Admissão Proposta de Alteração",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": null,
+   "OevId": "1731227",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": "72483",
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "441",
+   "Comissao": null,
+   "DataFase": "2026-07-03",
+   "EvtId": "111",
+   "Fase": "Reapreciação do decreto",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": [
+    {
+     "dataReuniaoPlenaria": "2026-07-03",
+     "oradores": [
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": null,
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "09:00",
+       "horaTermo": "14:12",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/111/3"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": "Ministro da Presidência",
+        "governo": "XXV GOVERNO CONSTITUCIONAL",
+        "nome": "António Leitão Amaro"
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "504759",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "4-4"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2026-07-04",
+         "pubLeg": "XVII",
+         "pubNr": "111",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/111/2026-07-04/4?pgs=4&org=PLC"
+        }
+       ],
+       "sumario": "Proposta de Lei nº 1/XVII/1.ª",
+       "teor": null
+      },
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": [
+        {
+         "GP": "PSD",
+         "idCadastro": "1132",
+         "nome": "António Rodrigues"
+        }
+       ],
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "09:00",
+       "horaTermo": "14:12",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/111/4"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": null,
+        "governo": null,
+        "nome": null
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "504785",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "5-6"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2026-07-04",
+         "pubLeg": "XVII",
+         "pubNr": "111",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/111/2026-07-04/5?pgs=5-6&org=PLC"
+        }
+       ],
+       "sumario": "Proposta de Lei nº 1/XVII/1.ª",
+       "teor": null
+      },
+      {
+       "convidados": {
+        "cargo": null,
+        "honra": null,
+        "nome": null,
+        "pais": null
+       },
+       "deputadosOradores": [
+        {
+         "GP": "BE",
+         "idCadastro": "7040",
+         "nome": "Fabian Figueiredo"
+        }
+       ],
+       "faseDebate": null,
+       "faseSessao": "P",
+       "horaInicio": "09:00",
+       "horaTermo": "14:12",
+       "linkVideo": [
+        {
+         "link": "https://av.parlamento.pt/videos/Plenary/17/1/111/5"
+        }
+       ],
+       "membrosGoverno": {
+        "cargo": null,
+        "governo": null,
+        "nome": null
+       },
+       "publicacao": [
+        {
+         "debateDtReu": null,
+         "idAct": null,
+         "idDeb": null,
+         "idInt": "504787",
+         "idPag": null,
+         "obs": null,
+         "pag": [
+          "6-6"
+         ],
+         "pagFinalDiarioSupl": null,
+         "pubdt": "2026-07-04",
+         "pubLeg": "XVII",
+         "pubNr": "111",
+         "pubSL": "1",
+         "pubTipo": "DAR I série",
+         "pubTp": "D",
+         "supl": null,
+         "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/111/2026-07-04/6?pgs=6&org=PLC"
+        }
+       ],
+       "sumario": "Proposta de Lei nº 1/XVII/1.ª",
+       "teor": null
+      }
+     ]
+    }
+   ],
+   "Links": null,
+   "ObsFase": "Reapreciação do Decreto da Assembleia da República n.º 49/XVII/1.ª - \"Altera o Código Penal, criando a pena acessória de perda da nacionalidade\"",
+   "OevId": "1730967",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": [
+    {
+     "debateDtReu": null,
+     "idAct": null,
+     "idDeb": null,
+     "idInt": "67552",
+     "idPag": null,
+     "obs": null,
+     "pag": [
+      "4-15"
+     ],
+     "pagFinalDiarioSupl": null,
+     "pubdt": "2026-07-04",
+     "pubLeg": "XVII",
+     "pubNr": "111",
+     "pubSL": "1",
+     "pubTipo": "DAR I série",
+     "pubTp": "D",
+     "supl": null,
+     "URLDiario": "https://debates.parlamento.pt/catalogo/r3/dar/01/17/01/111/2026-07-04/4?pgs=4-15&org=PLC"
+    }
+   ],
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": [
+    {
+     "anexoFich": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c32466c5a546b7a5a4445304c5749774d7a63744e4449345a5330354d546b324c57457759324d334f4463354d6a55794d7935775a47593d&fich=aee93d14-b037-428e-9196-a0cc78792523.pdf&Inline=true",
+     "anexoNome": "Resultado de votações"
+    }
+   ],
+   "CodigoFase": "310",
+   "Comissao": null,
+   "DataFase": "2026-07-03",
+   "EvtId": "34",
+   "Fase": "Votação na especialidade",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Reapreciação do Decreto da Assembleia da República n.º 49/XVII/1.ª  - \"Altera o Código Penal, criando a pena acessória de perda da nacionalidade\"",
+   "OevId": "1731320",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": null
+  },
+  {
+   "ActId": null,
+   "ActividadesConjuntas": null,
+   "AnexosFase": null,
+   "CodigoFase": "512",
+   "Comissao": null,
+   "DataFase": "2026-07-03",
+   "EvtId": "112",
+   "Fase": "Confirmação do decreto",
+   "IniciativasConjuntas": null,
+   "Intervencoesdebates": null,
+   "Links": null,
+   "ObsFase": "Decreto da Assembleia da República n.º 49/XVII/1.ª  - \"Altera o Código Penal, criando a pena acessória de perda da nacionalidade\"",
+   "OevId": "1731321",
+   "OevTextId": null,
+   "PcpublicasConjuntas": null,
+   "PeticoesConjuntas": null,
+   "PublicacaoFase": null,
+   "RecursoDeputados": null,
+   "RecursoGP": null,
+   "TextosAprovados": null,
+   "Votacao": [
+    {
+     "ausencias": null,
+     "data": "2026-07-03",
+     "descricao": null,
+     "detalhe": "A Favor: <I>54-CH</I>, <I> 2-CDS-PP</I><BR>Contra:<I>80-PSD</I>, <I> 53-PS</I>, <I> 7-IL</I>, <I> 6-L</I>, <I> 3-PCP</I>, <I> 1-BE</I>, <I> 1-PAN</I>, <I> 1-JPP</I>",
+     "id": "172424",
+     "publicacao": null,
+     "resultado": "Rejeitado",
+     "reuniao": "109",
+     "tipoReuniao": "RP",
+     "unanime": null
+    }
+   ]
+  }
+ ],
+ "IniId": "315160",
+ "IniLeg": "XVII",
+ "IniLinkTexto": "http://app.parlamento.pt/webutils/docs/doc.pdf?path=6148523063484d364c793968636d356c6443397a6158526c63793959566b6c4a5447566e4c305276593356745a57353062334e4a626d6c6a6157463061585a684c7a49794f4467344d5745334c5441314f5451744e474933596931694d3259314c546c684e574a6b4d7a5178596a686c4f43356b62324e34&fich=228881a7-0594-4b7b-b3f5-9a5bd341b8e8.docx&Inline=true",
+ "IniNr": "1",
+ "IniObs": null,
+ "IniSel": "1",
+ "IniTextoSubst": "NAO",
+ "IniTextoSubstCampo": null,
+ "IniTipo": "P",
+ "IniTitulo": "Altera a Lei n.º 37/81, de 3 de outubro, que aprova a Lei da Nacionalidade",
+ "Links": null,
+ "Peticoes": [
+  {
+   "assunto": "Pela criação de um regime transitório que mantenha temporariamente o prazo de cinco anos para a naturalização dos estrangeiros residentes legalmente em Portugal, em caso de alteração à Lei da Nacionalidade (Lei n.º 37/81)",
+   "dcl": null,
+   "descTipo": null,
+   "id": "34231",
+   "legislatura": "XVII",
+   "numero": "12",
+   "sessao": "1",
+   "tipo": null
+  },
+  {
+   "assunto": "Alteração à Lei da Nacionalidade relativa à contagem dos cinco anos de residência legal em Portugal para naturalização",
+   "dcl": null,
+   "descTipo": null,
+   "id": "34298",
+   "legislatura": "XVII",
+   "numero": "60",
+   "sessao": "1",
+   "tipo": null
+  },
+  {
+   "assunto": "Solicitam a alteração da Lei da Nacionalidade, no sentido de o prazo de residência, para efeitos de naturalização, continuar a contar-se a partir do momento do pedido da autorização de residência, por qualquer via formulado, e de ser estabelecida uma norma transitória para quem já reúne o requisito vigente da residência legal de 5 anos mas ainda não apresentou o seu pedido",
+   "dcl": null,
+   "descTipo": null,
+   "id": "34311",
+   "legislatura": "XVII",
+   "numero": "73",
+   "sessao": "1",
+   "tipo": null
+  }
+ ],
+ "PropostasAlteracao": null
+}
