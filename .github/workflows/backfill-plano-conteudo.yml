@@ -1,0 +1,62 @@
+# Backfill único do plano de conteúdo (docs/DEPLOY-PLANO-CONTEUDO.md §5, passos 2–5).
+# Só manual. Usa os mesmos secrets do "Sync diário". O AR completo corre no "Sync diário" com ar_limit=all.
+name: Backfill plano de conteúdo (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      reclassify:
+        description: 'Reclassificar temas legados (tema_fonte nulo)'
+        type: boolean
+        default: true
+      news_days:
+        description: 'Dias de notícias a importar (0 = saltar; precisa GOV_SEARCH_KEY na edge)'
+        default: '60'
+      link_days:
+        description: 'Janela das ligações comunicados ↔ iniciativas (0 = saltar)'
+        default: '60'
+      digests:
+        description: 'Regenerar digests AR'
+        type: boolean
+        default: true
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Reclassificar temas legados (dry-run + aplicar)
+        if: ${{ inputs.reclassify }}
+        run: |
+          node scripts/reclassify-temas-legacy.mjs --dry-run
+          node scripts/reclassify-temas-legacy.mjs
+
+      - name: Notícias (backfill)
+        if: ${{ inputs.news_days != '0' }}
+        run: |
+          set -e
+          curl -fsS --max-time 140 -X POST "$SUPABASE_URL/functions/v1/comunicados-sync?news_only=1&days=${{ inputs.news_days }}" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" -d '{}'
+          echo
+
+      - name: Ligações (propostas; públicas só auto_alta/confirmadas)
+        if: ${{ inputs.link_days != '0' }}
+        run: node scripts/link-comunicados.mjs --days=${{ inputs.link_days }} --sample=20
+
+      - name: Digests AR
+        if: ${{ inputs.digests }}
+        run: node scripts/generate-digests.mjs

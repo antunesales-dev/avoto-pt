@@ -9,9 +9,16 @@
         <span class="badge" :class="estadoClass">{{ estadosLabel[item.estado] }}</span>
         <span class="badge badge--navy">{{ item.tipo }}</span>
         <span class="badge badge--muted">{{ item.tema }}</span>
+        <span v-if="item.procedimento" class="badge badge--muted" title="Procedimento interno da AR">
+          Procedimento
+        </span>
       </div>
       <h3 class="link-card__title init-card__title">{{ item.titulo }}</h3>
       <p class="init-card__id">{{ item.idOficial }} · Legislatura {{ item.legislatura }}</p>
+      <p v-if="dossieCount > 0" class="init-card__dossie">
+        Dossiê: + {{ dossieCount }} {{ dossieCount === 1 ? 'iniciativa discutida' : 'iniciativas discutidas' }}
+        em conjunto ou com o mesmo título
+      </p>
 
       <div v-if="partyRows.length" class="init-card__parties">
         <span
@@ -40,21 +47,15 @@
 <script setup>
 import { computed } from 'vue'
 import VoteBar from './VoteBar.vue'
-import { estadosLabel, formatDate, partidos } from '@/data/partidos'
+import { estadoBadgeClass, estadosLabel, formatDate, partidos } from '@/data/partidos'
 
 const props = defineProps({
   item: { type: Object, required: true },
+  /** Nº de outras iniciativas do mesmo dossiê (agrupadas na lista). */
+  dossieCount: { type: Number, default: 0 },
 })
 
-const estadoClass = computed(() => {
-  const map = {
-    aprovado: 'badge--green',
-    rejeitado: 'badge--red',
-    em_discussao: 'badge--gold',
-    arquivado: 'badge--muted',
-  }
-  return map[props.item.estado] || 'badge--muted'
-})
+const estadoClass = computed(() => estadoBadgeClass(props.item.estado))
 
 /** Mini lista de partidos com voto AR — ordem alfabética por sigla (sem enviesar) */
 const partyRows = computed(() => {
@@ -143,6 +144,12 @@ const partyRows = computed(() => {
     border-left-color: #b8860b;
     color: #6b5500;
   }
+}
+.init-card__dossie {
+  margin: -0.25rem 0 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--pt-green-dark);
 }
 .init-card__no-party {
   margin: 0 0 0.65rem;

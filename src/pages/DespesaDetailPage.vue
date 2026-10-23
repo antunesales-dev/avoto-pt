@@ -82,19 +82,17 @@
           </ul>
           <p v-else class="hint">Sem URLs neste registo. Use os portais oficiais na lista de despesa.</p>
 
-          <div v-if="investimentoId" class="vote-cta">
-            <p class="hint">
-              Este contrato tem valor elevado e está disponível para
-              <strong>voto cidadão</strong> (aprovar / rejeitar / abster-se).
-            </p>
-            <router-link class="btn btn--primary btn--sm" :to="`/investimentos/${investimentoId}`">
-              Ver em Investimentos e votar
-            </router-link>
-          </div>
-          <p v-else class="hint" style="margin-top: 1rem">
-            Contratos abaixo de 100&nbsp;000&nbsp;€ ficam só em Despesa (consulta). Os de valor
-            elevado têm página em
-            <router-link to="/investimentos">Investimentos</router-link>.
+          <p class="hint" style="margin-top: 1rem">
+            <template v-if="grande">
+              Este contrato tem valor igual ou superior a 100&nbsp;000&nbsp;€, por isso também
+              aparece na vista
+              <router-link to="/contratos">Contratos ≥ 100&nbsp;000&nbsp;€</router-link>
+              (é o mesmo registo, não um segundo).
+            </template>
+            <template v-else>
+              Os contratos de 100&nbsp;000&nbsp;€ ou mais têm uma vista própria:
+              <router-link to="/contratos">Contratos ≥ 100&nbsp;000&nbsp;€</router-link>.
+            </template>
           </p>
         </div>
       </section>
@@ -112,6 +110,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { formatDate } from '@/data/partidos'
+import { isContratoGrande } from '@/lib/contratos'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
@@ -131,11 +130,17 @@ const meta = computed(() => {
 
 const links = computed(() => resolveSourceLinks(item.value))
 
-const investimentoId = computed(() => {
-  if (!item.value) return null
-  const inv = finance.getInvestimento(`inv-${item.value.id}`)
-  return inv?.id || null
-})
+const grande = computed(() => isContratoGrande(item.value))
+
+// Título da ficha também na navegação dentro da SPA (o HTML inicial já o traz via Pages Function).
+watch(
+  () => item.value?.titulo,
+  (titulo) => {
+    if (titulo && typeof document !== 'undefined' && !document.title.startsWith(titulo)) {
+      document.title = `${titulo} · A Voto — Bancada Cidadã`
+    }
+  },
+)
 
 const tipos = {
   contrato_publico: 'Contrato público',
@@ -169,9 +174,6 @@ watch(
     try {
       if (!finance.despesas.length) {
         await finance.loadDespesas()
-      }
-      if (!finance.investimentos.length) {
-        await finance.loadInvestimentos().catch(() => {})
       }
       resolved.value = await finance.ensureDespesa(id)
     } catch (e) {
@@ -267,15 +269,6 @@ watch(
     font-weight: 700;
     color: var(--pt-green-dark);
   }
-}
-.vote-cta {
-  margin-top: 1.15rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--pt-line);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  align-items: flex-start;
 }
 .muted {
   color: var(--pt-muted);

@@ -54,7 +54,7 @@
           partidos, seguir o
           <router-link to="/digest">resumo do dia</router-link>, consultar
           <router-link to="/despesa">despesa</router-link>,
-          <router-link to="/investimentos">investimentos</router-link>
+          <router-link to="/contratos">contratos ≥ 100 000 €</router-link>
           e
           <router-link to="/comunicados">comunicados oficiais do Governo</router-link>
           (sem voto), e ver o

@@ -10,8 +10,10 @@
   "scripts": {
     "dev": "quasar dev",
     "dev:pwa": "quasar dev -m pwa",
-    "build": "quasar build -m pwa",
-    "build:spa": "quasar build",
+    "build": "quasar build -m pwa && node scripts/prerender-meta.mjs dist/pwa",
+    "build:spa": "quasar build && node scripts/prerender-meta.mjs dist/spa",
+    "test": "node --test tests/*.test.mjs scripts/tests/*.test.mjs scripts/*.test.mjs seo/*.test.mjs",
+    "test:deno": "deno test -A supabase/functions/tests/ supabase/functions/_shared/",
     "postinstall": "quasar prepare --silent",
     "deploy": "pnpm build && wrangler pages deploy dist/pwa --project-name=avoto-pt --branch=main",
     "db:start": "supabase start",
@@ -23,7 +25,9 @@
     "fn:serve": "supabase functions serve",
     "sync:ar": "node scripts/sync-ar.mjs --limit=all",
     "sync:ar:50": "node scripts/sync-ar.mjs --limit=50",
-    "sync:digests": "node scripts/generate-digests.mjs"
+    "sync:digests": "node scripts/generate-digests.mjs",
+    "sync:links": "node scripts/link-comunicados.mjs --days=14",
+    "test:comunicados": "deno test -A supabase/functions/tests/ && node --test scripts/tests/*.test.mjs"
   },
   "dependencies": {
     "@quasar/extras": "^2.0.0",

@@ -65,9 +65,15 @@ jobs:
           AVOTO_CRON_SECRET: ${{ secrets.AVOTO_CRON_SECRET }}
         run: |
           set -e
-          curl -fsS -X POST "$SUPABASE_URL/functions/v1/comunicados-sync?limit=80" \
+          curl -fsS -X POST "$SUPABASE_URL/functions/v1/comunicados-sync?limit=30&days=3" \
             -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
             -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
             -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
             -H "Content-Type: application/json" -d '{}'
           echo
+
+      - name: Ligações comunicados ↔ iniciativas (propostas; confirmação manual)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/link-comunicados.mjs --days=14 --sample=5

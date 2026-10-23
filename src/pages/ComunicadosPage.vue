@@ -3,6 +3,7 @@
     <h1 class="page-title">Comunicados</h1>
     <p class="page-subtitle">
       Comunicados e notícias oficiais do Governo (portugal.gov.pt) — consulta, com link à fonte.
+      As nomeações de membros do Governo não entram nesta lista.
     </p>
 
     <div class="filter-row">
@@ -16,6 +17,14 @@
       >
         {{ t.label }}
       </button>
+    </div>
+
+    <div v-if="temas.length" class="filter-row">
+      <label class="tema-label" for="com-tema">Tema</label>
+      <select id="com-tema" v-model="tema" class="tema-select">
+        <option value="todos">Todos os temas</option>
+        <option v-for="t in temas" :key="t.tema" :value="t.tema">{{ t.tema }} ({{ t.n }})</option>
+      </select>
     </div>
 
     <DateRangeFilter
@@ -53,8 +62,12 @@
             <span class="badge badge--navy">{{ tipoLabel(c.tipo) }}</span>
             <span class="badge badge--muted">Sem voto</span>
             <span class="badge badge--muted">{{ formatDate(c.publicado_em) }}</span>
+            <span v-if="c.tema" class="badge badge--gold">{{ c.tema }}</span>
           </div>
           <h2 class="com-card__title">{{ c.titulo }}</h2>
+          <p v-if="c.officials?.length || c.areas?.length" class="com-card__who">
+            {{ [...(c.areas || []), ...(c.officials || [])].join(' · ') }}
+          </p>
           <p v-if="excerpt(c)" class="com-card__resumo">{{ excerpt(c) }}</p>
           <div class="com-card__actions">
             <a
@@ -131,12 +144,13 @@ const { comunicados, comunicadosDigests } = storeToRefs(finance)
 const loading = ref(true)
 const periodo = ref('todos')
 const tipo = ref('todos')
+const tema = ref('todos')
 
 const tipos = [
   { id: 'todos', label: 'Todos' },
   { id: 'comunicado_cm', label: 'Conselho de Ministros' },
   { id: 'noticia', label: 'Notícias' },
-  { id: 'outro', label: 'Outros (ex. nomeações)' },
+  { id: 'intervencao', label: 'Intervenções' },
 ]
 
 const periodoOpts = computed(() =>
@@ -146,9 +160,18 @@ const periodoOpts = computed(() =>
   ),
 )
 
+/** Temas presentes (notícias trazem área governativa → tema canónico). */
+const temas = computed(() => {
+  const m = new Map()
+  for (const c of comunicados.value || []) if (c.tema) m.set(c.tema, (m.get(c.tema) || 0) + 1)
+  return [...m.entries()].map(([t, n]) => ({ tema: t, n })).sort((a, b) => a.tema.localeCompare(b.tema, 'pt'))
+})
+
 const filtrados = computed(() =>
   (comunicados.value || []).filter((c) => {
+    if (c.tipo === 'nomeacao') return false
     if (tipo.value !== 'todos' && c.tipo !== tipo.value) return false
+    if (tema.value !== 'todos' && c.tema !== tema.value) return false
     return matchesDateRange(c.publicado_em, periodo.value)
   }),
 )
@@ -171,7 +194,7 @@ const {
   resetPage,
 } = usePagination(filtrados, { defaultSize: 12, sizes: [12, 24, 48], queryPrefix: 'com' })
 
-watch([periodo, tipo], () => resetPage())
+watch([periodo, tipo, tema], () => resetPage())
 
 function setPageSize(n) {
   pageSize.value = Number(n) || 12
@@ -241,6 +264,24 @@ onMounted(async () => {
   margin: 0 0 0.4rem;
   color: var(--pt-navy);
   line-height: 1.3;
+}
+.com-card__who {
+  margin: -0.15rem 0 0.4rem;
+  font-size: 0.82rem;
+  color: var(--pt-muted);
+  font-weight: 600;
+}
+.tema-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  align-self: center;
+}
+.tema-select {
+  font: inherit;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--pt-line);
+  border-radius: 8px;
+  background: #fff;
 }
 .com-card__resumo {
   margin: 0 0 0.85rem;

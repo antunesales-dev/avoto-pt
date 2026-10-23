@@ -83,7 +83,7 @@
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_investimentos" type="checkbox" @change="onSavePrefs" />
-              <span>Novos investimentos públicos (consulta)</span>
+              <span>Novos contratos ≥ 100 000 € (consulta)</span>
             </label>
             <label class="toggle">
               <input v-model="prefs.notify_despesa" type="checkbox" @change="onSavePrefs" />

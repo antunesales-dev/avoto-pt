@@ -1,3 +1,7 @@
+# 0) Antiga página Investimentos → vista Contratos ≥ 100 000 € (301 para crawlers/links antigos)
+/investimentos  /contratos  301
+/investimentos/inv-:id  /despesa/:id  301
+
 # 1) Assets: reescrever para o mesmo path.
 #    Se o ficheiro não existir → 404 (não index.html).
 #    Evita "Failed to fetch dynamically imported module" após deploys.
