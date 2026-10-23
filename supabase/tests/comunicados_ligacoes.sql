@@ -17,6 +17,14 @@ values ('t-com-1', 'Habitação: resolver heranças indivisas para colocar mais 
        ('t-com-nom', 'Ministro X', 'O rendimento bruto corresponde…', '', 'https://portugal.gov.pt/gc25/governo/nomeacoes/t-x',
         '2031-01-02', 'nomeacao', '{}', '{}');
 
+-- Corpus de enchimento (fora da janela de datas) para o IDF ter escala também numa BD vazia
+-- (`supabase db reset` sem dados): sem isto nenhuma palavra chega a “rara” (peso ≥ 3).
+insert into public.iniciativas (id, id_oficial, titulo, tipo, legislatura, autores, data_entrada, estado, tema)
+select 't-fill-' || g, 'R ' || (9100 + g) || ' XVII',
+       'Recomenda ao Governo a requalificação da escola básica número ' || g || ' do concelho',
+       'Projeto de Resolução', 'XVII', '{PS}', date '2015-01-01', 'em_discussao', 'Educação e Ciência'
+from generate_series(1, 40) g;
+
 do $$
 declare r record; v text;
 begin

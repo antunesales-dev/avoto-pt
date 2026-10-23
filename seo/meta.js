@@ -36,7 +36,7 @@ export const STATIC_ROUTES = {
   },
   '/comunicados': {
     title: 'Comunicados',
-    description: 'Comunicados oficiais do Governo (portugal.gov.pt), com link para a fonte. Só consulta, sem voto.',
+    description: 'Comunicados e notícias oficiais do Governo (portugal.gov.pt), por tema e ligados às iniciativas da AR. Só consulta, sem voto.',
   },
   '/comparacao': {
     title: 'Comparação',
