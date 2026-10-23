@@ -11,11 +11,15 @@ on:
         description: 'Máx. iniciativas AR a upsert'
         default: '200'
         required: false
+      textos_limit:
+        description: 'Máx. textos oficiais a extrair (novos/alterados; "all" para backfill)'
+        default: '150'
+        required: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +41,20 @@ jobs:
           # Opcional: fallback se a descoberta em parlamento.pt falhar (vazio = não definido)
           AR_INICIATIVAS_URL: ${{ vars.AR_INICIATIVAS_URL || secrets.AR_INICIATIVAS_URL }}
         run: node scripts/sync-ar.mjs --limit=${{ github.event.inputs.ar_limit || 'all' }}
+
+      # Excertos literais do texto oficial (exposição de motivos, Artigo 1.º, articulado) para a ficha.
+      # Idempotente: só iniciativas novas, com texto alterado ou com erro há > 24 h. Uma falha aqui
+      # (AR lenta, documento estranho) não pode parar o resto do sync — retoma no dia seguinte.
+      - name: Texto oficial das iniciativas (novas / alteradas)
+        continue-on-error: true
+        timeout-minutes: 25
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # pdftotext para os textos em .doc/.pdf (os .docx não precisam)
+          sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 || echo "::warning::poppler-utils indisponível; só .docx"
+          node scripts/extract-textos-ar.mjs --limit=${{ github.event.inputs.textos_limit || '150' }} --concurrency=3
 
       - name: despesa-sync (edge, paginado)
         env:

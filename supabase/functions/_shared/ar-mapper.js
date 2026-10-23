@@ -239,12 +239,13 @@ export function extractComissao(eventos) {
   let out = null
   const relatores = new Map()
   const pareceres = new Set()
+  const audDatas = new Set()
   for (const e of arr(eventos)) {
     for (const c of arr(e?.Comissao)) {
       if (str(c?.Competente).toUpperCase() !== 'S' || !c?.Nome) continue
       const nome = str(c.Nome).trim()
       if (!out) {
-        out = { nome, id: c.IdComissao ? str(c.IdComissao) : null, data_distribuicao: day(c.DataDistribuicao), relatores: [], pareceres_recebidos: [], audicoes: 0 }
+        out = { nome, id: c.IdComissao ? str(c.IdComissao) : null, data_distribuicao: day(c.DataDistribuicao), relatores: [], pareceres_recebidos: [], audicoes: 0, audicoes_datas: [], apreciacao_publica: null }
       }
       if (nome !== out.nome) continue
       out.data_distribuicao = out.data_distribuicao || day(c.DataDistribuicao)
@@ -253,11 +254,19 @@ export function extractComissao(eventos) {
       }
       for (const p of arr(c.PareceresRecebidos)) if (p?.nome) pareceres.add(str(p.nome).trim())
       out.audicoes += arr(c.Audicoes).length
+      for (const a of arr(c.Audicoes)) {
+        const d = day(a?.data)
+        if (d) audDatas.add(d)
+      }
+      const ini = day(c.DatainicioApreciacaoPublica)
+      const fim = day(c.DatafimApreciacaoPublica)
+      if ((ini || fim) && !out.apreciacao_publica) out.apreciacao_publica = { inicio: ini, fim }
     }
   }
   if (!out) return null
   out.relatores = [...relatores.values()]
   out.pareceres_recebidos = [...pareceres].slice(0, 30)
+  out.audicoes_datas = [...audDatas].sort().slice(0, 40)
   return out
 }
 
@@ -366,6 +375,55 @@ export function extractConjuntas(eventos, selfId) {
     }
   }
   return [...map.values()]
+}
+
+/** Ficha pública de uma petição na AR (BID = id da petição nos Dados Abertos). */
+export const AR_PETICAO_URL = 'https://www.parlamento.pt/ActividadeParlamentar/Paginas/DetalhePeticao.aspx?BID='
+
+/**
+ * Petições associadas: `Peticoes` (com id) e `PeticoesConjuntas` por fase (discutidas em conjunto; sem id fiável).
+ * [{ id, numero, legislatura, assunto, url, conjunta }]
+ */
+export function extractPeticoes(raw) {
+  const map = new Map()
+  for (const p of arr(raw?.Peticoes)) {
+    const numero = p?.numero != null ? str(p.numero) : ''
+    const leg = str(p?.legislatura || '')
+    const key = `${leg}-${numero}`
+    if (!numero || map.has(key)) continue
+    const id = p?.id ? str(p.id) : null
+    map.set(key, { id, numero, legislatura: leg || null, assunto: stripTags(p?.assunto).slice(0, 400) || null, url: id ? AR_PETICAO_URL + encodeURIComponent(id) : null, conjunta: false })
+  }
+  for (const e of arr(raw?.IniEventos)) {
+    for (const p of arr(e?.PeticoesConjuntas)) {
+      const numero = p?.nr != null ? str(p.nr) : ''
+      const leg = str(p?.leg || '')
+      const key = `${leg}-${numero}`
+      if (!numero || map.has(key)) continue
+      map.set(key, { id: null, numero, legislatura: leg || null, assunto: stripTags(p?.titulo).slice(0, 400) || null, url: null, conjunta: true })
+    }
+  }
+  return [...map.values()].slice(0, 30)
+}
+
+/** IniciativasOrigem / IniciativasOriginadas → [{ ar_ini_id, id_oficial, iniciativa_id, tipo, titulo }] */
+export function extractRelacionadasAr(list) {
+  const out = []
+  const seen = new Set()
+  for (const c of arr(list)) {
+    const id = str(c?.id)
+    if (!id || seen.has(id)) continue
+    seen.add(id)
+    const leg = str(c.legislatura || 'XVII')
+    out.push({
+      ar_ini_id: id,
+      id_oficial: [c.tipo, c.numero, leg].filter(Boolean).join(' '),
+      iniciativa_id: c.tipo && c.numero ? buildId(leg, c.tipo, c.numero, id) : null,
+      tipo: c.descTipo ? str(c.descTipo) : null,
+      titulo: stripTags(c.assunto).slice(0, 300) || null,
+    })
+  }
+  return out.slice(0, 30)
 }
 
 const AUTOR_GENERICO = new Set(['grupos parlamentares', 'deputados'])
@@ -508,6 +566,10 @@ export function mapArIniciativa(raw) {
     comissao,
     debates: extractDebates(eventos),
     conjuntas: extractConjuntas(eventos, iniId),
+    peticoes: extractPeticoes(raw),
+    iniciativas_origem: extractRelacionadasAr(raw.IniciativasOrigem),
+    iniciativas_originadas: extractRelacionadasAr(raw.IniciativasOriginadas),
+    texto_substituido: str(raw.IniTextoSubst).toUpperCase() === 'SIM' ? stripTags(raw.IniTextoSubstCampo).slice(0, 300) || 'Texto substituído' : null,
     procedimento,
     dossie_id: null,
   }

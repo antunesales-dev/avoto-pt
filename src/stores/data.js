@@ -94,6 +94,10 @@ export const useDataStore = defineStore('data', () => {
       comissao: row.comissao || null,
       debates: row.debates || [],
       conjuntas: row.conjuntas || [],
+      peticoes: row.peticoes || [],
+      iniciativasOrigem: row.iniciativas_origem || [],
+      iniciativasOriginadas: row.iniciativas_originadas || [],
+      textoSubstituido: row.texto_substituido || null,
       votosCidadaos: {
         favor: Number(agg?.favor ?? 0),
         contra: Number(agg?.contra ?? 0),
@@ -161,6 +165,35 @@ export const useDataStore = defineStore('data', () => {
     } finally {
       loadingDetail.value = false
     }
+  }
+
+  /**
+   * Excertos literais do texto oficial (tabela iniciativa_textos; RLS só devolve estado = 'ok').
+   * Falha silenciosa → null: a ficha continua sem este bloco.
+   */
+  async function loadTextoOficial(id) {
+    if (!id) return null
+    const { data: row, error: err } = await supabase
+      .from('iniciativa_textos')
+      .select('fonte_url,formato,estado,exposicao,objeto,artigos,dispositivo,extraido_em')
+      .eq('iniciativa_id', id)
+      .maybeSingle()
+    if (err) {
+      console.warn('iniciativa_textos:', err.message)
+      return null
+    }
+    return row || null
+  }
+
+  /** Outras iniciativas do mesmo tema com título semelhante (RPC iniciativas_relacionadas). */
+  async function loadRelacionadas(id, limit = 5) {
+    if (!id) return []
+    const { data: rows, error: err } = await supabase.rpc('iniciativas_relacionadas', { p_id: id, p_limit: limit })
+    if (err) {
+      console.warn('iniciativas_relacionadas:', err.message)
+      return []
+    }
+    return rows || []
   }
 
   /** Iniciativas do mesmo dossiê (da lista em memória; leve). */
@@ -250,6 +283,8 @@ export const useDataStore = defineStore('data', () => {
     loadAll,
     getIniciativa,
     ensureIniciativa,
+    loadTextoOficial,
+    loadRelacionadas,
     dossieDe,
     refreshAgg,
     startRealtime,
