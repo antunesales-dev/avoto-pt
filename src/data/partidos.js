@@ -1,3 +1,5 @@
+import { TEMAS } from './temas'
+
 /**
  * Metadados de exibição (siglas/cores) — não são fonte de votos da AR.
  * Ordem canónica: alfabética por sigla (pt), para não enviesar por “tamanho”
@@ -9,6 +11,7 @@ const PARTIDOS_RAW = [
   { id: 'cds', sigla: 'CDS-PP', nome: 'CDS – Partido Popular', cor: '#0093d4' },
   { id: 'chega', sigla: 'CHEGA', nome: 'CHEGA', cor: '#202056' },
   { id: 'il', sigla: 'IL', nome: 'Iniciativa Liberal', cor: '#00aeee' },
+  { id: 'jpp', sigla: 'JPP', nome: 'Juntos pelo Povo', cor: '#2a9d8f' },
   { id: 'livre', sigla: 'LIVRE', nome: 'LIVRE', cor: '#00c800' },
   { id: 'pan', sigla: 'PAN', nome: 'Pessoas–Animais–Natureza', cor: '#036a38' },
   { id: 'pcp', sigla: 'PCP', nome: 'Partido Comunista Português', cor: '#ff0000' },
@@ -30,25 +33,8 @@ export function sortPartidosAlfa(list) {
 /** Lista canónica — sempre alfabética por sigla. */
 export const partidos = sortPartidosAlfa(PARTIDOS_RAW)
 
-export const temas = [
-  'Todos',
-  'Saúde',
-  'Educação',
-  'Habitação',
-  'Trabalho',
-  'Ambiente',
-  'Economia',
-  'Justiça',
-  'Imigração',
-  'Defesa',
-  'Agricultura',
-  'Transportes',
-  'Cultura',
-  'Direitos sociais',
-  'Autarquias',
-  'Instituições',
-  'Outros',
-]
+/** Filtro de temas: “Todos” + taxonomia canónica (src/data/temas.js). */
+export const temas = ['Todos', ...TEMAS]
 
 /** true se há pelo menos um sentido de voto de partido */
 export function hasPartyVotes(resultadoPartidos) {
@@ -58,9 +44,25 @@ export function hasPartyVotes(resultadoPartidos) {
 
 export const estadosLabel = {
   aprovado: 'Aprovado',
+  aprovado_generalidade: 'Aprovado na generalidade',
   rejeitado: 'Rejeitado',
   em_discussao: 'Em discussão',
   arquivado: 'Arquivado',
+  retirado: 'Retirado',
+}
+
+/** Classe do badge por estado (lista, ficha, digest). */
+export function estadoBadgeClass(estado) {
+  return (
+    {
+      aprovado: 'badge--green',
+      aprovado_generalidade: 'badge--gold',
+      rejeitado: 'badge--red',
+      em_discussao: 'badge--gold',
+      arquivado: 'badge--muted',
+      retirado: 'badge--muted',
+    }[estado] || 'badge--muted'
+  )
 }
 
 export const votoLabel = {
@@ -68,6 +70,15 @@ export const votoLabel = {
   contra: 'Contra',
   abstencao: 'Abstenção',
   nao_participou: 'Sem votação',
+}
+
+/** Sigla da AR (autores, relatores, oradores: "CH", "L", "CDS-PP") → partido da UI. */
+const SIGLA_AR = { CH: 'chega', L: 'livre', 'CDS-PP': 'cds', PEV: 'pcp' }
+export function partidoPorSiglaAr(sigla) {
+  const s = String(sigla || '').trim().toUpperCase()
+  if (!s) return null
+  const id = SIGLA_AR[s] || s.toLowerCase()
+  return PARTIDOS_RAW.find((p) => p.id === id || p.sigla === s) || null
 }
 
 export function totalVotos(v) {

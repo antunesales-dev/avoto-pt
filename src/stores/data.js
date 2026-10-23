@@ -2,6 +2,30 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref } from 'vue'
 import { fetchAllRows } from '@/lib/fetchAll'
 import { supabase } from '@/lib/supabase'
+import { canonicalTema } from '@/data/temas'
+
+/** Colunas leves para a lista (a ficha rica — fases, votações, documentos, debates — só no detalhe). */
+const LIST_COLUMNS = [
+  'id',
+  'id_oficial',
+  'titulo',
+  'tipo',
+  'legislatura',
+  'numero',
+  'autores',
+  'data_entrada',
+  'data_votacao',
+  'estado',
+  'tema',
+  'tema_fonte',
+  'descricao_oficial',
+  'explicacao',
+  'links',
+  'resultado_partidos',
+  'votacao_principal',
+  'procedimento',
+  'dossie_id',
+].join(',')
 
 /**
  * Dados públicos: iniciativas + agregados (Supabase).
@@ -39,6 +63,7 @@ export const useDataStore = defineStore('data', () => {
   let realtimeChannel = null
 
   function mapIniciativa(row, agg) {
+    const full = 'fases' in row
     return {
       id: row.id,
       idOficial: row.id_oficial,
@@ -50,11 +75,25 @@ export const useDataStore = defineStore('data', () => {
       dataEntrada: row.data_entrada,
       dataVotacao: row.data_votacao,
       estado: row.estado,
-      tema: row.tema,
+      tema: canonicalTema(row.tema),
+      temaFonte: row.tema_fonte || null,
       descricaoOficial: row.descricao_oficial,
       explicacao: row.explicacao,
       links: row.links || [],
       resultadoPartidos: row.resultado_partidos || {},
+      votacaoPrincipal: row.votacao_principal || null,
+      procedimento: Boolean(row.procedimento),
+      dossieId: row.dossie_id || null,
+      // ficha rica (só quando carregada com loadDetalhe / ensureIniciativa)
+      detalheCarregado: full,
+      arIniId: row.ar_ini_id || null,
+      autoresDeputados: row.autores_deputados || [],
+      fases: row.fases || [],
+      votacoes: row.votacoes || [],
+      documentos: row.documentos || [],
+      comissao: row.comissao || null,
+      debates: row.debates || [],
+      conjuntas: row.conjuntas || [],
       votosCidadaos: {
         favor: Number(agg?.favor ?? 0),
         contra: Number(agg?.contra ?? 0),
@@ -72,7 +111,7 @@ export const useDataStore = defineStore('data', () => {
         fetchAllRows(() =>
           supabase
             .from('iniciativas')
-            .select('*')
+            .select(LIST_COLUMNS)
             .order('data_votacao', { ascending: false, nullsFirst: false })
             .order('id', { ascending: true }),
         ),
@@ -97,11 +136,14 @@ export const useDataStore = defineStore('data', () => {
     return iniciativas.value.find((i) => i.id === id) || null
   }
 
-  /** Garante que o detalhe existe (mesmo se ainda não estiver na lista em memória). */
+  /**
+   * Garante a ficha completa (fases, votações, documentos, debates…) da iniciativa.
+   * A lista só traz colunas leves; aqui vai-se buscar a linha inteira e junta-se à lista.
+   */
   async function ensureIniciativa(id) {
     if (!id) return null
     const existing = getIniciativa(id)
-    if (existing) return existing
+    if (existing?.detalheCarregado) return existing
 
     loadingDetail.value = true
     try {
@@ -110,16 +152,21 @@ export const useDataStore = defineStore('data', () => {
         supabase.from('iniciativa_votos_agg').select('*').eq('iniciativa_id', id).maybeSingle(),
       ])
       if (err) throw err
-      if (!row) return null
+      if (!row) return existing || null
       const mapped = mapIniciativa(row, agg)
-      // merge na lista sem duplicar
-      if (!getIniciativa(id)) {
-        iniciativas.value = [mapped, ...iniciativas.value]
-      }
+      const idx = iniciativas.value.findIndex((i) => i.id === id)
+      if (idx >= 0) iniciativas.value[idx] = mapped
+      else iniciativas.value = [mapped, ...iniciativas.value]
       return mapped
     } finally {
       loadingDetail.value = false
     }
+  }
+
+  /** Iniciativas do mesmo dossiê (da lista em memória; leve). */
+  function dossieDe(item) {
+    if (!item?.dossieId) return []
+    return iniciativas.value.filter((i) => i.dossieId === item.dossieId && i.id !== item.id)
   }
 
   async function refreshAgg(iniciativaId) {
@@ -203,6 +250,7 @@ export const useDataStore = defineStore('data', () => {
     loadAll,
     getIniciativa,
     ensureIniciativa,
+    dossieDe,
     refreshAgg,
     startRealtime,
     stopRealtime,

@@ -12,6 +12,7 @@
     "dev:pwa": "quasar dev -m pwa",
     "build": "quasar build -m pwa",
     "build:spa": "quasar build",
+    "test": "node --test tests/*.test.mjs",
     "postinstall": "quasar prepare --silent",
     "deploy": "pnpm build && wrangler pages deploy dist/pwa --project-name=avoto-pt --branch=main",
     "db:start": "supabase start",

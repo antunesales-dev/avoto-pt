@@ -5,61 +5,25 @@
  * Uso:
  *   SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/sync-ar.mjs [--limit=200]
  *
+ * Desenvolvimento local (sem descarregar 100 MB de cada vez):
+ *   AR_JSON_FILE=/caminho/IniciativasXVII_json.txt node scripts/sync-ar.mjs --limit=all
+ *
+ * O mapeamento AR → linha `iniciativas` vive em supabase/functions/_shared/ar-mapper.js
+ * (partilhado com a edge function ar-sync). Testes: `pnpm test`.
+ *
  * CI: .github/workflows/sync-daily.yml
  */
+import { readFile } from 'node:fs/promises'
 import { createClient } from '@supabase/supabase-js'
+import { assignDossies, mapArIniciativa } from '../supabase/functions/_shared/ar-mapper.js'
 
 const DA = 'https://www.parlamento.pt/Cidadania/Paginas/DAIniciativas.aspx'
 const UA = 'A-Voto/1.0 (+https://avoto.pt; official open data sync)'
-// Último URL directo conhecido (XVII legislatura, verificado 2026-10-21). Só usado se a descoberta falhar.
+// Último URL directo conhecido (XVII legislatura). Só usado se a descoberta falhar.
+// Verificado a 2026-10-23: devolve o mesmo ficheiro (md5 igual, 2164 iniciativas) que o URL da descoberta.
+// O parâmetro `path` muda a cada pedido à página da AR, mas os URLs antigos continuam válidos.
 const AR_JSON_FALLBACK_URL =
   'https://app.parlamento.pt/webutils/docs/doc.txt?path=UQGSgE0Sp3tRCG2sn6zo8opxlYmNMYGWq7K%2bBVFroxGb8rT5%2bwdlFUWxrSb9vW017QRyajTH7FzYzqHk%2feBxphUs3seEKgdDbGcOW2WU5UMiySEcmNR23wvpbUtv6q5dLMQWKYYgMGSV9u5McWMka%2fPxuKmp6kvEh3JUmsagJ3RZWYjSeVEOsgF%2bPK0DfMP9Gw22neN1NTs3y7WLnbytRrlGWiKl%2fZRQUeZFT45Frfr58FECBbg9jywaDFWsHHU8NcV5uHH%2f2N8u7qVXB95xTo0nPaNmZ2FqBZ9T6wmMd4na7znOS9yuLydjwdU7ve%2f0w%2b0frYuMrB%2b67AaZ32uzuIn2SRHR9x0P6Bz%2bYoF9goJWikrxoaQuQohPP4mbkLdj&fich=IniciativasXVII_json.txt&Inline=true'
-
-const SIGLA_TO_ID = {
-  PS: 'ps',
-  PSD: 'psd',
-  CH: 'chega',
-  CHEGA: 'chega',
-  IL: 'il',
-  BE: 'be',
-  PCP: 'pcp',
-  PEV: 'pcp',
-  L: 'livre',
-  LIVRE: 'livre',
-  PAN: 'pan',
-  'CDS-PP': 'cds',
-  CDS: 'cds',
-  // JPP e outros: ignorados se não temos cor/UI
-}
-
-/** Partidos com UI na A Voto — para unânimes (ids; UI lista por sigla alfabética) */
-const PARTIDOS_UI = ['be', 'cds', 'chega', 'il', 'livre', 'pan', 'pcp', 'ps', 'psd']
-
-const TEMA_RULES = [
-  [/sa[uú]de|hospital|sns|medicament|m[eé]dic/i, 'Saúde'],
-  [/educa|escol|universid|ensino|aluno|professor/i, 'Educação'],
-  [/habita|renda|arrendamento|casa|im[oó]vel|fogos/i, 'Habitação'],
-  [/trabalh|sal[aá]rio|desemprego|greve|contrato de trabalho|ss\b|segurança social/i, 'Trabalho'],
-  [/ambient|clima|energia|res[ií]duo|floresta|água|ocean|biodivers/i, 'Ambiente'],
-  [/or[cç]ament|imposto|irc|irs|iva|d[eé]ficit|finan[cç]|banc[aá]|econom/i, 'Economia'],
-  [/justi[cç]a|tribunal|c[oó]digo penal|crime|pris/i, 'Justiça'],
-  [/imigra|estrangeir|asilo|fronteira/i, 'Imigração'],
-  [/defesa|for[cç]as armadas|militar|nato/i, 'Defesa'],
-  [/agricult|pescas|rural|florest/i, 'Agricultura'],
-  [/transport|infraestrut|estrada|ferrovi|metro|aeroporto/i, 'Transportes'],
-  [/cultura|patrim[oó]nio|museu|desporto|media|imprensa/i, 'Cultura'],
-  [/fam[ií]lia|crian[cç]a|igualdade|g[eé]nero|discrimina/i, 'Direitos sociais'],
-  [/autarqu|munic[ií]p|regi[aã]o aut[oó]nom|descentral/i, 'Autarquias'],
-  [/constitui|eleitor|assembleia|parlament|regimento|partid/i, 'Instituições'],
-]
-
-function inferTema(titulo, tipoDesc = '') {
-  const text = `${titulo} ${tipoDesc}`
-  for (const [re, tema] of TEMA_RULES) {
-    if (re.test(text)) return tema
-  }
-  return 'Outros'
-}
 
 function parseArgs() {
   let limit = 200
@@ -71,185 +35,6 @@ function parseArgs() {
     }
   }
   return { limit }
-}
-
-function parseDetalhePartidos(detalhe) {
-  const out = {}
-  if (!detalhe) return out
-  const text = String(detalhe)
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/?i>/gi, ' ')
-    .replace(/&nbsp;/gi, ' ')
-  // secções: A Favor / Contra / Abstenção (com ou sem acento)
-  const sections = [
-    { re: /a\s*favor\s*:?\s*([^\n]+)/i, voto: 'favor' },
-    { re: /contra\s*:?\s*([^\n]+)/i, voto: 'contra' },
-    { re: /absten[cç][aã]o\s*:?\s*([^\n]+)/i, voto: 'abstencao' },
-  ]
-  for (const { re, voto } of sections) {
-    const m = text.match(re)
-    if (!m) continue
-    // siglas: PSD, CH, CDS-PP, L, …
-    const chunk = m[1]
-    for (const tok of chunk.split(/[,;|/]/)) {
-      const sigla = tok.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().toUpperCase()
-      if (!sigla) continue
-      // token pode ser "CH" ou " PSD "
-      const id = SIGLA_TO_ID[sigla] || SIGLA_TO_ID[sigla.replace(/\s/g, '')]
-      if (id) out[id] = voto
-    }
-  }
-  return out
-}
-
-/**
- * Escolhe a melhor votação: prioriza fases finais E detalhe com partidos.
- * Unânimes sem detalhe → todos os partidos UI no mesmo sentido.
- */
-function pickMainVotacao(eventos) {
-  if (!Array.isArray(eventos)) return null
-  const priority = [
-    'votação final global',
-    'votação final',
-    'votação global',
-    'votação na generalidade',
-    'votação deliberação',
-    'votação na especialidade',
-    'votação',
-  ]
-  const cands = []
-  for (const e of eventos) {
-    if (!e?.Votacao) continue
-    const list = Array.isArray(e.Votacao) ? e.Votacao : [e.Votacao]
-    const faseL = String(e.Fase || '').toLowerCase()
-    let phaseScore = 1
-    for (let i = 0; i < priority.length; i++) {
-      if (faseL.includes(priority[i])) {
-        phaseScore = 100 - i
-        break
-      }
-    }
-    for (const vo of list) {
-      if (!vo || typeof vo !== 'object') continue
-      const detalhe = vo.detalhe ? String(vo.detalhe) : null
-      const parties = parseDetalhePartidos(detalhe)
-      const unanime = Boolean(vo.unanime)
-      cands.push({
-        score: phaseScore + (Object.keys(parties).length ? 40 : 0) + (detalhe ? 10 : 0),
-        data: vo.data ? String(vo.data).slice(0, 10) : e.DataFase ? String(e.DataFase).slice(0, 10) : null,
-        resultado: vo.resultado ? String(vo.resultado) : null,
-        detalhe,
-        descricao: vo.descricao ? String(vo.descricao) : null,
-        parties,
-        unanime,
-        fase: e.Fase || '',
-      })
-    }
-  }
-  if (!cands.length) return null
-  cands.sort((a, b) => b.score - a.score)
-  const best = cands[0]
-  let parties = { ...best.parties }
-  if (!Object.keys(parties).length) {
-    // unânime ou detalhe vazio: inferir do resultado
-    const res = (best.resultado || '').toLowerCase()
-    let voto = null
-    if (res.includes('aprov') || res.includes('adopt') || res.includes('adot')) voto = 'favor'
-    else if (res.includes('rejeit')) voto = 'contra'
-    if (voto && (best.unanime || !best.detalhe)) {
-      for (const id of PARTIDOS_UI) parties[id] = voto
-    }
-  }
-  return {
-    data: best.data,
-    resultado: best.resultado,
-    detalhe: best.detalhe,
-    descricao: best.descricao,
-    parties,
-    fase: best.fase,
-  }
-}
-
-function mapAr(raw) {
-  const iniId = raw.IniId != null ? String(raw.IniId) : ''
-  if (!iniId) return null
-  const leg = String(raw.IniLeg || 'XVII')
-  const tipoCod = String(raw.IniTipo || '')
-  const nr = raw.IniNr != null ? String(raw.IniNr) : ''
-  const titulo = String(raw.IniTitulo || '').trim()
-  if (!titulo) return null
-  const tipoDesc = String(raw.IniDescTipo || raw.IniTipo || 'Iniciativa')
-  const idOficial = [tipoCod, nr, leg].filter(Boolean).join(' ').trim() || iniId
-  const id = `ar-${leg.toLowerCase()}-${tipoCod.toLowerCase() || 'x'}-${nr || iniId}`.replace(
-    /[^a-z0-9-]+/gi,
-    '-',
-  )
-  const eventos = Array.isArray(raw.IniEventos) ? raw.IniEventos : []
-  const main = pickMainVotacao(eventos)
-  let estado = 'em_discussao'
-  const r = (main?.resultado || '').toLowerCase()
-  if (r.includes('rejeit')) estado = 'rejeitado'
-  else if (r.includes('aprov') || r.includes('adopt') || r.includes('adot')) estado = 'aprovado'
-  // arquivado por fase
-  const fases = eventos.map((e) => String(e?.Fase || '').toLowerCase()).join(' ')
-  if (fases.includes('arquiv')) estado = 'arquivado'
-
-  const autores = []
-  const outros = raw.IniAutorOutros
-  if (outros?.nome) autores.push(String(outros.nome))
-  if (Array.isArray(raw.IniAutorGruposParlamentares)) {
-    for (const g of raw.IniAutorGruposParlamentares) {
-      if (g?.GP || g?.nome || g?.sigla) autores.push(String(g.GP || g.nome || g.sigla))
-    }
-  }
-  let dataEntrada = null
-  for (const e of eventos) {
-    if (String(e?.Fase || '').toLowerCase() === 'entrada' && e.DataFase) {
-      dataEntrada = String(e.DataFase).slice(0, 10)
-      break
-    }
-  }
-  const links = []
-  if (raw.IniLinkTexto) links.push({ label: 'Texto na AR', url: String(raw.IniLinkTexto) })
-  links.push({ label: 'Dados Abertos AR', url: DA })
-
-  const descParts = []
-  if (main?.descricao) descParts.push(main.descricao)
-  if (raw.IniObs) descParts.push(String(raw.IniObs))
-  if (raw.IniEpigrafe) descParts.push(String(raw.IniEpigrafe))
-  const descricao = (descParts.join(' — ') || titulo)
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 4000)
-
-  const parties = main?.parties || {}
-  let explicacao = ''
-  if (main?.fase && Object.keys(parties).length) {
-    explicacao = `Votação AR (${main.fase})${main.resultado ? `: ${main.resultado}` : ''}. Sentido de voto por partido a partir do registo oficial.`
-  } else if (main?.resultado) {
-    explicacao = `Resultado AR: ${main.resultado}. Sem detalhe nominal de grupos parlamentares no registo desta votação.`
-  } else {
-    explicacao = 'Ainda sem votação nominal de grupos parlamentares nos Dados Abertos para esta iniciativa.'
-  }
-
-  return {
-    id,
-    id_oficial: idOficial,
-    titulo,
-    tipo: tipoDesc,
-    legislatura: leg,
-    numero: nr ? Number(nr) || null : null,
-    autores: [...new Set(autores.filter(Boolean))],
-    data_entrada: dataEntrada,
-    data_votacao: main?.data || null,
-    estado,
-    tema: inferTema(titulo, tipoDesc),
-    descricao_oficial: descricao,
-    explicacao,
-    links,
-    resultado_partidos: parties,
-  }
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -342,6 +127,27 @@ async function fetchJsonWithRetry(url, attempts = 3) {
   throw lastErr
 }
 
+/**
+ * A AR já serviu um ficheiro com menos iniciativas do que a véspera (22/10: 2346; 23/10: 2164).
+ * O upsert nunca apaga linhas, mas convém avisar no run para não passar despercebido.
+ */
+async function warnIfShrunk(admin, rawCount) {
+  const { data } = await admin
+    .from('ar_sync_runs')
+    .select('meta')
+    .eq('status', 'ok')
+    .eq('source', 'parlamento.pt')
+    .not('meta->raw', 'is', null)
+    .order('started_at', { ascending: false })
+    .limit(1)
+  const prev = Number(data?.[0]?.meta?.raw || 0)
+  if (prev && rawCount < prev) {
+    console.warn(
+      `::warning::AR JSON has fewer iniciativas than the last OK sync (${rawCount} < ${prev}). Existing rows are kept (upsert never deletes).`,
+    )
+  }
+}
+
 async function main() {
   const { limit } = parseArgs()
   const url = process.env.SUPABASE_URL
@@ -360,13 +166,24 @@ async function main() {
   if (runErr) throw runErr
 
   try {
-    console.log('Discovering AR JSON…')
-    const jsonUrl = await discoverJsonUrl()
-    console.log('Downloading…')
-    const list = await fetchJsonWithRetry(jsonUrl)
+    let list
+    const file = (process.env.AR_JSON_FILE || '').trim()
+    if (file) {
+      console.log('Reading AR JSON from AR_JSON_FILE…')
+      list = JSON.parse(await readFile(file, 'utf8'))
+      if (!Array.isArray(list)) throw new Error('AR_JSON_FILE: expected JSON array')
+    } else {
+      console.log('Discovering AR JSON…')
+      const jsonUrl = await discoverJsonUrl()
+      console.log('Downloading…')
+      list = await fetchJsonWithRetry(jsonUrl)
+    }
     console.log('Raw iniciativas:', list.length)
+    await warnIfShrunk(admin, list.length)
 
-    const mapped = list.map(mapAr).filter(Boolean)
+    const mapped = list.map(mapArIniciativa).filter(Boolean)
+    const nDossies = assignDossies(mapped)
+    console.log('Dossiês (≥ 2 iniciativas):', nDossies)
     // Preferir: tem partidos → tem data votação → mais recente
     mapped.sort((a, b) => {
       const pa = Object.keys(a.resultado_partidos || {}).length ? 1 : 0
@@ -384,11 +201,13 @@ async function main() {
 
     let upserted = 0
     let skipped = 0
+    const errors = []
     for (let i = 0; i < batch.length; i += 20) {
       const slice = batch.slice(i, i + 20)
       const results = await Promise.all(
         slice.map(async (p) => {
           const { error } = await admin.rpc('upsert_iniciativa_from_ar', { p })
+          if (error && errors.length < 5) errors.push(`${p.id}: ${error.message}`)
           return !error
         }),
       )
@@ -399,6 +218,7 @@ async function main() {
       process.stdout.write(`  ${upserted + skipped}/${batch.length}\r`)
     }
     console.log('\nDone', { upserted, skipped })
+    if (errors.length) console.warn('Sample errors:', errors)
 
     await admin
       .from('ar_sync_runs')
@@ -407,7 +227,7 @@ async function main() {
         finished_at: new Date().toISOString(),
         upserted,
         skipped,
-        meta: { mode: 'node_script', limit, raw: list.length },
+        meta: { mode: 'node_script', limit, raw: list.length, dossies: nDossies, source: file ? 'file' : 'parlamento.pt' },
       })
       .eq('id', run.id)
   } catch (e) {

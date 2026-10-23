@@ -52,6 +52,17 @@
           {{ e.label }}
         </button>
       </div>
+      <div class="filter-row toggles" style="margin: 0">
+        <label class="toggle">
+          <input v-model="agrupar" type="checkbox" />
+          Agrupar por dossiê (iniciativas discutidas em conjunto ou com o mesmo título)
+        </label>
+        <label class="toggle">
+          <input v-model="mostrarProcedimentos" type="checkbox" />
+          Mostrar procedimentos internos ({{ nProcedimentos }}: prazos de comissões de inquérito,
+          deslocações do PR, urgências…)
+        </label>
+      </div>
       <DateRangeFilter
         v-model="periodo"
         label="Data da votação AR (ou entrada)"
@@ -76,7 +87,12 @@
     />
 
     <div v-if="pageItems.length" class="init-grid">
-      <InitiativeCard v-for="item in pageItems" :key="item.id" :item="item" />
+      <InitiativeCard
+        v-for="item in pageItems"
+        :key="item.id"
+        :item="item"
+        :dossie-count="agrupar ? (dossieCounts[item.dossieId] || 1) - 1 : 0"
+      />
     </div>
     <div v-else class="av-card av-card-pad">
       <p style="margin: 0; color: var(--pt-muted)">
@@ -120,6 +136,8 @@ const tema = ref('Todos')
 const estado = ref('todos')
 const detalhe = ref('com_partidos')
 const periodo = ref('todos')
+const agrupar = ref(true)
+const mostrarProcedimentos = ref(false)
 
 const detalheOpts = [
   { id: 'com_partidos', label: 'Com voto dos partidos' },
@@ -130,9 +148,13 @@ const detalheOpts = [
 const estados = [
   { id: 'todos', label: 'Todos os estados' },
   { id: 'em_discussao', label: 'Em discussão' },
-  { id: 'aprovado', label: 'Aprovado' },
+  { id: 'aprovado_generalidade', label: 'Aprovado na generalidade' },
+  { id: 'aprovado', label: 'Aprovado (votação final)' },
   { id: 'rejeitado', label: 'Rejeitado' },
+  { id: 'retirado', label: 'Retirado' },
 ]
+
+const nProcedimentos = computed(() => data.iniciativas.filter((i) => i.procedimento).length)
 
 /** Data de referência: votação AR; se não houver, data de entrada (para “futuro” / calendário). */
 function dataRefIniciativa(i) {
@@ -143,6 +165,7 @@ function dataRefIniciativa(i) {
 const baseFiltradas = computed(() => {
   const q = query.value.trim().toLowerCase()
   return data.iniciativas.filter((i) => {
+    if (!mostrarProcedimentos.value && i.procedimento) return false
     if (detalhe.value === 'com_partidos' && !hasPartyVotes(i.resultadoPartidos)) return false
     if (detalhe.value === 'com_votacao' && !i.dataVotacao) return false
     if (tema.value !== 'Todos' && i.tema !== tema.value) return false
@@ -152,7 +175,8 @@ const baseFiltradas = computed(() => {
       i.titulo.toLowerCase().includes(q) ||
       i.idOficial.toLowerCase().includes(q) ||
       i.tema.toLowerCase().includes(q) ||
-      i.tipo.toLowerCase().includes(q)
+      i.tipo.toLowerCase().includes(q) ||
+      (i.autores || []).some((a) => a.toLowerCase().includes(q))
     )
   })
 })
@@ -164,9 +188,31 @@ const periodoOpts = computed(() =>
   ),
 )
 
-const filtradas = computed(() =>
+const filtradasSemGrupo = computed(() =>
   baseFiltradas.value.filter((i) => matchesDateRange(dataRefIniciativa(i), periodo.value)),
 )
+
+/** Nº de iniciativas (já filtradas) por dossiê. */
+const dossieCounts = computed(() => {
+  const out = {}
+  for (const i of filtradasSemGrupo.value) if (i.dossieId) out[i.dossieId] = (out[i.dossieId] || 0) + 1
+  return out
+})
+
+/**
+ * Agrupado: um cartão por dossiê — a primeira iniciativa na ordem da lista
+ * (votação AR mais recente). As restantes aparecem na ficha, em “Mesmo dossiê”.
+ */
+const filtradas = computed(() => {
+  if (!agrupar.value) return filtradasSemGrupo.value
+  const seen = new Set()
+  return filtradasSemGrupo.value.filter((i) => {
+    if (!i.dossieId) return true
+    if (seen.has(i.dossieId)) return false
+    seen.add(i.dossieId)
+    return true
+  })
+})
 
 const {
   page,
@@ -186,7 +232,7 @@ function setPageSize(n) {
   pageSize.value = n
 }
 
-watch([query, tema, estado, detalhe, periodo], () => resetPage())
+watch([query, tema, estado, detalhe, periodo, agrupar, mostrarProcedimentos], () => resetPage())
 </script>
 
 <style scoped lang="scss">
@@ -213,6 +259,22 @@ watch([query, tema, estado, detalhe, periodo], () => resetPage())
     font-size: 0.98rem;
     color: var(--pt-ink);
     outline: none;
+  }
+}
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--pt-muted);
+  cursor: pointer;
+  input {
+    accent-color: var(--pt-green);
   }
 }
 .init-grid {
