@@ -1,7 +1,13 @@
 /**
- * Comunicados oficiais — portugal.gov.pt (sitemap + página HTML).
- * Sem AI. Sem X. Upsert por URL canónica.
+ * Comunicados oficiais — portugal.gov.pt.
+ * - Comunicados do CM: sitemap + página HTML.
+ * - Notícias: índice de pesquisa público do próprio portal (o mesmo que a página
+ *   /gc25/comunicacao/noticias usa no browser), paginado por data. O sitemap só lista o índice.
+ * Sem AI. Sem X. Upsert por URL canónica. Pedidos espaçados (delay) e identificados (UA).
+ * Fonte: portugal.gov.pt — o aviso legal permite reprodução para fins não comerciais citando a fonte;
+ * guardamos texto e metadados, NÃO as fotografias (Lusa).
  */
+import { temaFromGov } from './govTemas.ts'
 
 const UA = 'A-Voto/1.0 (+https://avoto.pt; civic open data; official sources only)'
 const SITEMAP = 'https://portugal.gov.pt/sitemap.xml'
@@ -15,12 +21,24 @@ export type MappedComunicado = {
   corpo: string
   url_oficial: string
   publicado_em: string
-  tipo: 'noticia' | 'comunicado_cm' | 'intervencao' | 'outro'
+  tipo: 'noticia' | 'comunicado_cm' | 'intervencao' | 'nomeacao' | 'outro'
   source: string
+  /** card:tags / card:areas / card:officials / card:roles do portal */
+  tags: string[]
+  areas: string[]
+  officials: string[]
+  roles: string[]
+  /** Tema canónico derivado da área governativa (ver govTemas.ts) */
+  tema: string | null
   meta: Record<string, unknown>
 }
 
-function normalizeUrl(raw: string): string {
+export const NEWS_TEMPLATE_ID = '{DC3CC8F2-1004-46C7-827C-CAD36919C735}'
+export const DEFAULT_SEARCH_ENDPOINT = 'https://discover-euc1.sitecorecloud.io/discover/v2/135545443'
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+export function normalizeUrl(raw: string): string {
   try {
     const u = new URL(raw, ORIGIN)
     u.hash = ''
@@ -45,13 +63,13 @@ async function stableId(url: string): Promise<string> {
   return `gov-${hex.slice(0, 28)}`
 }
 
-function classifyTipo(url: string): MappedComunicado['tipo'] {
+export function classifyTipo(url: string): MappedComunicado['tipo'] {
   if (url.includes('comunicado-do-conselho-de-ministros') || url.includes('/comunicados-do-conselho-de-ministros/')) {
     return 'comunicado_cm'
   }
   if (url.includes('/intervencoes/')) return 'intervencao'
   if (url.includes('/noticias/')) return 'noticia'
-  if (url.includes('/nomeacoes/')) return 'outro'
+  if (url.includes('/nomeacoes/')) return 'nomeacao'
   return 'outro'
 }
 
@@ -72,11 +90,17 @@ function isListingUrl(url: string): boolean {
   return bad.some((re) => re.test(path))
 }
 
-function isGc25ArticleUrl(url: string): boolean {
+/** Páginas de nomeações (cargos/remunerações): não são notícias → excluídas dos comunicados. */
+export function isNomeacaoUrl(url: string): boolean {
+  return /\/governo\/nomeacoes\//.test(url)
+}
+
+export function isGc25ArticleUrl(url: string): boolean {
   if (!url.includes('portugal.gov.pt')) return false
   if (!url.includes('/gc25/')) return false
   if (isListingUrl(url)) return false
-  // Artigos: CM, notícias com slug, intervenções, nomeações (gc25)
+  if (isNomeacaoUrl(url)) return false
+  // Artigos: CM, notícias com slug, intervenções (gc25). Nomeações ficam de fora.
   if (url.includes('/comunicados-do-conselho-de-ministros/')) {
     // aceita slug ou id numérico; rejeita só o índice (já filtrado por isListingUrl)
     return url.split('/comunicados-do-conselho-de-ministros/')[1]?.length > 0
@@ -84,9 +108,19 @@ function isGc25ArticleUrl(url: string): boolean {
   return (
     url.includes('/comunicacao/noticias/') ||
     url.includes('/comunicacao/intervencoes/') ||
-    url.includes('/comunicacao/comunicados/') ||
-    url.includes('/governo/nomeacoes/')
+    url.includes('/comunicacao/comunicados/')
   )
+}
+
+/** `card:tags` etc. vêm como "a | b | c". */
+export function parseCardList(raw: string | null | undefined): string[] {
+  if (!raw) return []
+  const out: string[] = []
+  for (const part of decodeEntities(String(raw)).split('|')) {
+    const v = part.replace(/\s+/g, ' ').trim()
+    if (v && !out.includes(v)) out.push(v)
+  }
+  return out
 }
 
 function metaContent(html: string, names: string[]): string | null {
@@ -291,6 +325,10 @@ export async function fetchComunicadoPage(
 
   const tipo = classifyTipo(url_oficial)
   const id = await stableId(url_oficial)
+  const tags = parseCardList(metaContent(html, ['card:tags']))
+  const areas = parseCardList(metaContent(html, ['card:areas']))
+  const officials = parseCardList(metaContent(html, ['card:officials']))
+  const roles = parseCardList(metaContent(html, ['card:roles']))
 
   return {
     id,
@@ -301,15 +339,192 @@ export async function fetchComunicadoPage(
     publicado_em,
     tipo,
     source: 'portugal.gov.pt',
+    tags,
+    areas,
+    officials,
+    roles,
+    tema: areas.length || tags.length ? temaFromGov({ areas, tags, titulo }) : null,
     meta: {
       lastmod: lastmod || null,
       slug: slugFromUrl(url_oficial),
       corpo_chars: corpo.length,
+      discovery: 'sitemap',
+      card_date: metaContent(html, ['card:date']),
     },
   }
 }
 
-export async function fetchComunicados(limit = 60): Promise<{
+// ---------------------------------------------------------------------------
+// Notícias: índice de pesquisa do portal (paginado, ordenado por data desc)
+// ---------------------------------------------------------------------------
+
+export type SearchItem = {
+  url?: string
+  title?: string
+  name?: string
+  description?: string
+  content?: string
+  date?: string
+  areas?: string[]
+  tags?: string[]
+  officials?: string[]
+  roles?: string[]
+  priority_tag?: string
+  priority_area?: string
+  category?: string
+  template?: string
+  gc?: string
+}
+
+/** Item do índice → linha `comunicados` (sem I/O além do hash). */
+export async function mapSearchItem(it: SearchItem): Promise<MappedComunicado | null> {
+  if (!it?.url) return null
+  const url_oficial = normalizeUrl(it.url)
+  if (!isGc25ArticleUrl(url_oficial)) return null
+  const publicado_em = parseDate(it.date || null)
+  if (!publicado_em) return null
+  const titulo = stripHtml(String(it.title || it.name || '')).trim().slice(0, 400) ||
+    slugFromUrl(url_oficial).replace(/-/g, ' ')
+  // O índice devolve parágrafos separados por \n → parágrafos da app (\n\n)
+  const corpo = String(it.content || '')
+    .replace(/\r/g, '')
+    .split(/\n+/)
+    .map((p) => p.replace(/[ \t]+/g, ' ').trim())
+    .filter(Boolean)
+    .join('\n\n')
+    .slice(0, 50000)
+  const resumo = stripHtml(String(it.description || '')).slice(0, 800) ||
+    corpo.replace(/\s+/g, ' ').slice(0, 400)
+  const clean = (xs?: string[]) => [...new Set((xs || []).map((x) => String(x).trim()).filter(Boolean))]
+  const areas = clean(it.areas)
+  const tags = clean(it.tags)
+  return {
+    id: await stableId(url_oficial),
+    titulo,
+    resumo,
+    corpo,
+    url_oficial,
+    publicado_em,
+    tipo: classifyTipo(url_oficial),
+    source: 'portugal.gov.pt',
+    tags,
+    areas,
+    officials: clean(it.officials),
+    roles: clean(it.roles),
+    tema: temaFromGov({ areas, tags, priorityTag: it.priority_tag || null, titulo }),
+    meta: {
+      slug: slugFromUrl(url_oficial),
+      corpo_chars: corpo.length,
+      discovery: 'search_index',
+      card_date: it.date || null,
+      priority_tag: it.priority_tag || null,
+      priority_area: it.priority_area || null,
+    },
+  }
+}
+
+export type NewsDiscoveryOptions = {
+  /** Chave pública do índice (a mesma que o portal envia do browser). Sem chave → desligado. */
+  searchKey: string
+  endpoint?: string
+  /** Só notícias com data >= since (YYYY-MM-DD). */
+  since: string
+  maxItems?: number
+  pageSize?: number
+  delayMs?: number
+  fetchImpl?: typeof fetch
+}
+
+/**
+ * Descobre notícias por ordem de data (mais recentes primeiro) até `since`.
+ * Pedidos sequenciais com pausa; para à primeira página mais antiga que `since`.
+ */
+export async function discoverNoticias(opts: NewsDiscoveryOptions): Promise<{
+  items: MappedComunicado[]
+  total: number | null
+  requests: number
+  errors: string[]
+}> {
+  const f = opts.fetchImpl || fetch
+  const endpoint = opts.endpoint || DEFAULT_SEARCH_ENDPOINT
+  const pageSize = Math.max(10, Math.min(50, opts.pageSize || 50))
+  const maxItems = Math.max(1, Math.min(2000, opts.maxItems || 400))
+  const delayMs = Math.max(0, opts.delayMs ?? 1500)
+  const items: MappedComunicado[] = []
+  const errors: string[] = []
+  const seen = new Set<string>()
+  let total: number | null = null
+  let requests = 0
+
+  for (let offset = 0; offset < 5000 && items.length < maxItems; offset += pageSize) {
+    if (requests > 0 && delayMs) await sleep(delayMs)
+    const body = {
+      context: { page: { uri: '/gc25/comunicacao/noticias' }, locale: { language: 'pt', country: 'pt' } },
+      widget: {
+        items: [
+          {
+            rfk_id: 'rfkid_7',
+            entity: 'ceger',
+            search: {
+              content: {},
+              offset,
+              limit: pageSize,
+              sort: { value: [{ name: 'date_descending' }] },
+              filter: {
+                type: 'and',
+                filters: [
+                  { type: 'eq', name: 'gc', value: 'gc25' },
+                  { type: 'eq', name: 'template', value: NEWS_TEMPLATE_ID },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    }
+    let json: { widgets?: { total_item?: number; content?: SearchItem[] }[] } | null = null
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      requests++
+      try {
+        const res = await f(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: opts.searchKey, 'User-Agent': UA },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(30000),
+        })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        json = await res.json()
+        break
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e)
+        if (attempt === 3) errors.push(`search offset=${offset}: ${msg}`)
+        else await sleep(delayMs * attempt + 500)
+      }
+    }
+    const w = json?.widgets?.[0]
+    if (!w) break
+    total = typeof w.total_item === 'number' ? w.total_item : total
+    const page = w.content || []
+    if (!page.length) break
+    let older = false
+    for (const it of page) {
+      const row = await mapSearchItem(it)
+      if (!row) continue
+      if (row.publicado_em < opts.since) {
+        older = true
+        continue
+      }
+      if (seen.has(row.id)) continue
+      seen.add(row.id)
+      items.push(row)
+      if (items.length >= maxItems) break
+    }
+    if (older || page.length < pageSize) break
+  }
+  return { items, total, requests, errors }
+}
+
+export async function fetchComunicados(limit = 60, delayMs = 800): Promise<{
   items: MappedComunicado[]
   candidates: number
   errors: string[]
@@ -320,8 +535,10 @@ export async function fetchComunicados(limit = 60): Promise<{
   const errors: string[] = []
   const seen = new Set<string>()
 
+  let n = 0
   for (const c of candidates) {
     if (items.length >= target) break
+    if (n++ > 0 && delayMs) await sleep(delayMs)
     try {
       const row = await fetchComunicadoPage(c.url, c.lastmod)
       if (!row) continue

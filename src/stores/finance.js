@@ -51,6 +51,7 @@ export const useFinanceStore = defineStore('finance', () => {
       supabase
         .from('comunicados')
         .select('*')
+        .neq('tipo', 'nomeacao')
         .order('publicado_em', { ascending: false }),
     )
     comunicados.value = rows || []

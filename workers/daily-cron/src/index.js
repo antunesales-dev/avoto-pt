@@ -61,7 +61,7 @@ async function runPipeline(env) {
   steps.push(await callFn(base, 'despesa-sync', secret, key, '?limit=80'))
   steps.push(await callFn(base, 'daily-digest', secret, key))
   // Comunicados do Governo (portugal.gov.pt) — digest próprio gerado no sync
-  steps.push(await callFn(base, 'comunicados-sync', secret, key, '?limit=80'))
+  steps.push(await callFn(base, 'comunicados-sync', secret, key, '?limit=30&days=3'))
 
   return {
     ok: steps.every((s) => s.ok),
