@@ -25,6 +25,20 @@
       :count="filtrados.length"
       style="margin-bottom: 1rem"
     />
+    <div class="filter-row ordem-row" role="group" aria-label="Ordenar contratos">
+      <span class="ordem-row__l">Ordenar</span>
+      <button
+        v-for="o in ORDEM_OPCOES"
+        :key="o.id"
+        type="button"
+        class="chip-btn"
+        :class="{ 'is-active': ordem === o.id }"
+        :aria-pressed="ordem === o.id"
+        @click="ordem = o.id"
+      >
+        {{ o.label }}
+      </button>
+    </div>
 
     <ListPager
       :page="page"
@@ -122,6 +136,7 @@ import { usePagination } from '@/composables/usePagination'
 import { formatDate } from '@/data/partidos'
 import { isContratoGrande } from '@/lib/contratos'
 import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
+import { ORDEM_DATA, ORDEM_OPCOES, ordenarPorDataOuValor } from '@/lib/ordenar'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
@@ -130,8 +145,9 @@ defineOptions({ name: 'ContratosPage' })
 const finance = useFinanceStore()
 const loading = ref(!finance.despesas.length)
 const periodo = ref('todos')
+const ordem = ref(ORDEM_DATA)
 
-/** Vista de Despesa: mesmos registos, só montante ≥ limiar (ordenados por montante na store). */
+/** Vista de Despesa: mesmos registos, só montante ≥ limiar. */
 const contratos = computed(() => (finance.despesas || []).filter(isContratoGrande))
 
 const periodoOpts = computed(() =>
@@ -149,6 +165,11 @@ const totalMontante = computed(() =>
   filtrados.value.reduce((s, d) => s + (Number(d.montante_eur) || 0), 0),
 )
 
+/** Ordena antes de paginar; a data é a de publicação (a que o cartão mostra e o filtro usa). */
+const ordenados = computed(() =>
+  ordenarPorDataOuValor(filtrados.value, ordem.value, (d) => d.data_publicacao),
+)
+
 const {
   page,
   pageSize,
@@ -161,13 +182,13 @@ const {
   pageWindow,
   goPage,
   resetPage,
-} = usePagination(filtrados, {
+} = usePagination(ordenados, {
   defaultSize: 12,
   sizes: [12, 24, 48],
   queryPrefix: 'inv',
 })
 
-watch(periodo, () => resetPage())
+watch([periodo, ordem], () => resetPage())
 
 function setPageSize(n) {
   pageSize.value = Number(n) || 12
@@ -224,6 +245,18 @@ onMounted(async () => {
   font-size: 1.35rem;
   margin-top: 0.25rem;
   color: var(--pt-navy);
+}
+.ordem-row {
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.ordem-row__l {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pt-muted);
+  margin-right: 0.25rem;
 }
 .muted {
   color: var(--pt-muted);
