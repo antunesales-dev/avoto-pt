@@ -8,7 +8,7 @@
  * - Assume voto coeso da bancada (o registo AR costuma ser por grupo, não por cabeça).
  * - Composição actualizada periodicamente; votações antigas na mesma legislatura
  *   podem ter tido números ligeiramente diferentes.
- * - Partidos fora do mapa (ex. JPP) contam em “outros / não mapeados”.
+ * - Partidos fora do mapa contam em “outros / não mapeados” (desde 10/2026 o JPP já tem UI).
  *
  * Total legal: 230 deputados. Maioria absoluta: 116.
  */
@@ -34,13 +34,12 @@ export const COMPOSICAO_AR = {
       cds: 2,
       be: 1,
       pan: 1,
-    },
-    outros: {
       jpp: 1,
     },
+    outros: {},
     fonte:
       'Composição da Assembleia da República (230 lugares). Números de bancada oficiais / hemiciclo; actualizar após eleições ou mudanças de grupo.',
-    actualizado: '2026-08',
+    actualizado: '2026-10',
   },
 }
 

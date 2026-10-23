@@ -229,7 +229,7 @@ import ListPager from '@/components/ListPager.vue'
 import PartyVoteBadge from '@/components/PartyVoteBadge.vue'
 import VoteBar from '@/components/VoteBar.vue'
 import { usePagination } from '@/composables/usePagination'
-import { estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
+import { estadoBadgeClass, estadosLabel, formatDate, getPartido, partidos } from '@/data/partidos'
 import { dateRangeLabel, matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { useFinanceStore } from '@/stores/finance'
 
@@ -313,9 +313,7 @@ function estadoLabel(estado) {
 }
 
 function estadoBadge(estado) {
-  if (estado === 'aprovado') return 'badge--green'
-  if (estado === 'rejeitado') return 'badge--red'
-  return 'badge--muted'
+  return estadoBadgeClass(estado)
 }
 
 function truncate(s, n) {

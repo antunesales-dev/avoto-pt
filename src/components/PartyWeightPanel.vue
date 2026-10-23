@@ -120,7 +120,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { estadosLabel, formatNumber } from '@/data/partidos'
+import { estadoBadgeClass, estadosLabel, formatNumber } from '@/data/partidos'
 import { aritmeticaParlamentar, temAritmeticaUtil } from '@/lib/partyWeight'
 
 const props = defineProps({
@@ -146,12 +146,7 @@ const estadoOficial = computed(() =>
   props.estado ? estadosLabel[props.estado] || props.estado : null,
 )
 
-const estadoBadge = computed(() => {
-  if (props.estado === 'aprovado') return 'badge--green'
-  if (props.estado === 'rejeitado') return 'badge--red'
-  if (props.estado === 'em_discussao') return 'badge--gold'
-  return 'badge--muted'
-})
+const estadoBadge = computed(() => estadoBadgeClass(props.estado))
 
 const ariaBar = computed(() => {
   if (!arit.value) return ''
