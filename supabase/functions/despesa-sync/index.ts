@@ -8,7 +8,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { authorized } from '../_shared/auth.ts'
-import { fetchBaseContratos } from '../_shared/despesa.ts'
+import {
+  despesaPayloadError,
+  fetchBaseContratos,
+  investimentoPayloadError,
+} from '../_shared/despesa.ts'
 
 const OFFICIAL = {
   base: 'https://www.base.gov.pt',
@@ -80,6 +84,12 @@ Deno.serve(async (req) => {
     }
 
     for (const d of despesas) {
+      const invalid = despesaPayloadError(d)
+      if (invalid) {
+        skipped++
+        if (errors.length < 10) errors.push(invalid)
+        continue
+      }
       const { error } = await admin.rpc('upsert_despesa_publica', { p: d })
       if (error) {
         skipped++
@@ -87,6 +97,12 @@ Deno.serve(async (req) => {
       } else upserted++
     }
     for (const inv of investimentos) {
+      const invalid = investimentoPayloadError(inv)
+      if (invalid) {
+        skipped++
+        if (errors.length < 10) errors.push(invalid)
+        continue
+      }
       const { error } = await admin.rpc('upsert_investimento', { p: inv })
       if (error) {
         skipped++

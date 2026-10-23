@@ -15,6 +15,36 @@ const UA = 'A-Voto/1.0 (+https://avoto.pt; civic open data)'
 export type MappedDespesa = Record<string, unknown>
 export type MappedInvestimento = Record<string, unknown>
 
+/** Único formato de id aceite para contratos Base (o antigo `base-<nif>-<data>-<slug>` duplicava linhas). */
+export const STABLE_DESPESA_ID = /^base-[0-9a-f]{28}$/
+
+export function isStableDespesaId(id: unknown): boolean {
+  return typeof id === 'string' && STABLE_DESPESA_ID.test(id)
+}
+
+/**
+ * Valida um payload (sync ou backfill ops) antes de ir à BD.
+ * A BD também recusa (upsert_despesa_publica + check despesas_base_id_hash_chk),
+ * isto só dá um erro mais claro e evita round-trips.
+ */
+export function despesaPayloadError(d: Record<string, unknown>): string | null {
+  const source = String(d.source ?? 'oficial')
+  if (source === 'base.gov.pt' && !isStableDespesaId(d.id)) {
+    return `LEGACY_DESPESA_ID: ${String(d.id)}`
+  }
+  return null
+}
+
+export function investimentoPayloadError(inv: Record<string, unknown>): string | null {
+  const source = String(inv.source ?? 'oficial')
+  if (source !== 'base.gov.pt') return null
+  const despesaId = inv.despesa_id
+  if (!isStableDespesaId(despesaId) || inv.id !== `inv-${String(despesaId)}`) {
+    return `INVESTIMENTO_SEM_DESPESA: ${String(inv.id)} → ${String(despesaId)}`
+  }
+  return null
+}
+
 /**
  * Portal Base/SNS mete HTML (ex. `<br/>`) em tipos de contrato.
  * Na UI leigos lêem "br" como Brasil — limpar sempre na importação.
@@ -147,7 +177,10 @@ export async function fetchBaseContratos(limit = 80): Promise<{
       id,
       tipo: 'contrato_publico',
       titulo: objeto.slice(0, 300),
+      // Nome tal como vem da fonte; a BD troca pelo nome canónico do NIF
+      // (despesa_entidades) e guarda este em meta.entidade_fonte.
       entidade,
+      entidade_nif: nifAdj || null,
       montante_eur: montante != null && !Number.isNaN(montante) ? String(montante) : null,
       moeda: 'EUR',
       data_publicacao: dataPub,
