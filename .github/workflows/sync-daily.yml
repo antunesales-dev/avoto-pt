@@ -53,7 +53,10 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           # pdftotext para os textos em .doc/.pdf (os .docx não precisam)
-          sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 || echo "::warning::poppler-utils indisponível; só .docx"
+          # apt-get update antes: sem índice atualizado o install falha no runner (e os .doc/.pdf ficavam em erro)
+          sudo apt-get update -qq >/dev/null && sudo apt-get install -y -qq --no-install-recommends poppler-utils >/dev/null \
+            || echo "::warning::poppler-utils indisponível; só .docx"
+          command -v pdftotext && pdftotext -v 2>&1 | head -1 || true
           node scripts/extract-textos-ar.mjs --limit=${{ github.event.inputs.textos_limit || '150' }} --concurrency=3
 
       - name: despesa-sync (edge, paginado)
