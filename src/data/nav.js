@@ -4,7 +4,7 @@ export const navPrincipal = [
   { to: '/iniciativas', label: 'Iniciativas', icon: 'gavel' },
   { to: '/digest', label: 'Resumo do dia', icon: 'today' },
   { to: '/despesa', label: 'Despesa', icon: 'account_balance' },
-  { to: '/investimentos', label: 'Investimentos', icon: 'savings' },
+  { to: '/contratos', label: 'Contratos ≥ 100 000 €', icon: 'savings' },
   { to: '/comunicados', label: 'Comunicados', icon: 'campaign' },
 ]
 

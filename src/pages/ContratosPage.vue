@@ -1,14 +1,26 @@
 <template>
   <div class="page-shell">
-    <h1 class="page-title">Investimentos</h1>
+    <h1 class="page-title">Contratos ≥&nbsp;100&nbsp;000&nbsp;€</h1>
     <p class="page-subtitle">
-      Contratos ≥&nbsp;100&nbsp;000&nbsp;€ do Portal Base (subconjunto de
-      <router-link to="/despesa">Despesa</router-link>). Consulta — data de publicação oficial.
+      Uma vista de <router-link to="/despesa">Despesa</router-link>: os mesmos contratos do
+      Portal Base, só os de valor igual ou superior a 100&nbsp;000&nbsp;€. Não é outra fonte
+      nem outra lista de investimentos. A data é a de publicação no portal.
     </p>
+
+    <div class="stats-grid" style="margin-bottom: 1.25rem">
+      <div class="stat-mini av-card av-card-pad">
+        <div class="stat-mini__l">Contratos (filtro)</div>
+        <div class="stat-mini__v font-display">{{ formatNumber(total) }}</div>
+      </div>
+      <div class="stat-mini av-card av-card-pad">
+        <div class="stat-mini__l">Soma montantes (filtro)</div>
+        <div class="stat-mini__v font-display">{{ formatMoney(totalMontante) }}</div>
+      </div>
+    </div>
 
     <DateRangeFilter
       v-model="periodo"
-      label="Data de referência do contrato"
+      label="Data de publicação"
       :options="periodoOpts"
       :count="filtrados.length"
       style="margin-bottom: 1rem"
@@ -23,19 +35,19 @@
       :range-to="rangeTo"
       :page-window="pageWindow"
       :sizes="sizes"
-      unit="investimentos"
-      aria-label="Paginação de investimentos"
+      unit="contratos"
+      aria-label="Paginação de contratos"
       @go="goPage"
       @update:page-size="setPageSize"
     />
 
-    <p v-if="loading" class="muted">A carregar investimentos…</p>
+    <p v-if="loading" class="muted">A carregar contratos…</p>
 
     <div v-else-if="pageItems.length" class="init-grid">
       <router-link
-        v-for="inv in pageItems"
-        :key="inv.id"
-        :to="`/investimentos/${inv.id}`"
+        v-for="d in pageItems"
+        :key="d.id"
+        :to="`/despesa/${d.id}`"
         class="av-card link-card inv-card"
       >
         <div class="flag-stripe" aria-hidden="true">
@@ -44,23 +56,20 @@
         </div>
         <div class="av-card-pad">
           <div class="meta">
-            <span class="badge badge--navy">{{ inv.sector || 'Geral' }}</span>
-            <span class="badge" :class="decisaoClass(inv.decisao_oficial)">
-              Oficial: {{ decisaoLabel(inv.decisao_oficial) }}
-            </span>
-            <span class="badge" :class="sourceBadgeClass(inv.source)">
-              {{ sourceLabel(inv.source) }}
+            <span class="badge badge--navy">{{ d.categoria || 'Contrato público' }}</span>
+            <span class="badge" :class="sourceBadgeClass(d.source)">
+              {{ sourceLabel(d.source) }}
             </span>
           </div>
-          <h2 class="inv-card__title link-card__title">{{ inv.titulo }}</h2>
-          <p class="inv-card__money font-display">{{ formatMoney(inv.montante_eur) }}</p>
-          <p class="inv-card__ent">{{ inv.entidade }}</p>
+          <h2 class="inv-card__title link-card__title">{{ d.titulo }}</h2>
+          <p class="inv-card__money font-display">{{ formatMoney(d.montante_eur) }}</p>
+          <p class="inv-card__ent">{{ d.entidade || '—' }}</p>
           <p class="inv-card__src">
-            Fonte: {{ sourceLabel(inv.source) }}
-            <template v-if="primarySourceUrl(inv)">
+            Publicado a {{ formatDate(d.data_publicacao) }}
+            <template v-if="primarySourceUrl(d)">
               ·
               <a
-                :href="primarySourceUrl(inv)"
+                :href="primarySourceUrl(d)"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inv-card__ext"
@@ -70,19 +79,19 @@
               </a>
             </template>
           </p>
-          <div class="inv-card__foot">Ver detalhe →</div>
+          <div class="inv-card__foot">Ver contrato →</div>
         </div>
       </router-link>
     </div>
     <div v-else class="av-card av-card-pad empty-box">
-      <p v-if="!finance.investimentos.length" style="margin: 0 0 0.65rem">
-        Ainda <strong>não há investimentos</strong> (≥&nbsp;100&nbsp;000&nbsp;€) importados.
-        Quando o sync de despesa trouxer contratos Base acima do limiar, aparecem aqui com a
-        mesma origem que em Despesa.
+      <p v-if="!contratos.length" style="margin: 0 0 0.65rem">
+        Ainda <strong>não há contratos</strong> de 100&nbsp;000&nbsp;€ ou mais importados.
+        Quando o sync de despesa trouxer contratos do Portal Base acima desse valor,
+        aparecem aqui e em Despesa.
       </p>
       <p v-else style="margin: 0 0 0.65rem">
-        Nenhum item neste período (há
-        {{ finance.investimentos.length }} na base). Alargue o filtro de datas.
+        Nenhum contrato neste período (há {{ formatNumber(contratos.length) }} no total).
+        Alargue o filtro de datas.
       </p>
       <router-link to="/dados" class="btn btn--ghost btn--sm">Ver estado das importações</router-link>
     </div>
@@ -98,8 +107,8 @@
       :page-window="pageWindow"
       :sizes="sizes"
       :show-size="false"
-      unit="investimentos"
-      aria-label="Paginação de investimentos (rodapé)"
+      unit="contratos"
+      aria-label="Paginação de contratos (rodapé)"
       @go="goPage"
     />
   </div>
@@ -107,30 +116,37 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
 import DateRangeFilter from '@/components/DateRangeFilter.vue'
 import ListPager from '@/components/ListPager.vue'
 import { usePagination } from '@/composables/usePagination'
+import { formatDate } from '@/data/partidos'
+import { isContratoGrande } from '@/lib/contratos'
 import { matchesDateRange, optionsForContext } from '@/lib/dateRange'
 import { resolveSourceLinks, sourceBadgeClass, sourceLabel } from '@/lib/sources'
 import { useFinanceStore } from '@/stores/finance'
 
+defineOptions({ name: 'ContratosPage' })
+
 const finance = useFinanceStore()
-const { investimentos } = storeToRefs(finance)
-const loading = ref(true)
+const loading = ref(!finance.despesas.length)
 const periodo = ref('todos')
+
+/** Vista de Despesa: mesmos registos, só montante ≥ limiar (ordenados por montante na store). */
+const contratos = computed(() => (finance.despesas || []).filter(isContratoGrande))
 
 const periodoOpts = computed(() =>
   optionsForContext(
     'investimentos',
-    (investimentos.value || []).map((inv) => inv.data_referencia),
+    contratos.value.map((d) => d.data_publicacao),
   ),
 )
 
 const filtrados = computed(() =>
-  (investimentos.value || []).filter((inv) =>
-    matchesDateRange(inv.data_referencia, periodo.value),
-  ),
+  contratos.value.filter((d) => matchesDateRange(d.data_publicacao, periodo.value)),
+)
+
+const totalMontante = computed(() =>
+  filtrados.value.reduce((s, d) => s + (Number(d.montante_eur) || 0), 0),
 )
 
 const {
@@ -157,8 +173,12 @@ function setPageSize(n) {
   pageSize.value = Number(n) || 12
 }
 
+function formatNumber(n) {
+  return new Intl.NumberFormat('pt-PT').format(Number(n) || 0)
+}
+
 function formatMoney(n) {
-  if (n == null) return '—'
+  if (n == null || n === '') return '—'
   return new Intl.NumberFormat('pt-PT', {
     style: 'currency',
     currency: 'EUR',
@@ -166,32 +186,19 @@ function formatMoney(n) {
   }).format(Number(n))
 }
 
-function primarySourceUrl(inv) {
-  return resolveSourceLinks(inv)[0]?.url || null
+function primarySourceUrl(d) {
+  return resolveSourceLinks(d)[0]?.url || null
 }
 
-function decisaoLabel(d) {
-  const m = {
-    aprovado: 'Aprovado',
-    rejeitado: 'Rejeitado',
-    em_curso: 'Em curso',
-    nao_aplicavel: 'N/A',
-    desconhecido: 'Desconhecido',
-  }
-  return m[d] || d
-}
-
-function decisaoClass(d) {
-  if (d === 'aprovado') return 'badge--green'
-  if (d === 'rejeitado') return 'badge--red'
-  if (d === 'em_curso') return 'badge--gold'
-  return 'badge--muted'
-}
 
 onMounted(async () => {
+  if (finance.despesas.length) {
+    loading.value = false
+    return
+  }
   loading.value = true
   try {
-    await finance.loadInvestimentos()
+    await finance.loadDespesas()
   } catch (e) {
     console.error(e)
   } finally {
@@ -201,6 +208,23 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+}
+.stat-mini__l {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pt-muted);
+}
+.stat-mini__v {
+  font-size: 1.35rem;
+  margin-top: 0.25rem;
+  color: var(--pt-navy);
+}
 .muted {
   color: var(--pt-muted);
   font-weight: 600;

@@ -1,3 +1,5 @@
+import { despesaIdFromInvestimentoId } from '@/lib/contratos'
+
 const routes = [
   {
     path: '/',
@@ -46,16 +48,20 @@ const routes = [
         meta: { title: 'Despesa' },
       },
       {
-        path: 'investimentos',
-        name: 'investimentos',
-        component: () => import('@/pages/InvestimentosPage.vue'),
-        meta: { title: 'Investimentos' },
+        // Vista de Despesa (≥ 100 000 €); substitui a antiga página “Investimentos”.
+        path: 'contratos',
+        name: 'contratos',
+        component: () => import('@/pages/ContratosPage.vue'),
+        meta: { title: 'Contratos ≥ 100 000 €' },
       },
+      // Links antigos / notificações: /investimentos → /contratos; detalhe → contrato em Despesa
+      { path: 'investimentos', redirect: { name: 'contratos' } },
       {
         path: 'investimentos/:id',
-        name: 'investimento-detalhe',
-        component: () => import('@/pages/InvestimentoDetailPage.vue'),
-        meta: { title: 'Investimento' },
+        redirect: (to) => ({
+          name: 'despesa-detalhe',
+          params: { id: despesaIdFromInvestimentoId(to.params.id) },
+        }),
       },
       {
         path: 'comunicados',

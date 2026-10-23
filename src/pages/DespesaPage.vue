@@ -3,7 +3,8 @@
     <h1 class="page-title">Despesa pública</h1>
     <p class="page-subtitle">
       Contratos e despesa do Estado (Portal Base). Consulta — montantes, entidades e link
-      oficial. A data do filtro é a de <strong>publicação</strong> no portal.
+      oficial. A data do filtro é a de <strong>publicação</strong> no portal. Só os de valor
+      elevado: <router-link to="/contratos">Contratos ≥ 100&nbsp;000&nbsp;€</router-link>.
     </p>
 
     <div class="stats-grid" style="margin-bottom: 1.25rem">
@@ -161,7 +162,7 @@ function primarySourceUrl(d) {
 const tipos = [
   { id: 'todos', label: 'Todos' },
   { id: 'contrato_publico', label: 'Contratos' },
-  { id: 'investimento_publico', label: 'Investimentos' },
+  { id: 'investimento_publico', label: 'Investimento público' },
   { id: 'orcamento_linha', label: 'Orçamento' },
   { id: 'outro', label: 'Outro' },
 ]
