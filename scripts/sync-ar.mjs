@@ -11,6 +11,9 @@ import { createClient } from '@supabase/supabase-js'
 
 const DA = 'https://www.parlamento.pt/Cidadania/Paginas/DAIniciativas.aspx'
 const UA = 'A-Voto/1.0 (+https://avoto.pt; official open data sync)'
+// Último URL directo conhecido (XVII legislatura, verificado 2026-10-21). Só usado se a descoberta falhar.
+const AR_JSON_FALLBACK_URL =
+  'https://app.parlamento.pt/webutils/docs/doc.txt?path=UQGSgE0Sp3tRCG2sn6zo8opxlYmNMYGWq7K%2bBVFroxGb8rT5%2bwdlFUWxrSb9vW017QRyajTH7FzYzqHk%2feBxphUs3seEKgdDbGcOW2WU5UMiySEcmNR23wvpbUtv6q5dLMQWKYYgMGSV9u5McWMka%2fPxuKmp6kvEh3JUmsagJ3RZWYjSeVEOsgF%2bPK0DfMP9Gw22neN1NTs3y7WLnbytRrlGWiKl%2fZRQUeZFT45Frfr58FECBbg9jywaDFWsHHU8NcV5uHH%2f2N8u7qVXB95xTo0nPaNmZ2FqBZ9T6wmMd4na7znOS9yuLydjwdU7ve%2f0w%2b0frYuMrB%2b67AaZ32uzuIn2SRHR9x0P6Bz%2bYoF9goJWikrxoaQuQohPP4mbkLdj&fich=IniciativasXVII_json.txt&Inline=true'
 
 const SIGLA_TO_ID = {
   PS: 'ps',
@@ -249,22 +252,94 @@ function mapAr(raw) {
   }
 }
 
-async function discoverJsonUrl() {
-  if (process.env.AR_INICIATIVAS_URL) return process.env.AR_INICIATIVAS_URL
-  const page = await fetch(DA, { headers: { 'User-Agent': UA } })
-  const html0 = await page.text()
-  const leg =
-    html0.match(/href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=57465a4a[^"]+)"/i) ||
-    html0.match(/href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=[^"]+Path=[^"]+)"/i)
-  if (!leg) throw new Error('Legislatura link not found')
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+/**
+ * Fetch an HTML page and extract a match, retrying on network errors,
+ * non-2xx responses or pages missing the expected link (parlamento.pt
+ * occasionally serves an error/maintenance page to CI runners).
+ */
+async function fetchAndMatch(url, headers, patterns, what, attempts = 3) {
+  let lastInfo = ''
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const res = await fetch(url, { headers, signal: AbortSignal.timeout(60_000) })
+      const html = await res.text()
+      const title = (html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] || '').trim().slice(0, 120)
+      lastInfo = `HTTP ${res.status}, ${html.length} bytes, title="${title}"`
+      if (res.ok) {
+        for (const re of patterns) {
+          const m = html.match(re)
+          if (m) return m
+        }
+      }
+    } catch (e) {
+      lastInfo = String(e?.message || e)
+    }
+    if (attempt < attempts) {
+      console.warn(`${what} not found (attempt ${attempt}/${attempts}: ${lastInfo}); retrying…`)
+      await sleep(30_000 * attempt)
+    }
+  }
+  throw new Error(`${what} not found (${lastInfo})`)
+}
+
+async function discoverJsonUrlFromPages() {
+  const leg = await fetchAndMatch(
+    DA,
+    { 'User-Agent': UA },
+    [
+      /href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=57465a4a[^"]+)"/i,
+      /href="(\/Cidadania\/Paginas\/DAIniciativas\.aspx\?t=[^"]+Path=[^"]+)"/i,
+    ],
+    'Legislatura link',
+  )
   const legUrl = 'https://www.parlamento.pt' + leg[1].replace(/&amp;/g, '&')
-  const html = await (await fetch(legUrl, { headers: { 'User-Agent': UA, Referer: DA } })).text()
-  const jsonLink =
-    html.match(
+  const jsonLink = await fetchAndMatch(
+    legUrl,
+    { 'User-Agent': UA, Referer: DA },
+    [
       /href="(https:\/\/app\.parlamento\.pt\/webutils\/docs\/doc\.txt\?[^"]*Iniciativas[A-Z0-9]*_json\.txt[^"]*)"/i,
-    ) || html.match(/href="(https:\/\/app\.parlamento\.pt\/webutils\/docs\/doc\.txt\?path=[^"]+)"/i)
-  if (!jsonLink) throw new Error('JSON file link not found')
+      /href="(https:\/\/app\.parlamento\.pt\/webutils\/docs\/doc\.txt\?path=[^"]+)"/i,
+    ],
+    'JSON file link',
+  )
   return jsonLink[1].replace(/&amp;/g, '&')
+}
+
+async function discoverJsonUrl() {
+  try {
+    return await discoverJsonUrlFromPages()
+  } catch (e) {
+    const envUrl = (process.env.AR_INICIATIVAS_URL || '').trim()
+    const fallback = envUrl || AR_JSON_FALLBACK_URL
+    const source = envUrl ? 'AR_INICIATIVAS_URL' : 'AR_JSON_FALLBACK_URL (hardcoded)'
+    console.warn(`::warning::AR discovery failed (${e?.message || e}); falling back to ${source}`)
+    return fallback
+  }
+}
+
+async function fetchJsonWithRetry(url, attempts = 3) {
+  let lastErr
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': UA, Accept: 'application/json', Referer: DA },
+        signal: AbortSignal.timeout(300_000),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const list = await res.json()
+      if (!Array.isArray(list)) throw new Error('Expected JSON array')
+      return list
+    } catch (e) {
+      lastErr = e
+      if (attempt < attempts) {
+        console.warn(`AR JSON download failed (attempt ${attempt}/${attempts}: ${e?.message || e}); retrying…`)
+        await sleep(30_000 * attempt)
+      }
+    }
+  }
+  throw lastErr
 }
 
 async function main() {
@@ -288,12 +363,7 @@ async function main() {
     console.log('Discovering AR JSON…')
     const jsonUrl = await discoverJsonUrl()
     console.log('Downloading…')
-    const res = await fetch(jsonUrl, {
-      headers: { 'User-Agent': UA, Accept: 'application/json', Referer: DA },
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const list = await res.json()
-    if (!Array.isArray(list)) throw new Error('Expected JSON array')
+    const list = await fetchJsonWithRetry(jsonUrl)
     console.log('Raw iniciativas:', list.length)
 
     const mapped = list.map(mapAr).filter(Boolean)
