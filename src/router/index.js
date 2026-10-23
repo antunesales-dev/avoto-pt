@@ -48,7 +48,19 @@ export default defineRouter((/* { store, ssrContext } */) => {
     return true
   })
 
+  let firstNavigation = true
   Router.afterEach((to) => {
+    // 1.ª navegação: se o HTML já veio com o <title> desta rota (pré-render / Pages Function,
+    // ver seo/meta.js), não o trocar pelo genérico — o Googlebot executa JS e veria o genérico.
+    if (firstNavigation) {
+      firstNavigation = false
+      const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href')
+      try {
+        if (canonical && decodeURI(new URL(canonical).pathname) === decodeURI(to.path)) return
+      } catch {
+        /* canonical inválido → título genérico */
+      }
+    }
     const page = to.meta?.title ? `${to.meta.title} · ` : ''
     document.title = `${page}A Voto — Bancada Cidadã`
   })

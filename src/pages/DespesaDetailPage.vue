@@ -132,6 +132,16 @@ const links = computed(() => resolveSourceLinks(item.value))
 
 const grande = computed(() => isContratoGrande(item.value))
 
+// Título da ficha também na navegação dentro da SPA (o HTML inicial já o traz via Pages Function).
+watch(
+  () => item.value?.titulo,
+  (titulo) => {
+    if (titulo && typeof document !== 'undefined' && !document.title.startsWith(titulo)) {
+      document.title = `${titulo} · A Voto — Bancada Cidadã`
+    }
+  },
+)
+
 const tipos = {
   contrato_publico: 'Contrato público',
   investimento_publico: 'Investimento público',

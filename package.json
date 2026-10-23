@@ -10,8 +10,8 @@
   "scripts": {
     "dev": "quasar dev",
     "dev:pwa": "quasar dev -m pwa",
-    "build": "quasar build -m pwa",
-    "build:spa": "quasar build",
+    "build": "quasar build -m pwa && node scripts/prerender-meta.mjs dist/pwa",
+    "build:spa": "quasar build && node scripts/prerender-meta.mjs dist/spa",
     "postinstall": "quasar prepare --silent",
     "deploy": "pnpm build && wrangler pages deploy dist/pwa --project-name=avoto-pt --branch=main",
     "db:start": "supabase start",
