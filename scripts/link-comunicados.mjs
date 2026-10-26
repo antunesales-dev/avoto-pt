@@ -47,7 +47,7 @@ export function chunk(list, n) {
 }
 
 const isTimeout = (e) => e?.code === '57014' || /statement timeout/i.test(e?.message || '')
-// RPC sem o parâmetro p_ids (migração 20261023160000 ainda não aplicada)
+// RPC sem o parâmetro p_ids (migração 20261023160124 ainda não aplicada)
 const isMissingParam = (e) => e?.code === 'PGRST202' || /p_ids/.test(e?.message || '')
 
 /**

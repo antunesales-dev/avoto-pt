@@ -10,7 +10,7 @@
   - Em telemóvel fica tudo numa coluna, com o voto logo a seguir ao cabeçalho.
 
 ## Rollout (por esta ordem)
-1. **Migração:** `supabase/migrations/20261023170000_ficha_contexto_texto_oficial.sql`.
+1. **Migração:** `supabase/migrations/20261023172126_ficha_contexto_texto_oficial.sql`.
    - É aditiva e idempotente: colunas novas com default, tabela nova, RPC nova, e o upsert recriado com os mesmos campos mais os novos.
    - Não reescreve linhas existentes, por isso é rápida.
 2. **Deploy do site:** acontece com o merge em `main` (deploy-cloudflare-prod).
