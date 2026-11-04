@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+// Sem compilação JIT (Function/eval): a CSP bloqueia-a e o zod faria uma sonda em cada carregamento.
+z.config({ jitless: true })
+
 export const emailSchema = z
   .string()
   .trim()
