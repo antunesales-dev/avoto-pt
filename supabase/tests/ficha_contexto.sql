@@ -1,4 +1,4 @@
--- Testes SQL da migração 20261023170000 (BD LOCAL com as migrações aplicadas):
+-- Testes SQL da migração 20261023172126 (BD LOCAL com as migrações aplicadas):
 --   psql "$LOCAL_DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/ficha_contexto.sql
 -- Tudo numa transação revertida no fim; não depende de dados existentes.
 begin;
