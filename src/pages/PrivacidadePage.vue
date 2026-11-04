@@ -139,7 +139,8 @@
           </li>
           <li>
             <strong>Cloudflare</strong> — alojamento (Pages), rede de distribuição, Turnstile
-            (anti-bot).
+            (anti-bot) e Web Analytics (estatísticas agregadas de visitas e desempenho, sem
+            cookies nem identificação individual).
           </li>
           <li>
             <strong>GitHub Pages</strong> — ambiente de desenvolvimento/pré-visualização (código

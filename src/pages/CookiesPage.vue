@@ -53,6 +53,12 @@
               <td>Sessão / conforme Cloudflare</td>
             </tr>
             <tr>
+              <td>Cloudflare Web Analytics</td>
+              <td>Estatística agregada</td>
+              <td>Contar visitas e medir o desempenho das páginas, sem cookies nem localStorage e sem identificar visitantes</td>
+              <td>Nada guardado no dispositivo</td>
+            </tr>
+            <tr>
               <td>Preferências de UI (se existirem)</td>
               <td>Funcional</td>
               <td>Lembrar escolhas da interface</td>
