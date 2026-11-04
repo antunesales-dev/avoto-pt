@@ -37,7 +37,7 @@
     "quasar": "^2.32.2",
     "vue": "^3.5.22",
     "vue-router": "^5.0.6",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@quasar/app-vite": "^3.3.0",
