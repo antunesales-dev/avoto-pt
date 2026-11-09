@@ -60,13 +60,14 @@ jobs:
           node scripts/extract-textos-ar.mjs --limit=${{ github.event.inputs.textos_limit || '150' }} --concurrency=3
 
       - name: despesa-sync (edge, paginado)
+        continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           AVOTO_CRON_SECRET: ${{ secrets.AVOTO_CRON_SECRET }}
         run: |
           set -e
-          curl -fsS -X POST "$SUPABASE_URL/functions/v1/despesa-sync?limit=400" \
+          curl -fsS --retry 2 --retry-all-errors --retry-delay 30 -X POST "$SUPABASE_URL/functions/v1/despesa-sync?limit=400" \
             -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
             -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
             -H "x-avoto-cron-secret: $AVOTO_CRON_SECRET" \
