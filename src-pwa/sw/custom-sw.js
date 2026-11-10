@@ -3,7 +3,7 @@
  * Evita servir index.html antigo com hashes de chunks já inexistentes.
  */
 
-import { clientsClaim } from 'workbox-core'
+import { cacheNames, clientsClaim } from 'workbox-core'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { NetworkFirst } from 'workbox-strategies'
@@ -12,13 +12,6 @@ import {
   createHandlerBoundToURL,
   precacheAndRoute,
 } from 'workbox-precaching'
-
-// Só é "atualização" se já havia um SW ativo quando este instalou.
-// Na 1.ª visita não há SW anterior: não forçar reload da página.
-let isUpdate = false
-self.addEventListener('install', () => {
-  isUpdate = !!self.registration.active
-})
 
 self.skipWaiting()
 clientsClaim()
@@ -29,25 +22,21 @@ self.addEventListener('message', (event) => {
   }
 })
 
-// Em activate: limpar caches + revalidar tabs (sai do shell com hashes mortos)
+// Em activate: apagar só caches que não são deste SW (precache/runtime atuais ficam,
+// senão o offline deixa de funcionar). Precache antigo: cleanupOutdatedCaches().
+// O reload das tabs após atualização é feito pelo cliente (register-sw.js, controllerchange).
+const KEEP_CACHES = [cacheNames.precache, cacheNames.runtime, 'avoto-pages']
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys()
-      await Promise.all(keys.map((k) => caches.delete(k)))
+      await Promise.all(
+        keys
+          .filter((k) => !KEEP_CACHES.some((keep) => k === keep || k.startsWith(keep + '-')))
+          .map((k) => caches.delete(k)),
+      )
       await self.clients.claim()
-      if (!isUpdate) return
-      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-      for (const client of windows) {
-        // força reload com HTML da rede
-        if (client.url && 'navigate' in client) {
-          try {
-            client.navigate(client.url)
-          } catch {
-            /* ignore */
-          }
-        }
-      }
     })(),
   )
 })
