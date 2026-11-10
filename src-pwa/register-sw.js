@@ -45,16 +45,18 @@ if (isGitHubPages) {
     }
   })
 } else {
-  const RELOAD_KEY = 'avoto-sw-reloaded'
+  // Recarregar 1× quando um SW novo assume o controlo (atualização).
+  // Na 1.ª visita não havia controller: o clientsClaim não deve recarregar.
+  const hadController = !!navigator.serviceWorker?.controller
+  let refreshing = false
+  navigator.serviceWorker?.addEventListener('controllerchange', () => {
+    if (!hadController || refreshing) return
+    refreshing = true
+    window.location.reload()
+  })
 
   register(import.meta.env.QUASAR_SERVICE_WORKER_FILE, {
-    ready () {
-      try {
-        sessionStorage.removeItem(RELOAD_KEY)
-      } catch {
-        /* ignore */
-      }
-    },
+    ready () {},
 
     registered (registration) {
       if (registration && typeof registration.update === 'function') {
@@ -68,16 +70,10 @@ if (isGitHubPages) {
     updatefound () {},
 
     updated (registration) {
+      // o reload acontece no controllerchange (uma vez)
       if (registration?.waiting) {
         registration.waiting.postMessage({ type: 'SKIP_WAITING' })
       }
-      try {
-        if (sessionStorage.getItem(RELOAD_KEY) === '1') return
-        sessionStorage.setItem(RELOAD_KEY, '1')
-      } catch {
-        /* ignore */
-      }
-      window.location.reload()
     },
 
     offline () {},
