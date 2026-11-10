@@ -13,6 +13,13 @@ import {
   precacheAndRoute,
 } from 'workbox-precaching'
 
+// Só é "atualização" se já havia um SW ativo quando este instalou.
+// Na 1.ª visita não há SW anterior: não forçar reload da página.
+let isUpdate = false
+self.addEventListener('install', () => {
+  isUpdate = !!self.registration.active
+})
+
 self.skipWaiting()
 clientsClaim()
 
@@ -29,6 +36,7 @@ self.addEventListener('activate', (event) => {
       const keys = await caches.keys()
       await Promise.all(keys.map((k) => caches.delete(k)))
       await self.clients.claim()
+      if (!isUpdate) return
       const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
       for (const client of windows) {
         // força reload com HTML da rede
