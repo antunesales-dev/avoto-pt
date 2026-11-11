@@ -23,3 +23,28 @@ export function govSearchKey(req: Request, envKey = Deno.env.get('GOV_SEARCH_KEY
   }
   return envKey.trim()
 }
+
+/** Comparação em tempo constante (SHA-256 de ambos + XOR), sem curto-circuito no conteúdo. */
+async function safeEqual(a: string, b: string): Promise<boolean> {
+  const enc = new TextEncoder()
+  const [ha, hb] = await Promise.all([
+    crypto.subtle.digest('SHA-256', enc.encode(a)),
+    crypto.subtle.digest('SHA-256', enc.encode(b)),
+  ])
+  const x = new Uint8Array(ha)
+  const y = new Uint8Array(hb)
+  let diff = 0
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i]
+  return diff === 0
+}
+
+/**
+ * Exige o header `x-avoto-cron-secret` igual a `AVOTO_CRON_SECRET`.
+ * Falha fechado: sem secret no servidor ou sem header → false (o service_role sozinho não chega).
+ */
+export async function cronSecretOk(req: Request): Promise<boolean> {
+  const cron = Deno.env.get('AVOTO_CRON_SECRET') || ''
+  const headerSecret = req.headers.get('x-avoto-cron-secret') || ''
+  if (!cron || !headerSecret) return false
+  return await safeEqual(headerSecret, cron)
+}

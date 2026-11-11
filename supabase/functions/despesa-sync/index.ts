@@ -1,13 +1,13 @@
 /**
  * Sync despesa / contratos oficiais (Portal Base via SNS Transparência) + investimentos.
- * Auth: x-avoto-cron-secret | Bearer service_role
+ * Auth: x-avoto-cron-secret obrigatório (= AVOTO_CRON_SECRET); sem ele → 401
  *
  * Query: ?limit=80
  * POST body opcional: { despesas, investimentos } ops backfill
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
-import { authorized } from '../_shared/auth.ts'
+import { cronSecretOk } from '../_shared/auth.ts'
 import {
   despesaPayloadError,
   fetchBaseContratos,
@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST' && req.method !== 'GET') {
     return jsonResponse({ error: 'METHOD_NOT_ALLOWED' }, 405)
   }
-  if (!authorized(req)) return jsonResponse({ error: 'UNAUTHORIZED' }, 401)
+  if (!(await cronSecretOk(req))) return jsonResponse({ error: 'UNAUTHORIZED' }, 401)
 
   const admin = createClient(
     Deno.env.get('SUPABASE_URL')!,
